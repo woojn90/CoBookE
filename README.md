@@ -1,2 +1,2 @@
 # CourseBookmarkApplication
-Boostcamp February
+Basic Structure Branch

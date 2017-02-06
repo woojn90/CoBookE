@@ -1,14 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@android:id/tabhost"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_basic_margin"
-    tools:context="com.android.woojn.coursebookmarkapplication.MainActivity">
+    tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Test" />
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- 코스 tab -->
+            <FrameLayout
+                android:id="@+id/tab_course"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_insert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/ic_fab_add"
+                    android:backgroundTint="@color/colorPrimary"
+                    app:borderWidth="0dp"
+                    android:layout_gravity="bottom|end"/>
+
+                <!-- 코스가 있을 경우 -->
+                <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rv_course_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </ScrollView>
+
+                <!-- 코스가 없을 경우 -->
+                <TextView
+                    android:id="@+id/tv_course_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:text="@string/msg_add_new_course"
+                    android:visibility="gone"/>
+
+            </FrameLayout>
+
+            <!-- 항목 tab -->
+            <FrameLayout
+                android:id="@+id/tab_item"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <!-- 항목이 있을 경우 -->
+                <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <!-- TODO 항목 별 list UI 결정 -->
+                </ScrollView>
+
+                <!-- 항목이 없을 경우 -->
+                <TextView
+                    android:id="@+id/tv_item_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:text="@string/msg_add_new_item"
+                    android:visibility="visible"/>
+
+            </FrameLayout>
+
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</TabHost>

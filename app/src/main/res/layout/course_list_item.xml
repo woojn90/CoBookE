@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@android:color/holo_green_light">
+
+    <!-- TODO delete default TextView and make UI more specifically (After DB design) -->
+    <TextView
+        android:id="@+id/tv_text_test1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        tools:text="Text"/>
+    <TextView
+        android:id="@+id/tv_text_test2"
+        android:layout_marginLeft="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Description"/>
+</LinearLayout>

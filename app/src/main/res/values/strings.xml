@@ -1,5 +1,15 @@
 <resources>
-    <string name="app_name">CourseBookmarkApplication</string>
-    <string name="action_main">코스 북마크 앱</string>
+    <string name="app_name">CourseBookmark</string>
+
+    <!-- Action Bar -->
+    <string name="action_main">메인</string>
+    <string name="action_detail">상세</string>
     <string name="action_setting">설정</string>
+
+    <!-- UI -->
+    <string name="string_course">코스</string>
+    <string name="string_item">항목</string>
+
+    <string name="msg_add_new_course">새로운 코스를 등록해보세요!</string>
+    <string name="msg_add_new_item">새로운 Bookmark를 등록해보세요!</string>
 </resources>

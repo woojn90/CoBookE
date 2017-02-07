@@ -1,9 +1,11 @@
 package com.android.woojn.coursebookmarkapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,12 +19,14 @@ import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.adapter.CourseAdapter;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private TabHost tabHost;
     private TextView emptyCourseTextView;
     private RecyclerView courseRecyclerView;
-    private CourseAdapter mCourseAdapter;
+    private CourseAdapter mAdapter;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,21 +48,26 @@ public class MainActivity extends AppCompatActivity {
                 .setIndicator(getString(R.string.string_item));
         tabHost.addTab(spec2);
 
-        // TODO Settings 값으로 default tab을 설정
-        tabHost.setCurrentTab(0);
+        // Settings 적용 (최초 tab 설정)
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int tabIndex = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_tab_index_key), "0"));
+        tabHost.setCurrentTab(tabIndex);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         // TODO DB 설정
 
         // Adapter 설정
-        Cursor cursor = getAllCourse();
-        mCourseAdapter = new CourseAdapter(this, cursor);
-        courseRecyclerView.setAdapter(mCourseAdapter);
+        Cursor fakeCursor = getAllCourse();
+        mAdapter = new CourseAdapter(this, fakeCursor);
+        courseRecyclerView.setAdapter(mAdapter);
 
         courseRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, courseRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long id) {
-                // TODO 수정
+                // TODO 항목 수정
                 Toast.makeText(getApplicationContext(), "click / id = " + id, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+                startActivity(intent);
             }
             @Override
             public void onItemLongClick(View view, long id) {
@@ -66,6 +75,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "long click / id = " + id, Toast.LENGTH_LONG).show();
             }
         }));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -83,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     }
 
     private Cursor getAllCourse() {

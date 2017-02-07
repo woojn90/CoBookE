@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    app:cardCornerRadius="5dp"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/tv_section_detail_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                tools:text="블로그 제목"/>
+
+            <TextView
+                android:id="@+id/tv_section_detail_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/tv_section_detail_title"
+                android:textSize="14sp"
+                tools:text="블로그 내용 일부"/>
+
+            <Button
+                android:id="@+id/btn_delete_section_detail"
+                android:layout_width="70dp"
+                android:layout_height="42dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:text="@string/string_delete"/>
+
+            <Button
+                android:id="@+id/btn_share_section_detail"
+                android:layout_width="70dp"
+                android:layout_height="42dp"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/btn_delete_section_detail"
+                android:text="@string/string_share"/>
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_section_detail_image"
+            android:layout_width="280dp"
+            android:layout_height="120dp"
+            android:background="@color/cardview_dark_background"/>
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>

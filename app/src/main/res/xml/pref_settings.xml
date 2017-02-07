@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="화면(추가 예정)">
+        <ListPreference
+            android:key="@string/pref_tab_index_key"
+            android:title="@string/pref_tab_index_label"
+            android:defaultValue="0"
+            android:entries="@array/pref_tab_index_labels"
+            android:entryValues="@array/pref_tab_index_values"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="검색(개발 예정)">
+        <Preference
+            android:summary="개발 예정"
+            android:title="개발 예정"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="어플 정보(개발 예정)">
+        <Preference
+            android:summary="개발자 정보를 확인합니다."
+            android:title="개발자 정보">
+        </Preference>
+        <Preference
+            android:summary="개발자에게 메일을 보냅니다."
+            android:title="메일 보내기">
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

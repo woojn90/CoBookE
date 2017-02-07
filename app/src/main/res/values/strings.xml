@@ -9,7 +9,16 @@
     <!-- UI -->
     <string name="string_course">코스</string>
     <string name="string_item">항목</string>
+    <string name="string_delete">삭제</string>
+    <string name="string_share">공유</string>
 
     <string name="msg_add_new_course">새로운 코스를 등록해보세요!</string>
+    <string name="msg_add_new_course_section">새로운 코스 그룹을 등록해보세요!</string>
     <string name="msg_add_new_item">새로운 Bookmark를 등록해보세요!</string>
+
+    <!-- Settings -->
+    <string name="pref_tab_index_key" translatable="false">tab</string>
+    <string name="pref_tab_index_label">최초 실행시 선택 Tab</string>
+
+
 </resources>

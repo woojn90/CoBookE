@@ -1,12 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center">
-    <TextView
+    android:padding="@dimen/activity_basic_margin">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_insert_section"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/ic_fab_add"
+        android:backgroundTint="@color/colorPrimary"
+        app:borderWidth="0dp"
+        android:layout_gravity="bottom|end"/>
+
+    <!-- 섹션이 있을 경우 -->
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_course_section_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+
+    <!-- 섹션이 없을 경우 -->
+    <TextView
+        android:id="@+id/tv_course_section_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:textSize="20sp"
-        android:text="개발 예정"/>
-</LinearLayout>
+        android:text="@string/msg_add_new_course"
+        android:visibility="gone"/>
+
+</FrameLayout>

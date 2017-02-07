@@ -4,7 +4,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@android:color/holo_green_light">
+    android:background="@android:color/holo_blue_light">
 
     <!-- TODO delete default TextView and make UI more specifically (After DB design) -->
     <TextView

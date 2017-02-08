@@ -21,7 +21,7 @@ import butterknife.OnClick;
 
 public class CourseSectionDetailAdapter extends RecyclerView.Adapter<CourseSectionDetailAdapter.CourseSectionDetailViewHolder> {
 
-    private Context mContext;
+    private final Context mContext;
     private Cursor mCursor;
     private OnButtonInItemClickListener mListener;
 
@@ -46,7 +46,7 @@ public class CourseSectionDetailAdapter extends RecyclerView.Adapter<CourseSecti
     public void onBindViewHolder(CourseSectionDetailViewHolder holder, int position) {
         if (!mCursor.moveToPosition(position)) return;
 
-        // TODO DB 설계 후 수정
+        // TODO: DB 설계 후 수정
         long id = mCursor.getLong(mCursor.getColumnIndex("_ID"));
         String title = mCursor.getString(mCursor.getColumnIndex("title"));
         String subTitle = mCursor.getString(mCursor.getColumnIndex("sub_title"));

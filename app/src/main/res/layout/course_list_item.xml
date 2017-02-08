@@ -6,7 +6,7 @@
     android:layout_height="60dp"
     android:background="@android:color/holo_blue_light">
 
-    <!-- TODO delete default TextView and make UI more specifically (After DB design) -->
+    <!-- TODO! delete default TextView and make UI more specifically (After DB design) -->
     <TextView
         android:id="@+id/tv_text_test1"
         android:layout_width="wrap_content"

@@ -23,7 +23,7 @@ import butterknife.OnClick;
 
 public class CourseSectionAdapter extends RecyclerView.Adapter<CourseSectionAdapter.CourseSectionViewHolder> {
 
-    private Context mContext;
+    private final Context mContext;
     private Cursor mCursor;
     private OnButtonInItemClickListener mListener;
 
@@ -48,7 +48,7 @@ public class CourseSectionAdapter extends RecyclerView.Adapter<CourseSectionAdap
     public void onBindViewHolder(CourseSectionViewHolder holder, int position) {
         if (!mCursor.moveToPosition(position)) return;
 
-        // TODO DB 설계 후 수정
+        // TODO: DB 설계 후 수정
         long id = mCursor.getLong(mCursor.getColumnIndex("_ID"));
         String title = mCursor.getString(mCursor.getColumnIndex("title"));
 
@@ -75,15 +75,15 @@ public class CourseSectionAdapter extends RecyclerView.Adapter<CourseSectionAdap
     }
 
     private Cursor getAllCourse() {
-        // TODO delete fake data & make db query
+        // TODO: delete fake data & make db query
 
         // fake data
-        String[] columns = new String[] { "_id", "title", "sub_title"};
-        MatrixCursor matrixCursor= new MatrixCursor(columns);
-        matrixCursor.addRow(new Object[] { 7, "blog1", "blog content1"});
-        matrixCursor.addRow(new Object[] { 8, "blog2", "blog content2"});
-        matrixCursor.addRow(new Object[] { 9, "blog3", "blog content3"});
-        matrixCursor.addRow(new Object[] { 10, "blog4", "blog content is very very long so that should be ..."});
+        String[] columns = new String[] { "_id", "title", "sub_title" };
+        MatrixCursor matrixCursor = new MatrixCursor(columns);
+        matrixCursor.addRow(new Object[] { 7, "blog1", "blog content1" });
+        matrixCursor.addRow(new Object[] { 8, "blog2", "blog content2" });
+        matrixCursor.addRow(new Object[] { 9, "blog3", "blog content3" });
+        matrixCursor.addRow(new Object[] { 10, "blog4", "blog content is very very long so that should be ..." });
 
         Cursor cursor = matrixCursor;
 

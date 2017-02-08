@@ -34,8 +34,7 @@ public class DetailActivity extends AppCompatActivity implements CourseSectionAd
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-        // TODO DB 설정
-
+        // TODO: DB 설정
 
         // RecyclerView 설정
         mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
@@ -58,13 +57,13 @@ public class DetailActivity extends AppCompatActivity implements CourseSectionAd
     }
 
     private Cursor getAllCourse() {
-        // TODO delete fake data & make db query
+        // TODO: delete fake data & make db query
 
         // fake data
-        String[] columns = new String[] { "_id", "title"};
-        MatrixCursor matrixCursor= new MatrixCursor(columns);
-        matrixCursor.addRow(new Object[] { 5, "section1"});
-        matrixCursor.addRow(new Object[] { 6, "section2"});
+        String[] columns = new String[] { "_id", "title" };
+        MatrixCursor matrixCursor = new MatrixCursor(columns);
+        matrixCursor.addRow(new Object[] { 5, "section1" });
+        matrixCursor.addRow(new Object[] { 6, "section2" });
 
         Cursor cursor = matrixCursor;
 

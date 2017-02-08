@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
 
 public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseViewHolder> {
 
-    private Context mContext;
+    private final Context mContext;
     private Cursor mCursor;
 
     public CourseAdapter(Context context, Cursor cursor) {
@@ -38,7 +38,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
     public void onBindViewHolder(CourseAdapter.CourseViewHolder holder, int position) {
         if (!mCursor.moveToPosition(position)) return;
 
-        // TODO DB 설계 후 수정
+        // TODO: DB 설계 후 수정
         long id = mCursor.getLong(mCursor.getColumnIndex("_ID"));
         String text = mCursor.getString(mCursor.getColumnIndex("text"));
         String description = mCursor.getString(mCursor.getColumnIndex("description"));

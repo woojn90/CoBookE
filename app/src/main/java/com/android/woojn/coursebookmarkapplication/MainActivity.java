@@ -55,8 +55,7 @@ public class MainActivity extends AppCompatActivity
         tabHost.setCurrentTab(tabIndex);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        // TODO DB 설정
-
+        // TODO: DB 설정
 
         // RecyclerView 설정
         mRecyclerViewCourse.setLayoutManager(new LinearLayoutManager(this));
@@ -68,14 +67,14 @@ public class MainActivity extends AppCompatActivity
         mRecyclerViewCourse.addOnItemTouchListener(new RecyclerClickListener(this, mRecyclerViewCourse, new RecyclerClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long id) {
-                // TODO 항목 수정
+                // TODO: 항목 수정
                 Toast.makeText(getApplicationContext(), "click / id = " + id, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
                 startActivity(intent);
             }
             @Override
             public void onItemLongClick(View view, long id) {
-                // TODO 리스트 출력 후 선택(공유, 삭제 등)
+                // TODO: 리스트 출력 후 선택(공유, 삭제 등)
                 Toast.makeText(getApplicationContext(), "long click / id = " + id, Toast.LENGTH_LONG).show();
             }
         }));
@@ -109,7 +108,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private Cursor getAllCourse() {
-        // TODO delete fake data & make db query
+        // TODO: delete fake data & make db query
 
         // fake data
         String[] columns = new String[] { "_id", "text", "description" };

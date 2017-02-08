@@ -19,6 +19,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.pref_settings);
 
+        // ListPreference Summary 추가
         SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
         PreferenceScreen preferenceScreen = getPreferenceScreen();
         int preferenceCategoryCount = preferenceScreen.getPreferenceCount();
@@ -39,6 +40,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        // ListPreference Summary 변경 적용
         Preference preference = findPreference(key);
         if (preference != null) {
             if (preference instanceof ListPreference) {

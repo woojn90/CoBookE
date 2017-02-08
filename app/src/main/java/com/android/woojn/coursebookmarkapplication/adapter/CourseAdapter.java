@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import com.android.woojn.coursebookmarkapplication.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by wjn on 2017-02-06.
  */
@@ -41,8 +44,8 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         String description = mCursor.getString(mCursor.getColumnIndex("description"));
 
         holder.itemView.setTag(id);
-        holder.textTextView.setText(text);
-        holder.descriptionTextView.setText(description);
+        holder.textViewTest1.setText(text);
+        holder.textViewTest2.setText(description);
     }
 
     @Override
@@ -60,13 +63,14 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
 
     class CourseViewHolder extends RecyclerView.ViewHolder {
 
-        TextView textTextView;
-        TextView descriptionTextView;
+        @BindView(R.id.tv_text_test1)
+        TextView textViewTest1;
+        @BindView(R.id.tv_text_test2)
+        TextView textViewTest2;
 
         public CourseViewHolder(View itemView) {
             super(itemView);
-            textTextView = (TextView) itemView.findViewById(R.id.tv_text_test1);
-            descriptionTextView = (TextView) itemView.findViewById(R.id.tv_text_test2);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

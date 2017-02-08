@@ -19,27 +19,28 @@ import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.adapter.CourseAdapter;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private TabHost tabHost;
-    private TextView emptyCourseTextView;
-    private RecyclerView courseRecyclerView;
+    @BindView(R.id.tv_course_empty)
+    protected TextView mTextViewCourseEmpty;
+    @BindView(R.id.rv_course_list)
+    protected RecyclerView mRecyclerViewCourse;
+
     private CourseAdapter mAdapter;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences mSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // View 설정
-        emptyCourseTextView = (TextView) findViewById(R.id.tv_course_empty);
-        courseRecyclerView = (RecyclerView) findViewById(R.id.rv_course_list);
-        courseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        ButterKnife.bind(this);
 
         // Tab 설정
-        tabHost = (TabHost) findViewById(android.R.id.tabhost);
+        TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
         tabHost.setup();
         TabHost.TabSpec spec1 = tabHost.newTabSpec("Tab1").setContent(R.id.tab_course)
                 .setIndicator(getString(R.string.string_course));
@@ -49,19 +50,22 @@ public class MainActivity extends AppCompatActivity
         tabHost.addTab(spec2);
 
         // Settings 적용 (최초 tab 설정)
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int tabIndex = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_tab_index_key), "0"));
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int tabIndex = Integer.parseInt(mSharedPreferences.getString(getString(R.string.pref_tab_index_key), "0"));
         tabHost.setCurrentTab(tabIndex);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         // TODO DB 설정
 
-        // Adapter 설정
+
+        // RecyclerView 설정
+        mRecyclerViewCourse.setLayoutManager(new LinearLayoutManager(this));
+
         Cursor fakeCursor = getAllCourse();
         mAdapter = new CourseAdapter(this, fakeCursor);
-        courseRecyclerView.setAdapter(mAdapter);
+        mRecyclerViewCourse.setAdapter(mAdapter);
 
-        courseRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, courseRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+        mRecyclerViewCourse.addOnItemTouchListener(new RecyclerClickListener(this, mRecyclerViewCourse, new RecyclerClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, long id) {
                 // TODO 항목 수정
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -117,9 +121,9 @@ public class MainActivity extends AppCompatActivity
 
         // 코스 아이템이 없으면, 추가 권유 메세지가 나옴
         if (cursor != null && cursor.getCount() > 0) {
-            emptyCourseTextView.setVisibility(View.GONE);
+            mTextViewCourseEmpty.setVisibility(View.GONE);
         } else {
-            emptyCourseTextView.setVisibility(View.VISIBLE);
+            mTextViewCourseEmpty.setVisibility(View.VISIBLE);
         }
         return cursor;
     }

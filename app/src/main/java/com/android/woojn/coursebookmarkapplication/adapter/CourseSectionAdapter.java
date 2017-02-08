@@ -8,10 +8,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by wjn on 2017-02-07.
@@ -21,10 +25,16 @@ public class CourseSectionAdapter extends RecyclerView.Adapter<CourseSectionAdap
 
     private Context mContext;
     private Cursor mCursor;
+    private OnButtonInItemClickListener mListener;
 
-    public CourseSectionAdapter(Context context, Cursor cursor) {
+    public CourseSectionAdapter(Context context, Cursor cursor, OnButtonInItemClickListener listener) {
         this.mContext = context;
         this.mCursor = cursor;
+        this.mListener = listener;
+    }
+
+    public interface OnButtonInItemClickListener {
+        void onButtonInItemClick(long id, int viewId);
     }
 
     @Override
@@ -43,12 +53,12 @@ public class CourseSectionAdapter extends RecyclerView.Adapter<CourseSectionAdap
         String title = mCursor.getString(mCursor.getColumnIndex("title"));
 
         holder.itemView.setTag(id);
-        holder.sectionTitleTextView.setText(title);
+        holder.textViewSectionTitle.setText(title);
 
         // Adapter
         Cursor fakeCursor = getAllCourse();
-        CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, fakeCursor);
-        holder.sectionDetailRecyclerView.setAdapter(adapter);
+        CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, fakeCursor, holder);
+        holder.recyclerViewCourseSectionDetail.setAdapter(adapter);
     }
 
     @Override
@@ -80,20 +90,42 @@ public class CourseSectionAdapter extends RecyclerView.Adapter<CourseSectionAdap
         return cursor;
     }
 
-    class CourseSectionViewHolder extends RecyclerView.ViewHolder {
+    class CourseSectionViewHolder extends RecyclerView.ViewHolder
+            implements CourseSectionDetailAdapter.OnButtonInItemClickListener {
 
-        TextView sectionTitleTextView;
-        Button sectionShareButton;
-        Button sectionDeleteButton;
-        RecyclerView sectionDetailRecyclerView;
+        @BindView(R.id.tv_section_title)
+        TextView textViewSectionTitle;
+        @BindView(R.id.rv_course_section_detail_list)
+        RecyclerView recyclerViewCourseSectionDetail;
 
         public CourseSectionViewHolder(View itemView) {
             super(itemView);
-            sectionTitleTextView = (TextView) itemView.findViewById(R.id.tv_section_title);
-            sectionShareButton = (Button) itemView.findViewById(R.id.btn_share_section);
-            sectionDeleteButton = (Button) itemView.findViewById(R.id.btn_delete_section);
-            sectionDetailRecyclerView = (RecyclerView) itemView.findViewById(R.id.rv_course_section_detail_list);
-            sectionDetailRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+            ButterKnife.bind(this, itemView);
+
+            recyclerViewCourseSectionDetail.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+        }
+
+        @OnClick({R.id.btn_share_section, R.id.btn_delete_section})
+        public void onClick(View view) {
+            long id = (long) itemView.getTag();
+            int viewId = view.getId();
+
+            mListener.onButtonInItemClick(id, viewId);
+        }
+
+        @Override
+        public void onButtonInItemClick(long id, int viewId) {
+            switch (viewId) {
+                case -1:
+                    Toast.makeText(mContext, "just item click / id : " + id, Toast.LENGTH_LONG).show();
+                    break;
+                case R.id.btn_share_section_detail:
+                    Toast.makeText(mContext, "share / id : " + id, Toast.LENGTH_LONG).show();
+                    break;
+                case R.id.btn_delete_section_detail:
+                    Toast.makeText(mContext, "delete / id : " + id, Toast.LENGTH_LONG).show();
+                    break;
+            }
         }
     }
 }

@@ -5,11 +5,15 @@ import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.woojn.coursebookmarkapplication.R;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by wjn on 2017-02-07.
@@ -19,10 +23,16 @@ public class CourseSectionDetailAdapter extends RecyclerView.Adapter<CourseSecti
 
     private Context mContext;
     private Cursor mCursor;
+    private OnButtonInItemClickListener mListener;
 
-    public CourseSectionDetailAdapter(Context context, Cursor cursor) {
+    public CourseSectionDetailAdapter(Context context, Cursor cursor, OnButtonInItemClickListener listener) {
         this.mContext = context;
         this.mCursor = cursor;
+        this.mListener = listener;
+    }
+
+    public interface OnButtonInItemClickListener {
+        void onButtonInItemClick(long id, int viewId);
     }
 
     @Override
@@ -59,19 +69,26 @@ public class CourseSectionDetailAdapter extends RecyclerView.Adapter<CourseSecti
         }
     }
 
-    class CourseSectionDetailViewHolder extends RecyclerView.ViewHolder {
+    class CourseSectionDetailViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
 
+        @BindView(R.id.tv_section_detail_title)
         TextView sectionDetailTitleTextView;
+        @BindView(R.id.tv_section_detail_subtitle)
         TextView sectionDetailSubTitleTextView;
-        Button sectionDetailShareButton;
-        Button sectionDetailDeleteButton;
 
         public CourseSectionDetailViewHolder(View itemView) {
             super(itemView);
-            sectionDetailTitleTextView = (TextView) itemView.findViewById(R.id.tv_section_detail_title);
-            sectionDetailSubTitleTextView = (TextView) itemView.findViewById(R.id.tv_section_detail_subtitle);
-            sectionDetailShareButton = (Button) itemView.findViewById(R.id.btn_share_section_detail);
-            sectionDetailDeleteButton = (Button) itemView.findViewById(R.id.btn_delete_section_detail);
+            ButterKnife.bind(this, itemView);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @OnClick({R.id.btn_share_section_detail, R.id.btn_delete_section_detail})
+        public void onClick(View view) {
+            long id = (long) itemView.getTag();
+            int viewId = view.getId();
+
+            mListener.onButtonInItemClick(id, viewId);
         }
     }
 }

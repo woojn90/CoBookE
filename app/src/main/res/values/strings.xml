@@ -17,8 +17,18 @@
     <string name="msg_add_new_item">새로운 Bookmark를 등록해보세요!</string>
 
     <!-- Settings -->
+    <string name="settings_category_ui">화면(추가 예정)</string>
+    <string name="settings_category_search">검색(개발 예정)</string>
+    <string name="settings_category_app_info">어플 정보(개발 예정)</string>
+
     <string name="pref_tab_index_key" translatable="false">tab</string>
     <string name="pref_tab_index_label">최초 실행시 선택 Tab</string>
 
+    <string name="settings_developer_info">개발자 정보</string>
+    <string name="settings_developer_info_summary">개발자 정보를 확인합니다.</string>
+    <string name="settings_developer_mail">메일 보내기</string>
+    <string name="settings_developer_mail_summary">개발자에게 메일을 보냅니다.</string>
 
+    <!-- etc -->
+    <string name="msg_development_scheduled">개발 예정</string>
 </resources>

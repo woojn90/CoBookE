@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/settings_category_ui">
+        <ListPreference
+            android:key="@string/pref_tab_index_key"
+            android:title="@string/pref_tab_index_label"
+            android:defaultValue="0"
+            android:entries="@array/pref_tab_index_labels"
+            android:entryValues="@array/pref_tab_index_values"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_search">
+        <Preference
+            android:summary="@string/msg_development_scheduled"
+            android:title="@string/msg_development_scheduled"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_app_info">
+        <Preference
+            android:summary="@string/settings_developer_info_summary"
+            android:title="@string/settings_developer_info">
+        </Preference>
+        <Preference
+            android:summary="@string/settings_developer_mail_summary"
+            android:title="@string/settings_developer_mail">
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

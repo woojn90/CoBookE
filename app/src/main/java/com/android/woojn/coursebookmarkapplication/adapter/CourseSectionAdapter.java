@@ -27,12 +27,10 @@ import io.realm.RealmRecyclerViewAdapter;
 public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, CourseSectionAdapter.CourseSectionViewHolder> {
 
     private OnRecyclerViewClickListener mListener;
-    private Realm mRealm;
 
-    public CourseSectionAdapter(final Context context, OrderedRealmCollection data, OnRecyclerViewClickListener listener, Realm realm) {
+    public CourseSectionAdapter(final Context context, OrderedRealmCollection data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
         this.mListener = listener;
-        this.mRealm = realm;
     }
 
     public interface OnRecyclerViewClickListener {
@@ -91,10 +89,12 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
                 case R.id.btn_delete_section_detail:
                     Log.d("Check", "CourseSectionAdapter onItemClick delete id : " + id + ", viewID : " + viewId);
                     // TODO: alert 띄우고 삭제하도록 수정
-                    mRealm.beginTransaction();
-                    SectionDetail sectionDetail = mRealm.where(SectionDetail.class).equalTo("id", id).findFirst();
+                    Realm realm = Realm.getDefaultInstance();
+                    SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo("id", id).findFirst();
+                    realm.beginTransaction();
                     sectionDetail.deleteFromRealm();
-                    mRealm.commitTransaction();
+                    realm.commitTransaction();
+                    realm.close();
                     break;
             }
         }

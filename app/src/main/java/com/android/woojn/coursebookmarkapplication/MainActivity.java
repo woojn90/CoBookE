@@ -18,8 +18,6 @@ import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.adapter.CourseAdapter;
 import com.android.woojn.coursebookmarkapplication.model.Course;
-import com.android.woojn.coursebookmarkapplication.model.Section;
-import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,6 +26,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.populateTestData;
 
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener,
@@ -117,10 +116,10 @@ public class MainActivity extends AppCompatActivity
                 Course course = mRealm.where(Course.class).equalTo("id", id).findFirst();
                 if (course.isFavorite()) {
                     course.setFavorite(false);
-                    makeToastMsg(getString(R.string.msg_favorite_n));
+                    makeToastMsg(R.string.msg_favorite_n);
                 } else {
                     course.setFavorite(true);
-                    makeToastMsg(getString(R.string.msg_favorite_y));
+                    makeToastMsg(R.string.msg_favorite_y);
                 }
                 mRealm.commitTransaction();
                 break;
@@ -142,56 +141,8 @@ public class MainActivity extends AppCompatActivity
     protected void onClick(View view) {
         // TODO: delete below fake data
 
-        mRealm.beginTransaction();
         int newCourseId = getNewIdByClass(mRealm, Course.class);
-        Course course = mRealm.createObject(Course.class, newCourseId);
-        course.setTitle("Test Course");
-        course.setDesc("Test for realm DB");
-        course.setFavorite(false);
-
-        int newSectionId1 = getNewIdByClass(mRealm, Section.class);
-        Section section1 = mRealm.createObject(Section.class, newSectionId1);
-        section1.setTitle("밥집");
-        int newSectionId2 = getNewIdByClass(mRealm, Section.class);
-        Section section2 = mRealm.createObject(Section.class, newSectionId2);
-        section2.setTitle("카페");
-        int newSectionId3 = getNewIdByClass(mRealm, Section.class);
-        Section section3 = mRealm.createObject(Section.class, newSectionId3);
-        section3.setTitle("관광");
-
-        course.getSections().add(section1);
-        course.getSections().add(section2);
-        course.getSections().add(section3);
-
-        int newSectionDetailId1 = getNewIdByClass(mRealm, SectionDetail.class);
-        SectionDetail sectionDetail1 = mRealm.createObject(SectionDetail.class, newSectionDetailId1);
-        sectionDetail1.setTitle("맛집1");
-        sectionDetail1.setDesc("맛있고 친절한 맛집");
-        int newSectionDetailId2 = getNewIdByClass(mRealm, SectionDetail.class);
-        SectionDetail sectionDetail2 = mRealm.createObject(SectionDetail.class, newSectionDetailId2);
-        sectionDetail2.setTitle("맛집2");
-        sectionDetail2.setDesc("친절하고 좋은 집");
-        int newSectionDetailId3 = getNewIdByClass(mRealm, SectionDetail.class);
-        SectionDetail sectionDetail3 = mRealm.createObject(SectionDetail.class, newSectionDetailId3);
-        sectionDetail3.setTitle("카페1");
-        sectionDetail3.setDesc("가격 대비 훌륭함");
-        int newSectionDetailId4 = getNewIdByClass(mRealm, SectionDetail.class);
-        SectionDetail sectionDetail4 = mRealm.createObject(SectionDetail.class, newSectionDetailId4);
-        sectionDetail4.setTitle("카페2");
-        sectionDetail4.setDesc("커피가 아주 맛있다");
-        int newSectionDetailId5 = getNewIdByClass(mRealm, SectionDetail.class);
-        SectionDetail sectionDetail5 = mRealm.createObject(SectionDetail.class, newSectionDetailId5);
-        sectionDetail5.setTitle("카페2");
-        sectionDetail5.setDesc("커피가 아주 맛있다");
-
-        section1.getSectionDetails().add(sectionDetail1);
-        section1.getSectionDetails().add(sectionDetail2);
-        section2.getSectionDetails().add(sectionDetail3);
-        section2.getSectionDetails().add(sectionDetail4);
-        section3.getSectionDetails().add(sectionDetail5);
-
-        mRealm.copyToRealmOrUpdate(course);
-        mRealm.commitTransaction();
+        populateTestData(mRealm, newCourseId);
 
         Intent insertIntent = new Intent(this, CourseActivity.class);
         insertIntent.putExtra("id", newCourseId);
@@ -208,11 +159,11 @@ public class MainActivity extends AppCompatActivity
         return mRealm.where(Course.class).findAllAsync();
     }
 
-    private void makeToastMsg(String msg) {
+    private void makeToastMsg(int resId) {
         if (mToast != null) {
             mToast.cancel();
         }
-        mToast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
+        mToast = Toast.makeText(this, resId, Toast.LENGTH_LONG);
         mToast.show();
     }
 }

@@ -63,7 +63,7 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
         mEditTextCourseDesc.setText(mCourse.getDesc());
         mTextViewCourseFavorite.setText(mCourse.isFavorite() ? "Y" : "N");
         mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections(), this, mRealm));
+        mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections(), this));
     }
 
     @Override
@@ -83,82 +83,85 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
             case R.id.btn_delete_section:
                 Log.d("Check", "delete / id : " + id);
                 // TODO: alert 띄우고 삭제하도록 수정
-                mRealm.beginTransaction();
                 Section section = mRealm.where(Section.class).equalTo("id", id).findFirst();
+                mRealm.beginTransaction();
                 section.deleteFromRealm();
                 mRealm.commitTransaction();
                 break;
         }
     }
 
-    @OnClick({R.id.tv_course_favorite,
-            R.id.btn_insert_section, R.id.btn_share_course,
-            R.id.btn_save_course, R.id.btn_cancel_course})
-    protected void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.tv_course_favorite:
-                Log.d("Check", "tv_course_favorite");
+    @OnClick(R.id.tv_course_favorite)
+    protected void onClickTextViewCourseFavorite(View view) {
+        Log.d("Check", "tv_course_favorite");
 
-                // TODO: 이미지 적용 후 변경
-                mRealm.beginTransaction();
-                if (mCourse.isFavorite()) {
-                    mCourse.setFavorite(false);
-                    mTextViewCourseFavorite.setText("N");
-                    makeToastMsg(getString(R.string.msg_favorite_n));
-                } else {
-                    mCourse.setFavorite(true);
-                    mTextViewCourseFavorite.setText("Y");
-                    makeToastMsg(getString(R.string.msg_favorite_y));
-                }
-                mRealm.commitTransaction();
-                break;
-
-            case R.id.btn_insert_section:
-                Log.d("Check", "btn_insert_section");
-                // TODO: Dialog 띄우고 내용 작성 후 추가하게 수정
-                mRealm.beginTransaction();
-                int newSectionId = getNewIdByClass(mRealm, Section.class);
-                Section section = mRealm.createObject(Section.class, newSectionId);
-                section.setTitle("Test Section");
-                mCourse.getSections().add(section);
-                mRealm.commitTransaction();
-                break;
-
-            case R.id.btn_share_course:
-                Log.d("Check", "btn_share_course");
-                break;
-            case R.id.btn_save_course:
-                Log.d("Check", "btn_save_section");
-                break;
-            case R.id.btn_cancel_course:
-                Log.d("Check", "btn_cancel_course");
-                break;
+        // TODO: 이미지 적용 후 변경
+        mRealm.beginTransaction();
+        if (mCourse.isFavorite()) {
+            mCourse.setFavorite(false);
+            mTextViewCourseFavorite.setText("N");
+            makeToastMsg(R.string.msg_favorite_n);
+        } else {
+            mCourse.setFavorite(true);
+            mTextViewCourseFavorite.setText("Y");
+            makeToastMsg(R.string.msg_favorite_y);
         }
+        mRealm.commitTransaction();
     }
 
-    @OnFocusChange({R.id.et_course_title, R.id.et_course_desc})
-    protected void onFocusChange(View view, boolean hasFocus) {
+    @OnClick(R.id.btn_insert_section)
+    protected void onClickButtonInsertSection(View view) {
+        Log.d("Check", "btn_insert_section");
+        // TODO: Dialog 띄우고 내용 작성 후 추가하게 수정
+        mRealm.beginTransaction();
+        int newSectionId = getNewIdByClass(mRealm, Section.class);
+        Section section = mRealm.createObject(Section.class, newSectionId);
+        section.setTitle("Test Section");
+        mCourse.getSections().add(section);
+        mRealm.commitTransaction();
+    }
+
+    @OnClick(R.id.btn_share_course)
+    protected void onClickButtonShareCourse(View view) {
+        Log.d("Check", "btn_share_course");
+    }
+
+    @OnClick(R.id.btn_save_course)
+    protected void onClickButtonSaveCourse(View view) {
+        Log.d("Check", "btn_save_section");
+    }
+
+    @OnClick(R.id.btn_cancel_course)
+    protected void onClickButtonCancelCourse(View view) {
+        Log.d("Check", "btn_cancel_course");
+    }
+
+    @OnFocusChange(R.id.et_course_title)
+    protected void onFocusChangeTitle(View view, boolean hasFocus) {
         // TODO: 저장 버튼 누를 때 저장되게 변경
         if (!hasFocus) {
-            String text = ((EditText) view).getText().toString();
+            String title = ((EditText) view).getText().toString();
             mRealm.beginTransaction();
-            switch (view.getId()) {
-                case R.id.et_course_title:
-                    mCourse.setTitle(text);
-                    break;
-                case R.id.et_course_desc:
-                    mCourse.setDesc(text);
-                    break;
-            }
+            mCourse.setTitle(title);
+            mRealm.commitTransaction();
+        }
+    }
+    @OnFocusChange(R.id.et_course_desc)
+    protected void onFocusChangeDesc(View view, boolean hasFocus) {
+        // TODO: 저장 버튼 누를 때 저장되게 변경
+        if (!hasFocus) {
+            String desc = ((EditText) view).getText().toString();
+            mRealm.beginTransaction();
+            mCourse.setDesc(desc);
             mRealm.commitTransaction();
         }
     }
 
-    private void makeToastMsg(String msg) {
+    private void makeToastMsg(int resId) {
         if (mToast != null) {
             mToast.cancel();
         }
-        mToast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
+        mToast = Toast.makeText(this, resId, Toast.LENGTH_LONG);
         mToast.show();
     }
 

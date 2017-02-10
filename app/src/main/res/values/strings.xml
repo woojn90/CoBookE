@@ -11,18 +11,18 @@
     <string name="string_item">항목</string>
     <string name="string_title">제목</string>
     <string name="string_desc">설명</string>
-
-    <string name="string_insert">추가</string>
+    <string name="string_register">등록</string>
     <string name="string_delete">삭제</string>
     <string name="string_share">공유</string>
-    <string name="string_save">저장</string>
-    <string name="string_cancel">취소</string>
+    <string name="string_search">검색</string>
 
-    <string name="msg_add_new_course">새로운 코스를 등록해보세요!</string>
-    <string name="msg_add_new_course_section">새로운 코스 그룹을 등록해보세요!</string>
-    <string name="msg_add_new_item">새로운 Bookmark를 등록해보세요!</string>
-    <string name="msg_course_title">코스 제목을 입력하세요.</string>
-    <string name="msg_course_desc">코스 설명을 입력하세요.</string>
+    <string name="msg_insert_new_course">새로운 코스를 등록해보세요!</string>
+    <string name="msg_insert_new_course_section">새로운 코스 그룹을 등록해보세요!</string>
+    <string name="msg_insert_new_course_section_detail">검색 버튼을 눌러 항목을 추가하세요!</string>
+    <string name="msg_insert_new_item">새로운 Bookmark를 등록해보세요!</string>
+
+    <string name="hint_course_title">코스 제목을 입력하세요.</string>
+    <string name="hint_course_desc">코스 설명을 입력하세요.</string>
 
     <!-- Toast -->
     <string name="msg_favorite_y">즐겨찾기에 추가되었습니다.</string>

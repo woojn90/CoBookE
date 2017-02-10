@@ -12,14 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="5dp">
+        android:layout_margin="5dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginBottom="3dp">
-
             <TextView
                 android:id="@+id/tv_section_detail_title"
                 android:layout_width="wrap_content"
@@ -29,7 +28,6 @@
                 android:textColor="@android:color/black"
                 android:textSize="15sp"
                 tools:text="Title"/>
-
             <TextView
                 android:id="@+id/tv_section_detail_desc"
                 android:layout_width="wrap_content"
@@ -38,7 +36,6 @@
                 android:layout_below="@id/tv_section_detail_title"
                 android:textSize="12sp"
                 tools:text="Description"/>
-
             <Button
                 android:id="@+id/btn_delete_section_detail"
                 android:layout_width="50dp"
@@ -48,7 +45,6 @@
                 android:layout_alignParentRight="true"
                 android:textSize="12sp"
                 android:text="@string/string_delete"/>
-
             <Button
                 android:id="@+id/btn_share_section_detail"
                 android:layout_width="50dp"

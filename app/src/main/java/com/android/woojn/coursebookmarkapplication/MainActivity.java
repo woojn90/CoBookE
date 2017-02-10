@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,10 +22,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.populateTestData;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
 
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener,
@@ -49,7 +47,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        // Tab 설정
         tabHost.setup();
         TabHost.TabSpec spec1 = tabHost.newTabSpec("Tab1").setContent(R.id.tab_course)
                 .setIndicator(getString(R.string.string_course));
@@ -64,12 +61,16 @@ public class MainActivity extends AppCompatActivity
         tabHost.setCurrentTab(tabIndex);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        // DB 설정
         mRealm = Realm.getDefaultInstance();
 
-        // RecyclerView 설정
         mRecyclerViewCourse.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerViewCourse.setAdapter(new CourseAdapter(this, getAllCourse(), this));
+        mRecyclerViewCourse.setAdapter(new CourseAdapter(this, mRealm.where(Course.class).findAllAsync(), this));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setTextViewEmptyVisibility(mRealm, Course.class, 0, mTextViewCourseEmpty);
     }
 
     @Override
@@ -112,58 +113,74 @@ public class MainActivity extends AppCompatActivity
                 startActivity(updateIntent);
                 break;
             case R.id.tv_course_favorite:
-                mRealm.beginTransaction();
-                Course course = mRealm.where(Course.class).equalTo("id", id).findFirst();
-                if (course.isFavorite()) {
-                    course.setFavorite(false);
-                    makeToastMsg(R.string.msg_favorite_n);
-                } else {
-                    course.setFavorite(true);
-                    makeToastMsg(R.string.msg_favorite_y);
-                }
-                mRealm.commitTransaction();
+                updateCourseFavoriteById(id);
                 break;
         }
     }
 
     @Override
     public void onItemLongClick(int id, int viewId) {
-        // TODO: 리스트 출력 후 선택 (공유, 삭제, 즐겨찾기 등)
         Log.d("Check", "long click / id = " + id);
 
-        mRealm.beginTransaction();
-        Course course = mRealm.where(Course.class).equalTo("id", id).findFirst();
-        course.deleteFromRealm();
-        mRealm.commitTransaction();
+        // TODO: 리스트 출력 후 선택 (공유, 삭제 등)
+        deleteCourse(id);
     }
 
     @OnClick(R.id.fab_insert_course)
-    protected void onClick(View view) {
-        // TODO: delete below fake data
-
+    protected void onClick() {
         int newCourseId = getNewIdByClass(mRealm, Course.class);
-        populateTestData(mRealm, newCourseId);
 
         Intent insertIntent = new Intent(this, CourseActivity.class);
         insertIntent.putExtra("id", newCourseId);
         startActivity(insertIntent);
+
+        insertCourse(newCourseId);
     }
 
-    private RealmResults<Course> getAllCourse() {
-        // 코스가 없으면, 추가 권유 메세지가 나옴
-        if (mRealm.where(Course.class).count() > 0) {
-            mTextViewCourseEmpty.setVisibility(View.GONE);
-        } else {
-            mTextViewCourseEmpty.setVisibility(View.VISIBLE);
-        }
-        return mRealm.where(Course.class).findAllAsync();
-    }
-
-    private void makeToastMsg(int resId) {
+    private void makeToastAfterCancel(int resId) {
         if (mToast != null) {
             mToast.cancel();
         }
         mToast = Toast.makeText(this, resId, Toast.LENGTH_LONG);
         mToast.show();
     }
+
+    private void insertCourse(final int courseId) {
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Course course = realm.createObject(Course.class, courseId);
+                course.setFavorite(false);
+                setTextViewEmptyVisibility(mRealm, Course.class, 0, mTextViewCourseEmpty);
+            }
+        });
+    }
+
+    private void updateCourseFavoriteById(final int courseId) {
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Course course = realm.where(Course.class).equalTo("id", courseId).findFirst();
+                if (course.isFavorite()) {
+                    course.setFavorite(false);
+                    makeToastAfterCancel(R.string.msg_favorite_n);
+                } else {
+                    course.setFavorite(true);
+                    makeToastAfterCancel(R.string.msg_favorite_y);
+                }
+            }
+        });
+    }
+
+    private void deleteCourse(final int courseId) {
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Course course = realm.where(Course.class).equalTo("id", courseId).findFirst();
+                course.deleteFromRealm();
+                setTextViewEmptyVisibility(realm, Course.class, 0, mTextViewCourseEmpty);
+            }
+        });
+    }
+
 }

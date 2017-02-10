@@ -42,7 +42,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_toRightOf="@id/tv_course_desc"
                 android:layout_alignBaseline="@id/tv_course_desc"
-                android:hint="@string/msg_course_desc"/>
+                android:hint="@string/hint_course_desc"/>
             <EditText
                 android:id="@+id/et_course_title"
                 android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                 android:layout_toRightOf="@id/tv_course_title"
                 android:layout_alignBaseline="@id/tv_course_title"
                 android:layout_alignLeft="@id/et_course_desc"
-                android:hint="@string/msg_course_title"
+                android:hint="@string/hint_course_title"
                 android:nextFocusDown="@id/et_course_desc"/>
         </RelativeLayout>
         <!-- TODO! delete below TextView and add 'Star' image -->
@@ -82,7 +82,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="@string/msg_add_new_course_section"
+            android:text="@string/msg_insert_new_course_section"
             android:visibility="gone"/>
     </FrameLayout>
 
@@ -95,22 +95,17 @@
             android:id="@+id/btn_insert_section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/string_insert"/>
+            android:text="@string/string_register"/>
         <Button
             android:id="@+id/btn_share_course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/string_share"/>
         <Button
-            android:id="@+id/btn_save_course"
+            android:id="@+id/btn_delete_course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/string_save"/>
-        <Button
-            android:id="@+id/btn_cancel_course"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/string_cancel"/>
+            android:text="@string/string_delete"/>
     </LinearLayout>
 
 </LinearLayout>

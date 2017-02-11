@@ -28,26 +28,24 @@
             <FrameLayout
                 android:id="@+id/tab_course"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:padding="8dp">
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/fab_insert_course"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
                     android:src="@drawable/ic_fab_add"
                     android:backgroundTint="@color/colorPrimary"
                     app:borderWidth="0dp"
                     android:layout_gravity="bottom|end"/>
 
                 <!-- 코스가 있을 경우 -->
-                <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_course_list"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rv_course_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </ScrollView>
+                    android:layout_height="match_parent" />
 
                 <!-- 코스가 없을 경우 -->
                 <TextView
@@ -56,23 +54,19 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textSize="20sp"
-                    android:text="@string/msg_add_new_course"
+                    android:text="@string/msg_insert_new_course"
                     android:visibility="gone"/>
-
             </FrameLayout>
 
             <!-- 항목 tab -->
             <FrameLayout
                 android:id="@+id/tab_item"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:padding="8dp">
 
                 <!-- 항목이 있을 경우 -->
-                <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <!-- TODO! 항목 별 list UI 결정 -->
-                </ScrollView>
+                <!-- TODO! 항목 별 list UI 결정 -->
 
                 <!-- 항목이 없을 경우 -->
                 <TextView
@@ -81,14 +75,10 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:textSize="20sp"
-                    android:text="@string/msg_add_new_item"
+                    android:text="@string/msg_insert_new_item"
                     android:visibility="visible"/>
-
             </FrameLayout>
-
-
         </FrameLayout>
 
     </LinearLayout>
-
 </TabHost>

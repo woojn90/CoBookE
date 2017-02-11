@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_basic_margin"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_course_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:text="@string/string_title"/>
+            <TextView
+                android:id="@+id/tv_course_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/tv_course_title"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:text="@string/string_desc"/>
+            <EditText
+                android:id="@+id/et_course_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@id/tv_course_desc"
+                android:layout_alignBaseline="@id/tv_course_desc"
+                android:hint="@string/hint_course_desc"/>
+            <EditText
+                android:id="@+id/et_course_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/tv_course_title"
+                android:layout_alignBaseline="@id/tv_course_title"
+                android:layout_alignLeft="@id/et_course_desc"
+                android:hint="@string/hint_course_title"
+                android:nextFocusDown="@id/et_course_desc"/>
+        </RelativeLayout>
+        <!-- TODO! delete below TextView and add 'Star' image -->
+        <TextView
+            android:id="@+id/tv_course_favorite"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="20sp"
+            tools:text="Y" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- 섹션이 있을 경우 -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_course_section_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- 섹션이 없을 경우 -->
+        <TextView
+            android:id="@+id/tv_course_section_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:text="@string/msg_insert_new_course_section"
+            android:visibility="gone"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+        <Button
+            android:id="@+id/btn_insert_section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/string_register"/>
+        <Button
+            android:id="@+id/btn_share_course"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/string_share"/>
+        <Button
+            android:id="@+id/btn_delete_course"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/string_delete"/>
+    </LinearLayout>
+
+</LinearLayout>
+
+

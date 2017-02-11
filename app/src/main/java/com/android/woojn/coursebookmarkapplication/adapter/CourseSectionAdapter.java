@@ -1,100 +1,72 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
+import com.android.woojn.coursebookmarkapplication.model.Section;
+import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.realm.OrderedRealmCollection;
+import io.realm.Realm;
+import io.realm.RealmRecyclerViewAdapter;
+
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
 
 /**
  * Created by wjn on 2017-02-07.
  */
 
-public class CourseSectionAdapter extends RecyclerView.Adapter<CourseSectionAdapter.CourseSectionViewHolder> {
+public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, CourseSectionAdapter.CourseSectionViewHolder> {
 
-    private final Context mContext;
-    private Cursor mCursor;
-    private OnButtonInItemClickListener mListener;
+    // BindViewHolder 내 에서 Adapter CourseSectionDetailAdapter 생성을 위해 mContext 추가
+    private Context mContext;
+    private OnRecyclerViewClickListener mListener;
 
-    public CourseSectionAdapter(Context context, Cursor cursor, OnButtonInItemClickListener listener) {
-        this.mContext = context;
-        this.mCursor = cursor;
+    public CourseSectionAdapter(Context context, OrderedRealmCollection data, OnRecyclerViewClickListener listener) {
+        super(context, data, true);
         this.mListener = listener;
+        this.mContext = context;
     }
 
-    public interface OnButtonInItemClickListener {
-        void onButtonInItemClick(long id, int viewId);
+    public interface OnRecyclerViewClickListener {
+        void onItemClick(int id, int viewId);
     }
 
     @Override
     public CourseSectionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.course_section_list_item, parent, false);
         return new CourseSectionViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(CourseSectionViewHolder holder, int position) {
-        if (!mCursor.moveToPosition(position)) return;
+        Section section = getData().get(position);
 
-        // TODO: DB 설계 후 수정
-        long id = mCursor.getLong(mCursor.getColumnIndex("_ID"));
-        String title = mCursor.getString(mCursor.getColumnIndex("title"));
-
-        holder.itemView.setTag(id);
-        holder.textViewSectionTitle.setText(title);
-
-        // Adapter
-        Cursor fakeCursor = getAllCourse();
-        CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, fakeCursor, holder);
+        holder.itemView.setTag(section.getId());
+        holder.textViewSectionTitle.setText(section.getTitle());
+        CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, section.getSectionDetails(), holder);
         holder.recyclerViewCourseSectionDetail.setAdapter(adapter);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mCursor.getCount();
-    }
-
-    public void swapCursor(Cursor newCursor) {
-        if (mCursor != null) mCursor.close();
-        mCursor = newCursor;
-        if (newCursor != null) {
-            this.notifyDataSetChanged();
-        }
-    }
-
-    private Cursor getAllCourse() {
-        // TODO: delete fake data & make db query
-
-        // fake data
-        String[] columns = new String[] { "_id", "title", "sub_title" };
-        MatrixCursor matrixCursor = new MatrixCursor(columns);
-        matrixCursor.addRow(new Object[] { 7, "blog1", "blog content1" });
-        matrixCursor.addRow(new Object[] { 8, "blog2", "blog content2" });
-        matrixCursor.addRow(new Object[] { 9, "blog3", "blog content3" });
-        matrixCursor.addRow(new Object[] { 10, "blog4", "blog content is very very long so that should be ..." });
-
-        Cursor cursor = matrixCursor;
-
-        return cursor;
+        setTextViewEmptyVisibility(SectionDetail.class, section.getId(), holder.textViewCourseSectionDetailEmpty);
     }
 
     class CourseSectionViewHolder extends RecyclerView.ViewHolder
-            implements CourseSectionDetailAdapter.OnButtonInItemClickListener {
+            implements CourseSectionDetailAdapter.OnRecyclerViewClickListener {
 
         @BindView(R.id.tv_section_title)
         TextView textViewSectionTitle;
+        @BindView(R.id.tv_course_section_detail_empty)
+        TextView textViewCourseSectionDetailEmpty;
         @BindView(R.id.rv_course_section_detail_list)
         RecyclerView recyclerViewCourseSectionDetail;
 
@@ -102,30 +74,46 @@ public class CourseSectionAdapter extends RecyclerView.Adapter<CourseSectionAdap
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            recyclerViewCourseSectionDetail.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+            recyclerViewCourseSectionDetail.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         }
 
-        @OnClick({R.id.btn_share_section, R.id.btn_delete_section})
+        @OnClick({R.id.btn_search_section_detail, R.id.btn_share_section, R.id.btn_delete_section})
         public void onClick(View view) {
-            long id = (long) itemView.getTag();
+            int id = (int) itemView.getTag();
             int viewId = view.getId();
 
-            mListener.onButtonInItemClick(id, viewId);
+            if (viewId == R.id.btn_search_section_detail) {
+                // TODO: 검색 완료 후 overlay로 저장할 때, 하도록 변경
+                setTextViewEmptyVisibility(SectionDetail.class, id, textViewCourseSectionDetailEmpty);
+            }
+            mListener.onItemClick(id, viewId);
         }
 
         @Override
-        public void onButtonInItemClick(long id, int viewId) {
+        public void onItemClick(int id, int viewId) {
             switch (viewId) {
                 case -1:
-                    Toast.makeText(mContext, "just item click / id : " + id, Toast.LENGTH_LONG).show();
+                    Log.d("Check", "CourseSectionAdapter move sectionDetail id : " + id + ", viewID : " + viewId);
                     break;
                 case R.id.btn_share_section_detail:
-                    Toast.makeText(mContext, "share / id : " + id, Toast.LENGTH_LONG).show();
+                    Log.d("Check", "CourseSectionAdapter share sectionDetail id : " + id + ", viewID : " + viewId);
                     break;
                 case R.id.btn_delete_section_detail:
-                    Toast.makeText(mContext, "delete / id : " + id, Toast.LENGTH_LONG).show();
+                    Log.d("Check", "CourseSectionAdapter delete sectionDetail id : " + id + ", viewID : " + viewId);
+                    // TODO: alert 띄우고 삭제하도록 수정
+                    deleteSectionDetail(id);
                     break;
             }
+        }
+
+        private void deleteSectionDetail(int sectionDetailId) {
+            Realm realm = Realm.getDefaultInstance();
+            SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo("id", sectionDetailId).findFirst();
+            realm.beginTransaction();
+            sectionDetail.deleteFromRealm();
+            realm.commitTransaction();
+            realm.close();
+            setTextViewEmptyVisibility(SectionDetail.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
         }
     }
 }

@@ -3,13 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginBottom="5dp"
+    android:background="@android:color/background_light">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp">
-
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="3dp">
         <TextView
             android:id="@+id/tv_section_title"
             android:layout_width="wrap_content"
@@ -17,32 +19,52 @@
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:textColor="@android:color/black"
-            android:textSize="18sp"
+            android:textSize="17sp"
             tools:text="Section"/>
-
         <Button
             android:id="@+id/btn_delete_section"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="42dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:text="@string/string_delete"/>
-
         <Button
             android:id="@+id/btn_share_section"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="42dp"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/btn_delete_section"
             android:text="@string/string_share"/>
+        <Button
+            android:id="@+id/btn_search_section_detail"
+            android:layout_width="60dp"
+            android:layout_height="42dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/btn_share_section"
+            android:text="@string/string_search"/>
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_course_section_detail_list"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:orientation="horizontal"/>
+        android:layout_height="152dp">
+
+        <!-- 섹션 항목이 있을 경우 -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_course_section_detail_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"/>
+
+        <!-- 섹션 항목이 없을 경우 -->
+        <TextView
+            android:id="@+id/tv_course_section_detail_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:text="@string/msg_insert_new_course_section_detail"
+            android:visibility="gone"/>
+    </FrameLayout>
 
 </LinearLayout>

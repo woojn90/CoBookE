@@ -24,7 +24,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     private OnRecyclerViewClickListener mListener;
 
-    public CourseAdapter(final Context context, OrderedRealmCollection<Course> data, OnRecyclerViewClickListener listener) {
+    public CourseAdapter(Context context, OrderedRealmCollection<Course> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
         this.mListener = listener;
     }
@@ -36,7 +36,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     @Override
     public CourseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.course_list_item, parent, false);
         return new CourseViewHolder(view);
     }

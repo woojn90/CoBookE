@@ -28,11 +28,14 @@ import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.se
 
 public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, CourseSectionAdapter.CourseSectionViewHolder> {
 
+    // BindViewHolder 내 에서 Adapter CourseSectionDetailAdapter 생성을 위해 mContext 추가
+    private Context mContext;
     private OnRecyclerViewClickListener mListener;
 
-    public CourseSectionAdapter(final Context context, OrderedRealmCollection data, OnRecyclerViewClickListener listener) {
+    public CourseSectionAdapter(Context context, OrderedRealmCollection data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
         this.mListener = listener;
+        this.mContext = context;
     }
 
     public interface OnRecyclerViewClickListener {
@@ -41,7 +44,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
     @Override
     public CourseSectionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.course_section_list_item, parent, false);
         return new CourseSectionViewHolder(view);
     }
@@ -52,7 +55,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
         holder.itemView.setTag(section.getId());
         holder.textViewSectionTitle.setText(section.getTitle());
-        CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(context, section.getSectionDetails(), holder);
+        CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, section.getSectionDetails(), holder);
         holder.recyclerViewCourseSectionDetail.setAdapter(adapter);
         Realm realm = Realm.getDefaultInstance();
         setTextViewEmptyVisibility(realm, SectionDetail.class, section.getId(), holder.textViewCourseSectionDetailEmpty);
@@ -82,8 +85,10 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             int viewId = view.getId();
 
             if (viewId == R.id.btn_search_section_detail) {
-                // TODO: 추가시 무조건 사라지는 형식 -> 수정할 것
-                textViewCourseSectionDetailEmpty.setVisibility(View.GONE);
+                // TODO: 검색 완료 후 overlay로 저장할 때, 하도록 변경
+                Realm realm = Realm.getDefaultInstance();
+                setTextViewEmptyVisibility(realm, SectionDetail.class, id, textViewCourseSectionDetailEmpty);
+                realm.close();
             }
             mListener.onItemClick(id, viewId);
         }

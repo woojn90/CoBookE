@@ -1,7 +1,5 @@
 package com.android.woojn.coursebookmarkapplication;
 
-import android.app.SearchManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -98,14 +96,9 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
         switch (viewId) {
             case R.id.btn_search_section_detail:
                 Log.d("Check", "search / section id : " + id);
-                // TODO: 검색 intent로 이동 후 overlay button으로 추가되게 수정
-//                int newSectionDetailId = getNewIdByClass(mRealm, SectionDetail.class);
-//                insertSectionDetail(id, newSectionDetailId);
-
-                Intent webIntent = new Intent(Intent.ACTION_WEB_SEARCH);
-                webIntent.putExtra(SearchManager.QUERY, "이태원 맛집");
-                startActivity(webIntent);
-
+                // TODO: 검색 intent로 이동 후 overlay button으로 추가되게 수정 + insertSectionDetail method 삭제
+                int newSectionDetailId = getNewIdByClass(mRealm, SectionDetail.class);
+                insertSectionDetail(id, newSectionDetailId);
                 break;
             case R.id.btn_share_section:
                 Log.d("Check", "share / section id : " + id);

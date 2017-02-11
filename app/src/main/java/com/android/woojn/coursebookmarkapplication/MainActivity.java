@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity
         CourseAdapter.OnRecyclerViewClickListener {
 
     @BindView(android.R.id.tabhost)
-    protected TabHost tabHost;
+    protected TabHost mTabHost;
     @BindView(R.id.tv_course_empty)
     protected TextView mTextViewCourseEmpty;
     @BindView(R.id.rv_course_list)
@@ -47,18 +47,18 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        tabHost.setup();
-        TabHost.TabSpec spec1 = tabHost.newTabSpec("Tab1").setContent(R.id.tab_course)
+        mTabHost.setup();
+        TabHost.TabSpec spec1 = mTabHost.newTabSpec("Tab1").setContent(R.id.tab_course)
                 .setIndicator(getString(R.string.string_course));
-        tabHost.addTab(spec1);
-        TabHost.TabSpec spec2 = tabHost.newTabSpec("Tab2").setContent(R.id.tab_item)
+        mTabHost.addTab(spec1);
+        TabHost.TabSpec spec2 = mTabHost.newTabSpec("Tab2").setContent(R.id.tab_item)
                 .setIndicator(getString(R.string.string_item));
-        tabHost.addTab(spec2);
+        mTabHost.addTab(spec2);
 
         // Settings 적용 (최초 tab 설정)
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int tabIndex = Integer.parseInt(mSharedPreferences.getString(getString(R.string.pref_tab_index_key), "0"));
-        tabHost.setCurrentTab(tabIndex);
+        mTabHost.setCurrentTab(tabIndex);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         mRealm = Realm.getDefaultInstance();

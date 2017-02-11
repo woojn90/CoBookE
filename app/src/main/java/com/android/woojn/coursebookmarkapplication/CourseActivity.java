@@ -54,7 +54,7 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
         setContentView(R.layout.activity_course);
         ButterKnife.bind(this);
 
-        ActionBar actionBar = this.getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

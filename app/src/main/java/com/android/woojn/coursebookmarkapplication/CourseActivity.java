@@ -68,7 +68,7 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
         mTextViewCourseFavorite.setText(mCourse.isFavorite() ? "Y" : "N");
         mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections(), this));
-        setTextViewEmptyVisibility(mRealm, Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
+        setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
     }
 
     @Override
@@ -192,7 +192,7 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
                 Section section = realm.createObject(Section.class, sectionId);
                 section.setTitle("Test Section");
                 mCourse.getSections().add(section);
-                setTextViewEmptyVisibility(realm, Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
+                setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
             }
         });
     }
@@ -203,7 +203,7 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
             public void execute(Realm realm) {
                 Section section = realm.where(Section.class).equalTo("id", sectionId).findFirst();
                 section.deleteFromRealm();
-                setTextViewEmptyVisibility(realm, Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
+                setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
             }
         });
     }

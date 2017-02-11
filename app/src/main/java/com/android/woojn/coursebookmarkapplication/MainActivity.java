@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        setTextViewEmptyVisibility(mRealm, Course.class, 0, mTextViewCourseEmpty);
+        setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity
             public void execute(Realm realm) {
                 Course course = realm.createObject(Course.class, courseId);
                 course.setFavorite(false);
-                setTextViewEmptyVisibility(mRealm, Course.class, 0, mTextViewCourseEmpty);
+                setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
             }
         });
     }
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity
             public void execute(Realm realm) {
                 Course course = realm.where(Course.class).equalTo("id", courseId).findFirst();
                 course.deleteFromRealm();
-                setTextViewEmptyVisibility(realm, Course.class, 0, mTextViewCourseEmpty);
+                setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
             }
         });
     }

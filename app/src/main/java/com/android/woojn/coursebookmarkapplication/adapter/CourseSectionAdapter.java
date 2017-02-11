@@ -57,9 +57,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
         holder.textViewSectionTitle.setText(section.getTitle());
         CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, section.getSectionDetails(), holder);
         holder.recyclerViewCourseSectionDetail.setAdapter(adapter);
-        Realm realm = Realm.getDefaultInstance();
-        setTextViewEmptyVisibility(realm, SectionDetail.class, section.getId(), holder.textViewCourseSectionDetailEmpty);
-        realm.close();
+        setTextViewEmptyVisibility(SectionDetail.class, section.getId(), holder.textViewCourseSectionDetailEmpty);
     }
 
     class CourseSectionViewHolder extends RecyclerView.ViewHolder
@@ -86,9 +84,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
             if (viewId == R.id.btn_search_section_detail) {
                 // TODO: 검색 완료 후 overlay로 저장할 때, 하도록 변경
-                Realm realm = Realm.getDefaultInstance();
-                setTextViewEmptyVisibility(realm, SectionDetail.class, id, textViewCourseSectionDetailEmpty);
-                realm.close();
+                setTextViewEmptyVisibility(SectionDetail.class, id, textViewCourseSectionDetailEmpty);
             }
             mListener.onItemClick(id, viewId);
         }
@@ -110,18 +106,14 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             }
         }
 
-        private void deleteSectionDetail(final int sectionDetailId) {
+        private void deleteSectionDetail(int sectionDetailId) {
             Realm realm = Realm.getDefaultInstance();
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo("id", sectionDetailId).findFirst();
-                    sectionDetail.deleteFromRealm();
-                    setTextViewEmptyVisibility(realm, SectionDetail.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
-                    // TODO: 여기서 닫는지 질문
-                    realm.close();
-                }
-            });
+            SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo("id", sectionDetailId).findFirst();
+            realm.beginTransaction();
+            sectionDetail.deleteFromRealm();
+            realm.commitTransaction();
+            realm.close();
+            setTextViewEmptyVisibility(SectionDetail.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
         }
     }
 }

@@ -28,7 +28,8 @@ public class RealmDbUtility {
         return newId;
     }
 
-    public static <E extends RealmModel> void setTextViewEmptyVisibility(Realm realm, Class<E> clazz, int parentId, TextView textViewEmpty) {
+    public static <E extends RealmModel> void setTextViewEmptyVisibility(Class<E> clazz, int parentId, TextView textViewEmpty) {
+        Realm realm = Realm.getDefaultInstance();
         if (clazz.equals(Course.class)) {
             if (realm.where(clazz).count() > 0) {
                 textViewEmpty.setVisibility(View.GONE);
@@ -48,5 +49,6 @@ public class RealmDbUtility {
                 textViewEmpty.setVisibility(View.VISIBLE);
             }
         }
+        realm.close();
     }
 }

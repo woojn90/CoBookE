@@ -1,7 +1,6 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,68 +8,89 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.woojn.coursebookmarkapplication.R;
+import com.android.woojn.coursebookmarkapplication.model.Course;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmRecyclerViewAdapter;
 
 /**
  * Created by wjn on 2017-02-06.
  */
 
-public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseViewHolder> {
+public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapter.CourseViewHolder> {
 
-    private final Context mContext;
-    private Cursor mCursor;
+    private OnRecyclerViewClickListener mListener;
 
-    public CourseAdapter(Context context, Cursor cursor) {
-        this.mContext = context;
-        this.mCursor = cursor;
+    public CourseAdapter(final Context context, OrderedRealmCollection<Course> data, OnRecyclerViewClickListener listener) {
+        super(context, data, true);
+        this.mListener = listener;
+    }
+
+    public interface OnRecyclerViewClickListener {
+        void onItemClick(int id, int viewId);
+        void onItemLongClick(int id, int viewId);
     }
 
     @Override
-    public CourseAdapter.CourseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+    public CourseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.course_list_item, parent, false);
         return new CourseViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(CourseAdapter.CourseViewHolder holder, int position) {
-        if (!mCursor.moveToPosition(position)) return;
+    public void onBindViewHolder(CourseViewHolder holder, int position) {
+        Course course = getData().get(position);
 
-        // TODO: DB 설계 후 수정
-        long id = mCursor.getLong(mCursor.getColumnIndex("_ID"));
-        String text = mCursor.getString(mCursor.getColumnIndex("text"));
-        String description = mCursor.getString(mCursor.getColumnIndex("description"));
-
-        holder.itemView.setTag(id);
-        holder.textViewTest1.setText(text);
-        holder.textViewTest2.setText(description);
+        holder.itemView.setTag(course.getId());
+        holder.textViewCourseTitle.setText(course.getTitle());
+        holder.textViewCourseDesc.setText(course.getDesc());
+        holder.textViewCourseFavorite.setText(
+                course.isFavorite() ? "Y" : "N");
     }
 
-    @Override
-    public int getItemCount() {
-        return mCursor.getCount();
-    }
+    class CourseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-    public void swapCursor(Cursor newCursor) {
-        if (mCursor != null) mCursor.close();
-        mCursor = newCursor;
-        if (newCursor != null) {
-            this.notifyDataSetChanged();
-        }
-    }
-
-    class CourseViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.tv_text_test1)
-        TextView textViewTest1;
-        @BindView(R.id.tv_text_test2)
-        TextView textViewTest2;
+        @BindView(R.id.tv_course_title)
+        TextView textViewCourseTitle;
+        @BindView(R.id.tv_course_desc)
+        TextView textViewCourseDesc;
+        // TODO: 별 모양 Image로 변경 (로직도 적용)
+        @BindView(R.id.tv_course_favorite)
+        TextView textViewCourseFavorite;
 
         public CourseViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @OnClick(R.id.tv_course_favorite)
+        public void onClick(View view) {
+            int id = (int) itemView.getTag();
+            int viewId = view.getId();
+
+            mListener.onItemClick(id, viewId);
+
+            switch (viewId) {
+                case R.id.tv_course_favorite:
+                    // TODO: 이미지 변경
+                    break;
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            int id = (int) itemView.getTag();
+            int viewId = view.getId();
+
+            mListener.onItemLongClick(id, viewId);
+            return true;
         }
     }
 }

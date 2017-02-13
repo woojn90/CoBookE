@@ -28,7 +28,6 @@ import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.se
 
 public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, CourseSectionAdapter.CourseSectionViewHolder> {
 
-    // BindViewHolder 내 에서 Adapter CourseSectionDetailAdapter 생성을 위해 mContext 추가
     private Context mContext;
     private OnRecyclerViewClickListener mListener;
 
@@ -40,6 +39,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, int viewId);
+        void onItemLongClick(int id);
     }
 
     @Override
@@ -54,14 +54,14 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
         Section section = getData().get(position);
 
         holder.itemView.setTag(section.getId());
-        holder.textViewSectionTitle.setText(section.getTitle());
+        holder.textViewSectionTitle.setText(section.getTitle() + " (" + section.getSearchWord() + ")");
         CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, section.getSectionDetails(), holder);
         holder.recyclerViewCourseSectionDetail.setAdapter(adapter);
         setTextViewEmptyVisibility(SectionDetail.class, section.getId(), holder.textViewCourseSectionDetailEmpty);
     }
 
     class CourseSectionViewHolder extends RecyclerView.ViewHolder
-            implements CourseSectionDetailAdapter.OnRecyclerViewClickListener {
+        implements View.OnLongClickListener, CourseSectionDetailAdapter.OnRecyclerViewClickListener {
 
         @BindView(R.id.tv_section_title)
         TextView textViewSectionTitle;
@@ -75,6 +75,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             ButterKnife.bind(this, itemView);
 
             recyclerViewCourseSectionDetail.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            itemView.setOnLongClickListener(this);
         }
 
         @OnClick({R.id.btn_search_section_detail, R.id.btn_share_section, R.id.btn_delete_section})
@@ -87,6 +88,13 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
                 setTextViewEmptyVisibility(SectionDetail.class, id, textViewCourseSectionDetailEmpty);
             }
             mListener.onItemClick(id, viewId);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            int id = (int) itemView.getTag();
+            mListener.onItemLongClick(id);
+            return true;
         }
 
         @Override

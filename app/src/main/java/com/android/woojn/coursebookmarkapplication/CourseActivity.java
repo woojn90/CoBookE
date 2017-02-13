@@ -1,13 +1,19 @@
 package com.android.woojn.coursebookmarkapplication;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,9 +40,12 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
     protected EditText mEditTextCourseTitle;
     @BindView(R.id.et_course_desc)
     protected EditText mEditTextCourseDesc;
-    // TODO: star 이미지로 변경
-    @BindView(R.id.tv_course_favorite)
-    protected TextView mTextViewCourseFavorite;
+    @BindView(R.id.et_course_search_word)
+    protected EditText mEditTextCourseSearchWord;
+    @BindView(R.id.iv_favorite_y_course)
+    protected ImageView mImageViewFavoriteY;
+    @BindView(R.id.iv_favorite_n_course)
+    protected ImageView mImageViewFavoriteN;
     @BindView(R.id.tv_course_section_empty)
     protected TextView mTextViewCourseSectionEmpty;
     @BindView(R.id.rv_course_section_list)
@@ -65,7 +74,8 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
 
         mEditTextCourseTitle.setText(mCourse.getTitle());
         mEditTextCourseDesc.setText(mCourse.getDesc());
-        mTextViewCourseFavorite.setText(mCourse.isFavorite() ? "Y" : "N");
+        mEditTextCourseSearchWord.setText(mCourse.getSearchWord());
+        setFavoriteImageView(mCourse.isFavorite());
         mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections(), this));
         setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
@@ -101,27 +111,27 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
                 insertSectionDetail(id, newSectionDetailId);
                 break;
             case R.id.btn_share_section:
-                Log.d("Check", "share / section id : " + id);
                 break;
             case R.id.btn_delete_section:
-                Log.d("Check", "delete / section id : " + id);
                 // TODO: alert 띄우고 삭제하도록 수정
                 deleteSection(id);
                 break;
         }
     }
 
-    @OnClick(R.id.tv_course_favorite)
-    protected void onClickTextViewCourseFavorite() {
-        Log.d("Check", "tv_course_favorite");
+    @Override
+    public void onItemLongClick(int id) {
+        // TODO: 리스트 출력 후 수정, 삭제 등을 선택하게 (현재는 수정만)
+        showSectionDialog(id, true);
+    }
 
-        // TODO: 이미지 적용 후 변경
+    @OnClick({R.id.iv_favorite_y_course, R.id.iv_favorite_n_course})
+    protected void onClickTextViewCourseFavorite() {
         updateCourseFavorite();
     }
 
     @OnClick(R.id.btn_insert_section)
     protected void onClickButtonInsertSection() {
-        Log.d("Check", "btn_insert_section");
         int newSectionId = getNewIdByClass(mRealm, Section.class);
         insertSection(newSectionId);
     }
@@ -133,7 +143,6 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
 
     @OnClick(R.id.btn_delete_course)
     protected void onClickButtonDeleteCourse() {
-        Log.d("Check", "btn_delete_course");
         deleteCourse();
     }
 
@@ -145,19 +154,29 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
         mToast.show();
     }
 
+    private void setFavoriteImageView(boolean isFavorite) {
+        if (isFavorite) {
+            mImageViewFavoriteN.setVisibility(View.GONE);
+            mImageViewFavoriteY.setVisibility(View.VISIBLE);
+        }
+        else {
+            mImageViewFavoriteY.setVisibility(View.GONE);
+            mImageViewFavoriteN.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void updateCourseFavorite() {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 if (mCourse.isFavorite()) {
                     mCourse.setFavorite(false);
-                    mTextViewCourseFavorite.setText("N");
                     makeToastAfterCancel(R.string.msg_favorite_n);
                 } else {
                     mCourse.setFavorite(true);
                     makeToastAfterCancel(R.string.msg_favorite_y);
-                    mTextViewCourseFavorite.setText("Y");
                 }
+                setFavoriteImageView(mCourse.isFavorite());
             }
         });
     }
@@ -168,8 +187,10 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
             public void execute(Realm realm) {
                 String title = mEditTextCourseTitle.getText().toString();
                 String desc = mEditTextCourseDesc.getText().toString();
+                String searchWord = mEditTextCourseSearchWord.getText().toString();
                 mCourse.setTitle(title);
                 mCourse.setDesc(desc);
+                mCourse.setSearchWord(searchWord);
             }
         });
     }
@@ -184,17 +205,8 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
         });
     }
 
-    private void insertSection(final int sectionId) {
-        mRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                // TODO: Dialog 띄우고 내용 작성 후 추가하게 수정
-                Section section = realm.createObject(Section.class, sectionId);
-                section.setTitle("Test Section");
-                mCourse.getSections().add(section);
-                setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
-            }
-        });
+    private void insertSection(int sectionId) {
+        showSectionDialog(sectionId, false);
     }
 
     private void deleteSection(final int sectionId) {
@@ -220,6 +232,68 @@ public class CourseActivity extends AppCompatActivity implements CourseSectionAd
                 section.getSectionDetails().add(sectionDetail);
             }
         });
+    }
+
+    private void showSectionDialog(final int sectionId, final boolean isCreated) {
+        final View dialogView = getLayoutInflater().inflate(R.layout.dialog_section, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(isCreated ? R.string.string_update_section : R.string.string_register_section);
+        builder.setView(dialogView);
+        final EditText editTextTitle = (EditText) dialogView.findViewById(R.id.et_section_title);
+        final EditText editTextSearchWord = (EditText) dialogView.findViewById(R.id.et_section_search_word);
+
+        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setPositiveButton(isCreated ? R.string.string_update : R.string.string_register, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String title = editTextTitle.getText().toString();
+                String searchWord = editTextSearchWord.getText().toString();
+
+                mRealm.beginTransaction();
+                Section section;
+                if (isCreated) {
+                    section = mRealm.where(Section.class).equalTo("id", sectionId).findFirst();
+                    section.setTitle(title);
+                    section.setSearchWord(searchWord);
+                }
+                else {
+                    section = mRealm.createObject(Section.class, sectionId);
+                    section.setTitle(title);
+                    section.setSearchWord(searchWord);
+                    mCourse.getSections().add(section);
+                }
+                mRealm.commitTransaction();
+                setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.show();
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Do nothing
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!editTextTitle.getText().toString().trim().isEmpty() &&
+                        !editTextSearchWord.getText().toString().trim().isEmpty()) {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                } else {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Do nothing
+            }
+        };
+        editTextTitle.addTextChangedListener(textWatcher);
+        editTextSearchWord.addTextChangedListener(textWatcher);
     }
 
 }

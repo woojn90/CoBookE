@@ -5,6 +5,5 @@ app/build
 build/
 *.iml
 local.properties
-gradle
 .DS_Store
 .externalNativeBuild

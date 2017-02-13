@@ -24,13 +24,21 @@
         android:textSize="16sp"
         tools:text="Description" />
 
-    <!-- TODO! delete below TextView and add 'Star' image -->
-    <TextView
-        android:id="@+id/tv_course_favorite"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+    <FrameLayout
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentRight="true"
-        android:gravity="center_vertical"
-        android:textSize="20sp"
-        tools:text="Y" />
+        android:layout_centerVertical="true">
+        <ImageView
+            android:id="@+id/iv_favorite_y_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_favorite_y"
+            android:visibility="gone"/>
+        <ImageView
+            android:id="@+id/iv_favorite_n_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_favorite_n"/>
+    </FrameLayout>
 </RelativeLayout>

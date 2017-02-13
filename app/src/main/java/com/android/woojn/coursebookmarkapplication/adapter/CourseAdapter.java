@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.woojn.coursebookmarkapplication.R;
@@ -15,6 +16,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
+
+import static com.android.woojn.coursebookmarkapplication.MainActivity.VIEW_ID_OF_ITEM_VIEW;
 
 /**
  * Created by wjn on 2017-02-06.
@@ -31,7 +34,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, int viewId);
-        void onItemLongClick(int id, int viewId);
+        void onItemLongClick(int id);
     }
 
     @Override
@@ -48,19 +51,26 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
         holder.itemView.setTag(course.getId());
         holder.textViewCourseTitle.setText(course.getTitle());
         holder.textViewCourseDesc.setText(course.getDesc());
-        holder.textViewCourseFavorite.setText(
-                course.isFavorite() ? "Y" : "N");
+        if (course.isFavorite()) {
+            holder.imageViewFavoriteN.setVisibility(View.GONE);
+            holder.imageViewFavoriteY.setVisibility(View.VISIBLE);
+        } else {
+            holder.imageViewFavoriteY.setVisibility(View.GONE);
+            holder.imageViewFavoriteN.setVisibility(View.VISIBLE);
+        }
     }
 
-    class CourseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class CourseViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener {
 
         @BindView(R.id.tv_course_title)
         TextView textViewCourseTitle;
         @BindView(R.id.tv_course_desc)
         TextView textViewCourseDesc;
-        // TODO: 별 모양 Image로 변경 (로직도 적용)
-        @BindView(R.id.tv_course_favorite)
-        TextView textViewCourseFavorite;
+        @BindView(R.id.iv_favorite_y_main)
+        ImageView imageViewFavoriteY;
+        @BindView(R.id.iv_favorite_n_main)
+        ImageView imageViewFavoriteN;
 
         public CourseViewHolder(View itemView) {
             super(itemView);
@@ -70,26 +80,31 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
             itemView.setOnLongClickListener(this);
         }
 
-        @OnClick(R.id.tv_course_favorite)
+        @OnClick({R.id.iv_favorite_y_main, R.id.iv_favorite_n_main})
         public void onClick(View view) {
             int id = (int) itemView.getTag();
             int viewId = view.getId();
 
-            mListener.onItemClick(id, viewId);
-
             switch (viewId) {
-                case R.id.tv_course_favorite:
-                    // TODO: 이미지 변경
+                case R.id.iv_favorite_y_main:
+                    imageViewFavoriteY.setVisibility(View.GONE);
+                    imageViewFavoriteN.setVisibility(View.VISIBLE);
+                    break;
+                case R.id.iv_favorite_n_main:
+                    imageViewFavoriteN.setVisibility(View.GONE);
+                    imageViewFavoriteY.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    viewId = VIEW_ID_OF_ITEM_VIEW;
                     break;
             }
+            mListener.onItemClick(id, viewId);
         }
 
         @Override
         public boolean onLongClick(View view) {
             int id = (int) itemView.getTag();
-            int viewId = view.getId();
-
-            mListener.onItemLongClick(id, viewId);
+            mListener.onItemLongClick(id);
             return true;
         }
     }

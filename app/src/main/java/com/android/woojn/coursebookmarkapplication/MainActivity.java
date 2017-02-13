@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener,
         CourseAdapter.OnRecyclerViewClickListener {
 
+    public static final int VIEW_ID_OF_ITEM_VIEW = 0;
+
     @BindView(android.R.id.tabhost)
     protected TabHost mTabHost;
     @BindView(R.id.tv_course_empty)
@@ -105,23 +107,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onItemClick(int id, int viewId) {
         switch (viewId) {
-            case -1:
-                // TODO: 항목 수정
-                Log.d("Check", "click / id = " + id);
+            case VIEW_ID_OF_ITEM_VIEW:
                 Intent updateIntent = new Intent(getApplicationContext(), CourseActivity.class);
                 updateIntent.putExtra("id", id);
                 startActivity(updateIntent);
                 break;
-            case R.id.tv_course_favorite:
+            case R.id.iv_favorite_y_main:
+            case R.id.iv_favorite_n_main:
                 updateCourseFavoriteById(id);
                 break;
         }
     }
 
     @Override
-    public void onItemLongClick(int id, int viewId) {
-        Log.d("Check", "long click / id = " + id);
-
+    public void onItemLongClick(int id) {
         // TODO: 리스트 출력 후 선택 (공유, 삭제 등)
         deleteCourse(id);
     }

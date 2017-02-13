@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -35,33 +34,60 @@
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:text="@string/string_desc"/>
+            <TextView
+                android:id="@+id/tv_course_search_word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/tv_course_desc"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:text="@string/string_search_word"/>
             <EditText
-                android:id="@+id/et_course_desc"
+                android:id="@+id/et_course_search_word"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:layout_toRightOf="@id/tv_course_desc"
-                android:layout_alignBaseline="@id/tv_course_desc"
-                android:hint="@string/hint_course_desc"/>
+                android:layout_toRightOf="@id/tv_course_search_word"
+                android:layout_alignBaseline="@id/tv_course_search_word"
+                android:hint="@string/hint_course_search_word"/>
             <EditText
                 android:id="@+id/et_course_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/tv_course_title"
                 android:layout_alignBaseline="@id/tv_course_title"
-                android:layout_alignLeft="@id/et_course_desc"
-                android:hint="@string/hint_course_title"
-                android:nextFocusDown="@id/et_course_desc"/>
+                android:layout_alignLeft="@id/et_course_search_word"
+                android:hint="@string/hint_course_title">
+                <requestFocus/>
+            </EditText>
+            <EditText
+                android:id="@+id/et_course_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/tv_course_desc"
+                android:layout_alignBaseline="@id/tv_course_desc"
+                android:layout_alignLeft="@id/et_course_search_word"
+                android:hint="@string/hint_course_desc"/>
         </RelativeLayout>
-        <!-- TODO! delete below TextView and add 'Star' image -->
-        <TextView
-            android:id="@+id/tv_course_favorite"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textSize="20sp"
-            tools:text="Y" />
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp">
+            <ImageView
+                android:id="@+id/iv_favorite_y_course"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/ic_favorite_y"
+                android:visibility="gone"/>
+            <ImageView
+                android:id="@+id/iv_favorite_n_course"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/ic_favorite_n"/>
+        </FrameLayout>
     </LinearLayout>
 
     <FrameLayout

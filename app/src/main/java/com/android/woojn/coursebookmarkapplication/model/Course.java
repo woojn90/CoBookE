@@ -14,8 +14,13 @@ public class Course extends RealmObject {
     private int id;
     private String title;
     private String desc;
+    private String searchWord;
     private boolean favorite;
     private RealmList<Section> sections;
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getId() {
         return id;
@@ -35,6 +40,14 @@ public class Course extends RealmObject {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getSearchWord() {
+        return searchWord;
+    }
+
+    public void setSearchWord(String searchWord) {
+        this.searchWord = searchWord;
     }
 
     public boolean isFavorite() {

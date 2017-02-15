@@ -25,7 +25,7 @@ import static com.android.woojn.coursebookmarkapplication.MainActivity.VIEW_ID_O
 
 public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapter.CourseViewHolder> {
 
-    private OnRecyclerViewClickListener mListener;
+    private final OnRecyclerViewClickListener mListener;
 
     public CourseAdapter(Context context, OrderedRealmCollection<Course> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
@@ -46,17 +46,18 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     @Override
     public void onBindViewHolder(CourseViewHolder holder, int position) {
-        Course course = getData().get(position);
-
-        holder.itemView.setTag(course.getId());
-        holder.textViewCourseTitle.setText(course.getTitle());
-        holder.textViewCourseDesc.setText(course.getDesc());
-        if (course.isFavorite()) {
-            holder.imageViewFavoriteN.setVisibility(View.GONE);
-            holder.imageViewFavoriteY.setVisibility(View.VISIBLE);
-        } else {
-            holder.imageViewFavoriteY.setVisibility(View.GONE);
-            holder.imageViewFavoriteN.setVisibility(View.VISIBLE);
+        if (getData() != null) {
+            Course course = getData().get(position);
+            holder.itemView.setTag(course.getId());
+            holder.textViewCourseTitle.setText(course.getTitle());
+            holder.textViewCourseDesc.setText(course.getDesc());
+            if (course.isFavorite()) {
+                holder.imageViewFavoriteN.setVisibility(View.GONE);
+                holder.imageViewFavoriteY.setVisibility(View.VISIBLE);
+            } else {
+                holder.imageViewFavoriteY.setVisibility(View.GONE);
+                holder.imageViewFavoriteN.setVisibility(View.VISIBLE);
+            }
         }
     }
 

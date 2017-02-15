@@ -1,13 +1,14 @@
 package com.android.woojn.coursebookmarkapplication;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity
         CourseAdapter.OnRecyclerViewClickListener {
 
     public static final int VIEW_ID_OF_ITEM_VIEW = 0;
+    public static final boolean IS_INSERTED_COURSE = true;
 
     @BindView(android.R.id.tabhost)
     protected TabHost mTabHost;
@@ -39,8 +41,8 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.rv_course_list)
     protected RecyclerView mRecyclerViewCourse;
 
-    private Realm mRealm;
     private SharedPreferences mSharedPreferences;
+    private Realm mRealm;
     private Toast mToast;
 
     @Override
@@ -57,9 +59,8 @@ public class MainActivity extends AppCompatActivity
                 .setIndicator(getString(R.string.string_item));
         mTabHost.addTab(spec2);
 
-        // Settings 적용 (최초 tab 설정)
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int tabIndex = Integer.parseInt(mSharedPreferences.getString(getString(R.string.pref_tab_index_key), "0"));
+        int tabIndex = Integer.parseInt(mSharedPreferences.getString(getString(R.string.pref_key_tab_index), "0"));
         mTabHost.setCurrentTab(tabIndex);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
+        menu.findItem(R.id.action_overflow).setVisible(false);
         return true;
     }
 
@@ -128,12 +130,12 @@ public class MainActivity extends AppCompatActivity
     @OnClick(R.id.fab_insert_course)
     protected void onClick() {
         int newCourseId = getNewIdByClass(mRealm, Course.class);
+        insertCourse(newCourseId);
 
         Intent insertIntent = new Intent(this, CourseActivity.class);
         insertIntent.putExtra("id", newCourseId);
+        insertIntent.putExtra("isInsertedCourse", IS_INSERTED_COURSE);
         startActivity(insertIntent);
-
-        insertCourse(newCourseId);
     }
 
     private void makeToastAfterCancel(int resId) {
@@ -172,14 +174,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void deleteCourse(final int courseId) {
-        mRealm.executeTransaction(new Realm.Transaction() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.msg_delete_confirm);
+        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
             @Override
-            public void execute(Realm realm) {
-                Course course = realm.where(Course.class).equalTo("id", courseId).findFirst();
-                course.deleteFromRealm();
-                setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
+            public void onClick(DialogInterface dialog, int which) {
+                mRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        Course course = realm.where(Course.class).equalTo("id", courseId).findFirst();
+                        course.deleteFromRealm();
+                        setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
+                    }
+                });
             }
         });
+        builder.show();
     }
 
 }

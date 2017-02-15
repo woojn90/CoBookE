@@ -16,13 +16,15 @@ import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
+import static com.android.woojn.coursebookmarkapplication.MainActivity.VIEW_ID_OF_ITEM_VIEW;
+
 /**
  * Created by wjn on 2017-02-07.
  */
 
 public class CourseSectionDetailAdapter extends RealmRecyclerViewAdapter<SectionDetail, CourseSectionDetailAdapter.CourseSectionDetailViewHolder> {
 
-    private OnRecyclerViewClickListener mListener;
+    private final OnRecyclerViewClickListener mListener;
 
     public CourseSectionDetailAdapter(Context context, OrderedRealmCollection<SectionDetail> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
@@ -42,19 +44,24 @@ public class CourseSectionDetailAdapter extends RealmRecyclerViewAdapter<Section
 
     @Override
     public void onBindViewHolder(CourseSectionDetailViewHolder holder, int position) {
-        SectionDetail sectionDetail = getData().get(position);
-
-        holder.itemView.setTag(sectionDetail.getId());
-        holder.sectionDetailTitleTextView.setText(sectionDetail.getTitle());
-        holder.sectionDetailDescTextView.setText(sectionDetail.getDesc());
+        if (getData() != null) {
+            SectionDetail sectionDetail = getData().get(position);
+            holder.itemView.setTag(sectionDetail.getId());
+            holder.textViewSectionDetailTitle.setText(sectionDetail.getTitle());
+            holder.textViewSectionDetailDesc.setText(sectionDetail.getDesc());
+            holder.textViewSectionDetailUrl.setText(sectionDetail.getUrl());
+        }
     }
 
-    class CourseSectionDetailViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class CourseSectionDetailViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
 
         @BindView(R.id.tv_section_detail_title)
-        TextView sectionDetailTitleTextView;
+        TextView textViewSectionDetailTitle;
         @BindView(R.id.tv_section_detail_desc)
-        TextView sectionDetailDescTextView;
+        TextView textViewSectionDetailDesc;
+        @BindView(R.id.tv_section_detail_url)
+        TextView textViewSectionDetailUrl;
 
         public CourseSectionDetailViewHolder(View itemView) {
             super(itemView);
@@ -68,6 +75,14 @@ public class CourseSectionDetailAdapter extends RealmRecyclerViewAdapter<Section
             int id = (int) itemView.getTag();
             int viewId = view.getId();
 
+            switch (viewId) {
+                case R.id.btn_share_section_detail:
+                case R.id.btn_delete_section_detail:
+                    break;
+                default:
+                    viewId = VIEW_ID_OF_ITEM_VIEW;
+                    break;
+            }
             mListener.onItemClick(id, viewId);
         }
     }

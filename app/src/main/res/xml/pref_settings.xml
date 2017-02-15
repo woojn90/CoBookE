@@ -2,18 +2,23 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/settings_category_ui">
         <ListPreference
-            android:key="@string/pref_tab_index_key"
-            android:title="@string/pref_tab_index_label"
+            android:key="@string/pref_key_tab_index"
+            android:title="@string/pref_label_tab_index"
             android:defaultValue="0"
-            android:entries="@array/pref_tab_index_labels"
-            android:entryValues="@array/pref_tab_index_values"
+            android:entries="@array/pref_labels_tab_index"
+            android:entryValues="@array/pref_values_tab_index"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_search">
-        <Preference
-            android:summary="@string/msg_development_scheduled"
-            android:title="@string/msg_development_scheduled"/>
+        <ListPreference
+            android:key="@string/pref_key_search_engine"
+            android:title="@string/pref_label_search_engine"
+            android:defaultValue="@string/pref_value_search_engine_naver_total"
+            android:entries="@array/pref_labels_search_engine"
+            android:entryValues="@array/pref_values_search_engine"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_app_info">
         <Preference

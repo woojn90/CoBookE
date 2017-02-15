@@ -2,9 +2,13 @@
     <string name="app_name">CourseBookmark</string>
 
     <!-- Action Bar -->
-    <string name="action_main">메인</string>
     <string name="action_course">코스</string>
     <string name="action_setting">설정</string>
+    <string name="action_overflow">Over Flow</string>
+    <string name="action_register_section">그룹 등록하기</string>
+    <string name="action_update">수정하기</string>
+    <string name="action_delete">삭제하기</string>
+    <string name="action_share">공유하기</string>
 
     <!-- UI -->
     <string name="string_course">코스</string>
@@ -14,17 +18,16 @@
     <string name="string_register">등록</string>
     <string name="string_update">수정</string>
     <string name="string_delete">삭제</string>
-    <string name="string_share">공유</string>
-    <string name="string_search">검색</string>
-    <string name="string_search_word">검색어</string>
-    <string name="string_register_section">코스 그룹 등록</string>
-    <string name="string_update_section">코스 그룹 수정</string>
     <string name="string_cancel">취소</string>
+    <string name="string_search_word">검색어</string>
+    <string name="string_section_info">코스 그룹 정보</string>
+    <string name="string_course_info">코스 정보</string>
 
     <string name="msg_insert_new_course">새로운 코스를 등록해보세요!</string>
     <string name="msg_insert_new_course_section">새로운 코스 그룹을 등록해보세요!</string>
     <string name="msg_insert_new_course_section_detail">검색 버튼을 눌러 항목을 추가하세요!</string>
     <string name="msg_insert_new_item">새로운 Bookmark를 등록해보세요!</string>
+    <string name="msg_delete_confirm">삭제하시겠습니까?</string>
 
     <string name="hint_course_title">코스 제목을 입력하세요.</string>
     <string name="hint_course_desc">코스 설명을 입력하세요.</string>
@@ -32,17 +35,29 @@
     <string name="hint_section_title">코스 그룹 제목을 입력하세요.</string>
     <string name="hint_section_search_word">코스 그룹 검색어를 입력하세요.</string>
 
+    <string name="content_desc_favorite_y">즐겨찾기 on</string>
+    <string name="content_desc_favorite_n">즐겨찾기 off</string>
+    <string name="content_desc_url_preview">URL Preview</string>
+
     <!-- Toast -->
     <string name="msg_favorite_y">즐겨찾기에 추가되었습니다.</string>
     <string name="msg_favorite_n">즐겨찾기에서 해제되었습니다.</string>
 
     <!-- Settings -->
     <string name="settings_category_ui">화면(추가 예정)</string>
-    <string name="settings_category_search">검색(개발 예정)</string>
+    <string name="settings_category_search">검색(추가 예정)</string>
     <string name="settings_category_app_info">어플 정보(개발 예정)</string>
 
-    <string name="pref_tab_index_key" translatable="false">tab</string>
-    <string name="pref_tab_index_label">최초 실행시 선택 Tab</string>
+    <string name="pref_label_tab_index">최초 실행시 선택 Tab</string>
+    <string name="pref_key_tab_index" translatable="false">tab</string>
+    <string name="pref_label_search_engine">검색 엔진</string>
+    <string name="pref_key_search_engine" translatable="false">search_engine</string>
+    <string name="pref_label_search_engine_naver_total">네이버(전체)</string>
+    <string name="pref_label_search_engine_naver_blog">네이버(블로그)</string>
+    <string name="pref_label_search_engine_google">구글</string>
+    <string name="pref_value_search_engine_naver_total">https://search.naver.com/search.naver?query=</string>
+    <string name="pref_value_search_engine_naver_blog">https://search.naver.com/search.naver?where=post&amp;query=</string>
+    <string name="pref_value_search_engine_google">https://www.google.com/search?q=</string>
 
     <string name="settings_developer_info">개발자 정보</string>
     <string name="settings_developer_info_summary">개발자 정보를 확인합니다.</string>

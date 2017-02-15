@@ -13,7 +13,7 @@ public class SectionDetail extends RealmObject {
     private int id;
     private String title;
     private String desc;
-    private String imageUrl;
+    private String url;
 
     public int getId() {
         return id;
@@ -35,11 +35,11 @@ public class SectionDetail extends RealmObject {
         this.desc = desc;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

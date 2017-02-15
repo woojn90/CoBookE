@@ -18,10 +18,6 @@ public class Course extends RealmObject {
     private boolean favorite;
     private RealmList<Section> sections;
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public int getId() {
         return id;
     }
@@ -60,9 +56,5 @@ public class Course extends RealmObject {
 
     public RealmList<Section> getSections() {
         return sections;
-    }
-
-    public void setSections(RealmList<Section> sections) {
-        this.sections = sections;
     }
 }

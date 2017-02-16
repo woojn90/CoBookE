@@ -13,10 +13,12 @@
         <item>@string/pref_label_search_engine_naver_total</item>
         <item>@string/pref_label_search_engine_naver_blog</item>
         <item>@string/pref_label_search_engine_google</item>
+        <item>@string/pref_label_search_engine_instagram</item>
     </string-array>
     <string-array name="pref_values_search_engine">
         <item>@string/pref_value_search_engine_naver_total</item>
         <item>@string/pref_value_search_engine_naver_blog</item>
         <item>@string/pref_value_search_engine_google</item>
+        <item>@string/pref_value_search_engine_instagram</item>
     </string-array>
 </resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- 코스가 있을 경우 -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_course_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <!-- 코스가 없을 경우 -->
+    <TextView
+        android:id="@+id/tv_course_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:text="@string/msg_insert_new_course"
+        android:visibility="gone"/>
+</FrameLayout>

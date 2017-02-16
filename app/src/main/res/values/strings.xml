@@ -22,6 +22,8 @@
     <string name="string_search_word">검색어</string>
     <string name="string_section_info">코스 그룹 정보</string>
     <string name="string_course_info">코스 정보</string>
+    <string name="string_save_and_continue">저장 후 계속</string>
+    <string name="string_save_and_close">저장 후 종료</string>
 
     <string name="msg_insert_new_course">새로운 코스를 등록해보세요!</string>
     <string name="msg_insert_new_course_section">새로운 코스 그룹을 등록해보세요!</string>
@@ -55,9 +57,11 @@
     <string name="pref_label_search_engine_naver_total">네이버(전체)</string>
     <string name="pref_label_search_engine_naver_blog">네이버(블로그)</string>
     <string name="pref_label_search_engine_google">구글</string>
+    <string name="pref_label_search_engine_instagram">인스타그램</string>
     <string name="pref_value_search_engine_naver_total">https://search.naver.com/search.naver?query=</string>
     <string name="pref_value_search_engine_naver_blog">https://search.naver.com/search.naver?where=post&amp;query=</string>
     <string name="pref_value_search_engine_google">https://www.google.com/search?q=</string>
+    <string name="pref_value_search_engine_instagram">https://www.instagram.com/explore/tags/</string>
 
     <string name="settings_developer_info">개발자 정보</string>
     <string name="settings_developer_info_summary">개발자 정보를 확인합니다.</string>

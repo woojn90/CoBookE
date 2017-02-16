@@ -15,23 +15,18 @@
         app:showAsAction="always">
         <menu>
             <item
-                android:id="@+id/action_register_section"
-                android:orderInCategory="1"
-                android:title="@string/action_register_section"
-                app:showAsAction="ifRoom"/>
-            <item
                 android:id="@+id/action_update"
-                android:orderInCategory="2"
+                android:orderInCategory="1"
                 android:title="@string/action_update"
                 app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/action_delete"
-                android:orderInCategory="3"
+                android:orderInCategory="2"
                 android:title="@string/action_delete"
                 app:showAsAction="ifRoom"/>
             <item
                 android:id="@+id/action_share"
-                android:orderInCategory="4"
+                android:orderInCategory="3"
                 android:title="@string/action_share"
                 app:showAsAction="ifRoom"/>
         </menu>

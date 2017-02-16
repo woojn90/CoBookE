@@ -12,31 +12,26 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".MainActivity"
+        <activity android:name=".activity.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name=".CourseActivity"
-            android:label="@string/action_course"
-            android:windowSoftInputMode="adjustPan">
+        <activity android:name=".activity.CourseActivity"
+            android:label="@string/action_course">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
-
-        <activity android:name=".SettingsActivity"
+        <activity android:name=".activity.SettingsActivity"
             android:label="@string/action_setting"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
-
+        <service android:name=".service.FloatingService"/>
     </application>
-
 </manifest>

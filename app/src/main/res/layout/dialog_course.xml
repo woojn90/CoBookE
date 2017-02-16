@@ -6,16 +6,12 @@
     android:stretchColumns="1">
     <TableRow>
         <TextView
+            style="@style/TextViewDialog"
             android:id="@+id/tv_course_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
             android:text="@string/string_title"/>
         <EditText
+            style="@style/EditTextDialog"
             android:id="@+id/et_course_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_left_of_edit_text"
             android:layout_marginStart="@dimen/margin_left_of_edit_text"
             android:hint="@string/hint_course_title">
@@ -24,32 +20,24 @@
     </TableRow>
     <TableRow>
         <TextView
+            style="@style/TextViewDialog"
             android:id="@+id/tv_course_search_word"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
             android:text="@string/string_search_word"/>
         <EditText
+            style="@style/EditTextDialog"
             android:id="@+id/et_course_search_word"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_left_of_edit_text"
             android:layout_marginStart="@dimen/margin_left_of_edit_text"
             android:hint="@string/hint_course_search_word"/>
     </TableRow>
     <TableRow>
         <TextView
+            style="@style/TextViewDialog"
             android:id="@+id/tv_course_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
             android:text="@string/string_desc"/>
         <EditText
+            style="@style/EditTextDialog"
             android:id="@+id/et_course_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_left_of_edit_text"
             android:layout_marginStart="@dimen/margin_left_of_edit_text"
             android:hint="@string/hint_course_desc">

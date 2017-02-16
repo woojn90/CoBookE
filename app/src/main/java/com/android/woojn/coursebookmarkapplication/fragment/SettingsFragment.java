@@ -1,4 +1,4 @@
-package com.android.woojn.coursebookmarkapplication;
+package com.android.woojn.coursebookmarkapplication.fragment;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
+
+import com.android.woojn.coursebookmarkapplication.R;
 
 /**
  * Created by wjn on 2017-02-07.

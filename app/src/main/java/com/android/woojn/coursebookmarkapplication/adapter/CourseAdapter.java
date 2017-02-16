@@ -17,7 +17,7 @@ import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
-import static com.android.woojn.coursebookmarkapplication.MainActivity.VIEW_ID_OF_ITEM_VIEW;
+import static com.android.woojn.coursebookmarkapplication.activity.MainActivity.VIEW_ID_OF_ITEM_VIEW;
 
 /**
  * Created by wjn on 2017-02-06.
@@ -34,7 +34,6 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, int viewId);
-        void onItemLongClick(int id);
     }
 
     @Override
@@ -50,7 +49,13 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
             Course course = getData().get(position);
             holder.itemView.setTag(course.getId());
             holder.textViewCourseTitle.setText(course.getTitle());
-            holder.textViewCourseDesc.setText(course.getDesc());
+            String desc = course.getDesc();
+            if (desc != null && !desc.isEmpty()) {
+                holder.textViewCourseDesc.setVisibility(View.VISIBLE);
+                holder.textViewCourseDesc.setText(course.getDesc());
+            } else {
+                holder.textViewCourseDesc.setVisibility(View.GONE);
+            }
             if (course.isFavorite()) {
                 holder.imageViewFavoriteN.setVisibility(View.GONE);
                 holder.imageViewFavoriteY.setVisibility(View.VISIBLE);
@@ -62,7 +67,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
     }
 
     class CourseViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener, View.OnLongClickListener {
+            implements View.OnClickListener {
 
         @BindView(R.id.tv_course_title)
         TextView textViewCourseTitle;
@@ -78,10 +83,9 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
             ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
         }
 
-        @OnClick({R.id.iv_favorite_y_main, R.id.iv_favorite_n_main})
+        @OnClick({R.id.iv_favorite_y_main, R.id.iv_favorite_n_main, R.id.btn_delete_course})
         public void onClick(View view) {
             int id = (int) itemView.getTag();
             int viewId = view.getId();
@@ -95,18 +99,13 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
                     imageViewFavoriteN.setVisibility(View.GONE);
                     imageViewFavoriteY.setVisibility(View.VISIBLE);
                     break;
+                case R.id.btn_delete_course:
+                    break;
                 default:
                     viewId = VIEW_ID_OF_ITEM_VIEW;
                     break;
             }
             mListener.onItemClick(id, viewId);
-        }
-
-        @Override
-        public boolean onLongClick(View view) {
-            int id = (int) itemView.getTag();
-            mListener.onItemLongClick(id);
-            return true;
         }
     }
 }

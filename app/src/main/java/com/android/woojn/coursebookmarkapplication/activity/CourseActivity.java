@@ -1,4 +1,4 @@
-package com.android.woojn.coursebookmarkapplication;
+package com.android.woojn.coursebookmarkapplication.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,16 +23,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.adapter.CourseSectionAdapter;
 import com.android.woojn.coursebookmarkapplication.model.Course;
 import com.android.woojn.coursebookmarkapplication.model.Section;
-import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
+import com.android.woojn.coursebookmarkapplication.service.FloatingService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 
+import static com.android.woojn.coursebookmarkapplication.R.id.rv_course_section_list;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
 
@@ -56,7 +58,7 @@ public class CourseActivity extends AppCompatActivity
     protected ImageView mImageViewFavoriteN;
     @BindView(R.id.tv_course_section_empty)
     protected TextView mTextViewCourseSectionEmpty;
-    @BindView(R.id.rv_course_section_list)
+    @BindView(rv_course_section_list)
     protected RecyclerView mRecyclerViewCourseSection;
 
     private SharedPreferences mSharedPreferences;
@@ -76,7 +78,6 @@ public class CourseActivity extends AppCompatActivity
         }
 
         int courseId = getIntent().getIntExtra("id", 0);
-        boolean isInsertedCourse = getIntent().getBooleanExtra("isInsertedCourse", false);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -84,16 +85,11 @@ public class CourseActivity extends AppCompatActivity
         mRealm = Realm.getDefaultInstance();
         mCourse = mRealm.where(Course.class).equalTo("id", courseId).findFirst();
 
+        setAllTextView();
         setFavoriteImageView(mCourse.isFavorite());
         mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections(), this));
         setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
-
-        if (isInsertedCourse) {
-            showCourseDialog(false, "", "", "");
-        } else {
-            setAllTextView();
-        }
     }
 
     @Override
@@ -117,12 +113,8 @@ public class CourseActivity extends AppCompatActivity
             case android.R.id.home:
                 onBackPressed();
                 break;
-            case R.id.action_register_section:
-                int newSectionId = getNewIdByClass(mRealm, Section.class);
-                insertSection(newSectionId);
-                break;
             case R.id.action_update:
-                showCourseDialog(true, mCourse.getTitle(), mCourse.getSearchWord(), mCourse.getDesc());
+                showCourseDialog(mCourse.getTitle(), mCourse.getSearchWord(), mCourse.getDesc());
                 break;
             case R.id.action_delete:
                 deleteCourse();
@@ -143,19 +135,26 @@ public class CourseActivity extends AppCompatActivity
     public void onItemClick(final int id, View view) {
         switch (view.getId()) {
             case R.id.btn_search_section_detail:
-            Section section = mRealm.where(Section.class).equalTo("id", id).findFirst();
+                Section section = mRealm.where(Section.class).equalTo("id", id).findFirst();
 
-            String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_search_engine),
+                String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_search_engine),
                         getString(R.string.pref_value_search_engine_naver_total));
-            String query = mCourse.getSearchWord() + " " + section.getSearchWord();
+                String query = mCourse.getSearchWord() + " " + section.getSearchWord();
 
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(searchEngine + query));
-            startActivity(intent);
+                if (getString(R.string.pref_value_search_engine_instagram).equals(searchEngine)) {
+                    query = query.replace(" ", "");
+                }
 
-            // TODO: overlay button으로 추가되게 수정 + insertSectionDetail method 삭제
-                int newSectionDetailId = getNewIdByClass(mRealm, SectionDetail.class);
-                insertSectionDetail(id, newSectionDetailId);
-            break;
+                Intent serviceIntent = new Intent(this, FloatingService.class);
+                serviceIntent.putExtra("sectionId", id);
+                serviceIntent.putExtra("url", searchEngine + query);
+                startService(serviceIntent);
+
+                // TODO: Service에서 처리하게 수정
+                Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(searchEngine + query));
+                startActivity(webIntent);
+                break;
             case R.id.btn_delete_section:
                 deleteSection(id);
                 break;
@@ -186,6 +185,12 @@ public class CourseActivity extends AppCompatActivity
         updateCourseFavorite();
     }
 
+    @OnClick(R.id.fab_insert_section)
+    protected void onClickFloatingActionButton() {
+        int newSectionId = getNewIdByClass(Section.class);
+        insertSection(newSectionId);
+    }
+
     private void makeToastAfterCancel(int resId) {
         if (mToast != null) {
             mToast.cancel();
@@ -208,7 +213,13 @@ public class CourseActivity extends AppCompatActivity
     private void setAllTextView() {
         mTextViewCourseTitle.setText(mCourse.getTitle());
         mTextViewCourseSearchWord.setText("(" + mCourse.getSearchWord() + ")");
-        mTextViewCourseDesc.setText(mCourse.getDesc());
+        String desc = mCourse.getDesc();
+        if (desc != null && !desc.isEmpty()) {
+            mTextViewCourseDesc.setVisibility(View.VISIBLE);
+            mTextViewCourseDesc.setText(mCourse.getDesc());
+        } else {
+            mTextViewCourseDesc.setVisibility(View.GONE);
+        }
     }
 
     private void updateCourseFavorite() {
@@ -277,22 +288,7 @@ public class CourseActivity extends AppCompatActivity
         builder.show();
     }
 
-    private void insertSectionDetail(final int sectionId, final int sectionDetailId) {
-        mRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Section section = realm.where(Section.class).equalTo("id", sectionId).findFirst();
-
-                SectionDetail sectionDetail = realm.createObject(SectionDetail.class, sectionDetailId);
-                sectionDetail.setTitle("Test Title");
-                sectionDetail.setDesc("Test Description");
-                sectionDetail.setUrl("https://www.google.com");
-                section.getSectionDetails().add(sectionDetail);
-            }
-        });
-    }
-
-    private void showCourseDialog(final boolean isCreated, final String beforeTitle, final String beforeSearchWord, final String beforeDesc) {
+    private void showCourseDialog(final String beforeTitle, final String beforeSearchWord, final String beforeDesc) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final View dialogView = getLayoutInflater().inflate(R.layout.dialog_course, null);
         builder.setView(dialogView);
@@ -300,25 +296,13 @@ public class CourseActivity extends AppCompatActivity
         final EditText editTextSearchWord = (EditText) dialogView.findViewById(R.id.et_course_search_word);
         final EditText editTextDesc = (EditText) dialogView.findViewById(R.id.et_course_desc);
 
-        if (isCreated) {
-            editTextTitle.setText(beforeTitle);
-            editTextSearchWord.setText(beforeSearchWord);
-            editTextDesc.setText(beforeDesc);
-        }
+        editTextTitle.setText(beforeTitle);
+        editTextSearchWord.setText(beforeSearchWord);
+        editTextDesc.setText(beforeDesc);
 
         builder.setTitle(R.string.string_course_info);
-        builder.setNegativeButton(R.string.string_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (!isCreated) {
-                    mRealm.beginTransaction();
-                    mCourse.deleteFromRealm();
-                    mRealm.commitTransaction();
-                    finish();
-                }
-            }
-        });
-        builder.setPositiveButton(isCreated ? R.string.string_update : R.string.string_register, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setPositiveButton(R.string.string_update, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String title = editTextTitle.getText().toString();
@@ -335,7 +319,6 @@ public class CourseActivity extends AppCompatActivity
         });
 
         final AlertDialog alertDialog = builder.create();
-        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
@@ -399,6 +382,8 @@ public class CourseActivity extends AppCompatActivity
                     section.setTitle(title);
                     section.setSearchWord(searchWord);
                     mCourse.getSections().add(section);
+                    mRecyclerViewCourseSection.smoothScrollBy(
+                            mRecyclerViewCourseSection.getLeft(), mRecyclerViewCourseSection.getBottom());
                 }
                 mRealm.commitTransaction();
                 setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
@@ -406,7 +391,6 @@ public class CourseActivity extends AppCompatActivity
         });
 
         final AlertDialog alertDialog = builder.create();
-        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 

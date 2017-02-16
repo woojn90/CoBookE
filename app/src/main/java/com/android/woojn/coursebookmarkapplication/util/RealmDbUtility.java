@@ -16,9 +16,11 @@ import io.realm.RealmModel;
 
 public class RealmDbUtility {
 
-    public static <E extends RealmModel> int getNewIdByClass(Realm realm, Class<E> clazz) {
+    public static <E extends RealmModel> int getNewIdByClass(Class<E> clazz) {
         int newId;
+        Realm realm = Realm.getDefaultInstance();
         Number id = realm.where(clazz).max("id");
+        realm.close();
 
         if (id == null) {
             newId = 1;

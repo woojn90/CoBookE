@@ -3,12 +3,15 @@
 
     <!-- Action Bar -->
     <string name="action_course">코스</string>
+    <string name="action_search">검색</string>
     <string name="action_setting">설정</string>
     <string name="action_overflow">Over Flow</string>
     <string name="action_register_section">그룹 등록하기</string>
     <string name="action_update">수정하기</string>
     <string name="action_delete">삭제하기</string>
     <string name="action_share">공유하기</string>
+    <string name="action_save">저장</string>
+    <string name="action_refresh">새로고침</string>
 
     <!-- UI -->
     <string name="string_course">코스</string>
@@ -44,6 +47,7 @@
     <!-- Toast -->
     <string name="msg_favorite_y">즐겨찾기에 추가되었습니다.</string>
     <string name="msg_favorite_n">즐겨찾기에서 해제되었습니다.</string>
+    <string name="msg_save">저장되었습니다.</string>
 
     <!-- Settings -->
     <string name="settings_category_ui">화면(추가 예정)</string>
@@ -67,7 +71,10 @@
     <string name="settings_developer_info_summary">개발자 정보를 확인합니다.</string>
     <string name="settings_developer_mail">메일 보내기</string>
     <string name="settings_developer_mail_summary">개발자에게 메일을 보냅니다.</string>
+    <string name="settings_license">오픈소스 라이센스</string>
+    <string name="settings_license_summary">오픈소스 라이센스 세부정보입니다.</string>
 
     <!-- etc -->
     <string name="msg_development_scheduled">개발 예정</string>
+
 </resources>

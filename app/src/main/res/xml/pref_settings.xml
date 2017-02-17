@@ -29,5 +29,9 @@
             android:summary="@string/settings_developer_mail_summary"
             android:title="@string/settings_developer_mail">
         </Preference>
+        <Preference
+            android:summary="@string/settings_license_summary"
+            android:title="@string/settings_license">
+        </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

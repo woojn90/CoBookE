@@ -1,5 +1,9 @@
 package com.android.woojn.coursebookmarkapplication.activity;
 
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.COURSE_ID;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
+
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.android.woojn.coursebookmarkapplication.R;
@@ -26,11 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-
 public class MainActivity extends AppCompatActivity {
-
-    public static final int VIEW_ID_OF_ITEM_VIEW = 0;
 
     @BindView(R.id.tabs)
     protected TabLayout mTabLayout;
@@ -48,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.string_course));
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.string_item));
 
-        PagerAdapter tapPagerAdapter = new PagerAdapter(getSupportFragmentManager(), mTabLayout.getTabCount());
-        mViewPager.setAdapter(tapPagerAdapter);
+        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), mTabLayout.getTabCount());
+        mViewPager.setAdapter(pagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.getTabAt(0).setText(R.string.string_course);
         mTabLayout.getTabAt(1).setText(R.string.string_item);
@@ -62,8 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        menu.findItem(R.id.action_overflow).setVisible(false);
+        inflater.inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 int newCourseId = getNewIdByClass(Course.class);
 
                 Intent insertIntent = new Intent(MainActivity.this, CourseActivity.class);
-                insertIntent.putExtra("id", newCourseId);
+                insertIntent.putExtra(COURSE_ID, newCourseId);
                 startActivity(insertIntent);
 
                 Realm realm = Realm.getDefaultInstance();
@@ -121,8 +122,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final AlertDialog alertDialog = builder.create();
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        editTextTitle.requestFocus();
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override

@@ -1,5 +1,7 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.VIEW_ID_OF_ITEM_VIEW;
+
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,8 +19,6 @@ import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
-import static com.android.woojn.coursebookmarkapplication.activity.MainActivity.VIEW_ID_OF_ITEM_VIEW;
-
 /**
  * Created by wjn on 2017-02-06.
  */
@@ -29,7 +29,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     public CourseAdapter(Context context, OrderedRealmCollection<Course> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
-        this.mListener = listener;
+        mListener = listener;
     }
 
     public interface OnRecyclerViewClickListener {
@@ -85,27 +85,33 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
             itemView.setOnClickListener(this);
         }
 
-        @OnClick({R.id.iv_favorite_y_main, R.id.iv_favorite_n_main, R.id.btn_delete_course})
+        @Override
         public void onClick(View view) {
-            int id = (int) itemView.getTag();
-            int viewId = view.getId();
+            mListener.onItemClick((int) itemView.getTag(), VIEW_ID_OF_ITEM_VIEW);
+        }
 
-            switch (viewId) {
-                case R.id.iv_favorite_y_main:
-                    imageViewFavoriteY.setVisibility(View.GONE);
-                    imageViewFavoriteN.setVisibility(View.VISIBLE);
-                    break;
-                case R.id.iv_favorite_n_main:
-                    imageViewFavoriteN.setVisibility(View.GONE);
-                    imageViewFavoriteY.setVisibility(View.VISIBLE);
-                    break;
-                case R.id.btn_delete_course:
-                    break;
-                default:
-                    viewId = VIEW_ID_OF_ITEM_VIEW;
-                    break;
-            }
-            mListener.onItemClick(id, viewId);
+        @OnClick(R.id.iv_favorite_y_main)
+        public void onClickImageViewFavoriteY(View view) {
+            imageViewFavoriteY.setVisibility(View.GONE);
+            imageViewFavoriteN.setVisibility(View.VISIBLE);
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
+        }
+
+        @OnClick(R.id.iv_favorite_n_main)
+        public void onClickImageViewFavoriteN(View view) {
+            imageViewFavoriteN.setVisibility(View.GONE);
+            imageViewFavoriteY.setVisibility(View.VISIBLE);
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
+        }
+
+        @OnClick(R.id.btn_update_course)
+        public void onClickButtonUpdateCourse(View view) {
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
+        }
+
+        @OnClick(R.id.btn_delete_course)
+        public void onClickButtonDeleteCourse(View view) {
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
         }
     }
 }

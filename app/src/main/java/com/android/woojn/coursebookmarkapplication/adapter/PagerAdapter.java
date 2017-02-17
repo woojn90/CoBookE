@@ -17,7 +17,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     public PagerAdapter(FragmentManager fm, int tabCount) {
         super(fm);
-        this.mTabCount = tabCount;
+        mTabCount = tabCount;
     }
 
     @Override

@@ -1,9 +1,21 @@
 package com.android.woojn.coursebookmarkapplication.activity;
 
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.COURSE_ID;
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.ID;
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY;
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY_WITH_SAVE;
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.SECTION_ID;
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.STRING_URL;
+import static com.android.woojn.coursebookmarkapplication.R.id.rv_course_section_list;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
+
+
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -18,6 +30,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,24 +41,26 @@ import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.adapter.CourseSectionAdapter;
 import com.android.woojn.coursebookmarkapplication.model.Course;
 import com.android.woojn.coursebookmarkapplication.model.Section;
-import com.android.woojn.coursebookmarkapplication.service.FloatingService;
+import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 
-import static com.android.woojn.coursebookmarkapplication.R.id.rv_course_section_list;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
-
 /**
  * Created by wjn on 2017-02-06.
  */
 
 public class CourseActivity extends AppCompatActivity
-        implements SharedPreferences.OnSharedPreferenceChangeListener,
-        CourseSectionAdapter.OnRecyclerViewClickListener{
+        implements CourseSectionAdapter.OnRecyclerViewClickListener {
 
     @BindView(R.id.tv_course_title)
     protected TextView mTextViewCourseTitle;
@@ -77,13 +93,12 @@ public class CourseActivity extends AppCompatActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        int courseId = getIntent().getIntExtra("id", 0);
+        int courseId = getIntent().getIntExtra(COURSE_ID, 0);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         mRealm = Realm.getDefaultInstance();
-        mCourse = mRealm.where(Course.class).equalTo("id", courseId).findFirst();
+        mCourse = mRealm.where(Course.class).equalTo(ID, courseId).findFirst();
 
         setAllTextView();
         setFavoriteImageView(mCourse.isFavorite());
@@ -93,17 +108,26 @@ public class CourseActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        for (Section section : mCourse.getSections()) {
+            for (SectionDetail sectionDetail : section.getSectionDetails()) {
+                int sectionDetailId = sectionDetail.getId();
+                setSectionDetailByUrl(sectionDetailId);
+            }
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         mRealm.close();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        menu.findItem(R.id.action_setting).setVisible(false);
+        inflater.inflate(R.menu.menu_course, menu);
         return true;
     }
 
@@ -127,33 +151,10 @@ public class CourseActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        // Do nothing
-    }
-
-    @Override
     public void onItemClick(final int id, View view) {
         switch (view.getId()) {
             case R.id.btn_search_section_detail:
-                Section section = mRealm.where(Section.class).equalTo("id", id).findFirst();
-
-                String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_search_engine),
-                        getString(R.string.pref_value_search_engine_naver_total));
-                String query = mCourse.getSearchWord() + " " + section.getSearchWord();
-
-                if (getString(R.string.pref_value_search_engine_instagram).equals(searchEngine)) {
-                    query = query.replace(" ", "");
-                }
-
-                Intent serviceIntent = new Intent(this, FloatingService.class);
-                serviceIntent.putExtra("sectionId", id);
-                serviceIntent.putExtra("url", searchEngine + query);
-                startService(serviceIntent);
-
-                // TODO: Service에서 처리하게 수정
-                Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(searchEngine + query));
-                startActivity(webIntent);
+                searchByWebView(id);
                 break;
             case R.id.btn_delete_section:
                 deleteSection(id);
@@ -174,7 +175,7 @@ public class CourseActivity extends AppCompatActivity
                         return false;
                     }
                 });
-                popupMenu.inflate(R.menu.menu_section);
+                popupMenu.inflate(R.menu.menu_in_section_view);
                 popupMenu.show();
                 break;
         }
@@ -262,13 +263,14 @@ public class CourseActivity extends AppCompatActivity
     }
 
     private void updateSection(int sectionId) {
-        Section section = mRealm.where(Section.class).equalTo("id", sectionId).findFirst();
+        Section section = mRealm.where(Section.class).equalTo(ID, sectionId).findFirst();
         String beforeTitle = section.getTitle();
         String beforeSearchWord = section.getSearchWord();
         showSectionDialog(sectionId, true, beforeTitle, beforeSearchWord);
     }
 
-    private void deleteSection(final int sectionId) {
+    private void deleteSection(int sectionId) {
+        final Section section = mRealm.where(Section.class).equalTo(ID, sectionId).findFirst();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.msg_delete_confirm);
         builder.setNegativeButton(R.string.string_cancel, null);
@@ -278,7 +280,6 @@ public class CourseActivity extends AppCompatActivity
                 mRealm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        Section section = realm.where(Section.class).equalTo("id", sectionId).findFirst();
                         section.deleteFromRealm();
                         setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
                     }
@@ -286,6 +287,24 @@ public class CourseActivity extends AppCompatActivity
             }
         });
         builder.show();
+    }
+
+    private void searchByWebView(int sectionId) {
+        Section section = mRealm.where(Section.class).equalTo(ID, sectionId).findFirst();
+
+        String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_search_engine),
+                getString(R.string.pref_value_search_engine_naver_total));
+        String query = mCourse.getSearchWord() + " " + section.getSearchWord();
+
+        if (getString(R.string.pref_value_search_engine_instagram).equals(searchEngine)) {
+            query = query.replace(" ", "");
+        }
+
+        Intent webIntent = new Intent(this, WebActivity.class);
+        webIntent.putExtra(REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
+        webIntent.putExtra(STRING_URL, searchEngine + query);
+        webIntent.putExtra(SECTION_ID, sectionId);
+        startActivity(webIntent);
     }
 
     private void showCourseDialog(final String beforeTitle, final String beforeSearchWord, final String beforeDesc) {
@@ -319,8 +338,10 @@ public class CourseActivity extends AppCompatActivity
         });
 
         final AlertDialog alertDialog = builder.create();
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        editTextTitle.requestFocus();
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -357,6 +378,9 @@ public class CourseActivity extends AppCompatActivity
         final EditText editTextTitle = (EditText) dialogView.findViewById(R.id.et_section_title);
         final EditText editTextSearchWord = (EditText) dialogView.findViewById(R.id.et_section_search_word);
 
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editTextTitle, 0);
+
         if (isCreated) {
             editTextTitle.setText(beforeTitle);
             editTextSearchWord.setText(beforeSearchWord);
@@ -373,7 +397,7 @@ public class CourseActivity extends AppCompatActivity
                 Section section;
                 mRealm.beginTransaction();
                 if (isCreated) {
-                    section = mRealm.where(Section.class).equalTo("id", sectionId).findFirst();
+                    section = mRealm.where(Section.class).equalTo(ID, sectionId).findFirst();
                     section.setTitle(title);
                     section.setSearchWord(searchWord);
                 }
@@ -391,8 +415,10 @@ public class CourseActivity extends AppCompatActivity
         });
 
         final AlertDialog alertDialog = builder.create();
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        editTextTitle.requestFocus();
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -418,6 +444,56 @@ public class CourseActivity extends AppCompatActivity
         };
         editTextTitle.addTextChangedListener(textWatcher);
         editTextSearchWord.addTextChangedListener(textWatcher);
+    }
+
+    private void setSectionDetailByUrl(int sectionDetailId) {
+        // TODO: refresh (이미 로딩된 항목 처리)
+        JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
+        jsoupAsyncTask.execute(sectionDetailId, null, null);
+    }
+
+    private class JsoupAsyncTask extends AsyncTask<Integer, Void, Void> {
+        @Override
+        protected Void doInBackground(Integer... params) {
+            try {
+                Realm realm = Realm.getDefaultInstance();
+                SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(ID, params[0]).findFirst();
+
+                Document doc = Jsoup.connect(sectionDetail.getUrl()).get();
+
+                Elements ogTags = doc.select("meta[property^=og:]");
+                if (ogTags.size() <= 0) {
+                    // TODO: og: 태그 없으면 title 등 다른 tag로 찾기
+                    return null;
+                }
+
+                realm.beginTransaction();
+                for (int i = 0; i < ogTags.size(); i++) {
+                    Element tag = ogTags.get(i);
+                    String property = tag.attr("property");
+                    String content = tag.attr("content");
+
+                    if ("og:title".equals(property)) {
+                        sectionDetail.setTitle(content);
+                    } else if ("og:description".equals(property)) {
+                        sectionDetail.setDesc(content);
+                    } else if ("og:image".equals(property)) {
+                        sectionDetail.setImageUrl(content);
+                    }
+                }
+                realm.commitTransaction();
+                realm.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
     }
 
 }

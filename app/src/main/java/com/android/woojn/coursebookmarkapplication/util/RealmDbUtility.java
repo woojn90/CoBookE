@@ -1,5 +1,7 @@
 package com.android.woojn.coursebookmarkapplication.util;
 
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.ID;
+
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,7 +21,7 @@ public class RealmDbUtility {
     public static <E extends RealmModel> int getNewIdByClass(Class<E> clazz) {
         int newId;
         Realm realm = Realm.getDefaultInstance();
-        Number id = realm.where(clazz).max("id");
+        Number id = realm.where(clazz).max(ID);
         realm.close();
 
         if (id == null) {
@@ -39,13 +41,13 @@ public class RealmDbUtility {
                 textViewEmpty.setVisibility(View.VISIBLE);
             }
         } else if (clazz.equals(Section.class)) {
-            if (realm.where(Course.class).equalTo("id", parentId).findFirst().getSections().size() > 0) {
+            if (realm.where(Course.class).equalTo(ID, parentId).findFirst().getSections().size() > 0) {
                 textViewEmpty.setVisibility(View.GONE);
             } else {
                 textViewEmpty.setVisibility(View.VISIBLE);
             }
         } else if (clazz.equals(SectionDetail.class)) {
-            if (realm.where(Section.class).equalTo("id", parentId).findFirst().getSectionDetails().size() > 0) {
+            if (realm.where(Section.class).equalTo(ID, parentId).findFirst().getSectionDetails().size() > 0) {
                 textViewEmpty.setVisibility(View.GONE);
             } else {
                 textViewEmpty.setVisibility(View.VISIBLE);

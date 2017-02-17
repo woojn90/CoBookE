@@ -29,8 +29,8 @@
             <FrameLayout
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginEnd="10dp">
                 <ImageView
@@ -76,7 +76,6 @@
                     android:textSize="17sp"
                     tools:text="Course Description"/>
             </LinearLayout>
-
         </LinearLayout>
 
         <FrameLayout

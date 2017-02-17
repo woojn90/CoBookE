@@ -11,12 +11,21 @@ public class SectionDetail extends RealmObject {
 
     @PrimaryKey
     private int id;
+    private String url;
     private String title;
     private String desc;
-    private String url;
+    private String imageUrl;
 
     public int getId() {
         return id;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getTitle() {
@@ -35,11 +44,12 @@ public class SectionDetail extends RealmObject {
         this.desc = desc;
     }
 
-    public String getUrl() {
-        return url;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
+
 }

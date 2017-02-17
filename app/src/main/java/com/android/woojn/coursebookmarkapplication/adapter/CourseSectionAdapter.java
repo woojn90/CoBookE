@@ -1,16 +1,25 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.ID;
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY;
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
+
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.STRING_URL;
+import static com.android.woojn.coursebookmarkapplication.ConstantClass.VIEW_ID_OF_ITEM_VIEW;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
+
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.woojn.coursebookmarkapplication.R;
+import com.android.woojn.coursebookmarkapplication.activity.WebActivity;
 import com.android.woojn.coursebookmarkapplication.model.Section;
 import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
 
@@ -20,9 +29,6 @@ import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
-
-import static com.android.woojn.coursebookmarkapplication.activity.MainActivity.VIEW_ID_OF_ITEM_VIEW;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
 
 /**
  * Created by wjn on 2017-02-07.
@@ -35,8 +41,8 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
     public CourseSectionAdapter(Context context, OrderedRealmCollection<Section> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
-        this.mListener = listener;
-        this.mContext = context;
+        mListener = listener;
+        mContext = context;
     }
 
     public interface OnRecyclerViewClickListener {
@@ -84,27 +90,22 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
         @OnClick({R.id.btn_search_section_detail, R.id.btn_delete_section, R.id.btn_section_overflow})
         public void onClick(View view) {
-            int id = (int) itemView.getTag();
-
-            if (view.getId() == R.id.btn_search_section_detail) {
-                // TODO: 검색 완료 후 overlay로 저장할 때, 하도록 변경
-                setTextViewEmptyVisibility(SectionDetail.class, id, textViewCourseSectionDetailEmpty);
-            }
-            mListener.onItemClick(id, view);
+            mListener.onItemClick((int) itemView.getTag(), view);
         }
 
         @Override
         public void onItemClick(int id, int viewId) {
             switch (viewId) {
                 case VIEW_ID_OF_ITEM_VIEW:
-                    // TODO: move to web page using this itemView's Url
                     Realm realm = Realm.getDefaultInstance();
-                    SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo("id", id).findFirst();
-                    String url = sectionDetail.getUrl();
+                    SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(ID, id).findFirst();
                     realm.close();
+                    String stringUrl = sectionDetail.getUrl();
 
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    mContext.startActivity(intent);
+                    Intent webIntent = new Intent(mContext, WebActivity.class);
+                    webIntent.putExtra(REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITHOUT_SAVE);
+                    webIntent.putExtra(STRING_URL, stringUrl);
+                    mContext.startActivity(webIntent);
                     break;
                 case R.id.btn_share_section_detail:
                     // TODO: 섹션 항목 공유
@@ -117,7 +118,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
         private void deleteSectionDetail(int sectionDetailId) {
             Realm realm = Realm.getDefaultInstance();
-            SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo("id", sectionDetailId).findFirst();
+            SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(ID, sectionDetailId).findFirst();
             realm.beginTransaction();
             sectionDetail.deleteFromRealm();
             realm.commitTransaction();

@@ -14,6 +14,7 @@ public class Course extends RealmObject {
     private int id;
     private String title;
     private String desc;
+    private String searchWord;
     private boolean favorite;
     private RealmList<Section> sections;
 
@@ -37,6 +38,14 @@ public class Course extends RealmObject {
         this.desc = desc;
     }
 
+    public String getSearchWord() {
+        return searchWord;
+    }
+
+    public void setSearchWord(String searchWord) {
+        this.searchWord = searchWord;
+    }
+
     public boolean isFavorite() {
         return favorite;
     }
@@ -47,9 +56,5 @@ public class Course extends RealmObject {
 
     public RealmList<Section> getSections() {
         return sections;
-    }
-
-    public void setSections(RealmList<Section> sections) {
-        this.sections = sections;
     }
 }

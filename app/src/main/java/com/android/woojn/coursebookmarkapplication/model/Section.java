@@ -13,6 +13,7 @@ public class Section extends RealmObject {
     @PrimaryKey
     private int id;
     private String title;
+    private String searchWord;
     private RealmList<SectionDetail> sectionDetails;
 
     public int getId() {
@@ -27,11 +28,15 @@ public class Section extends RealmObject {
         this.title = title;
     }
 
-    public RealmList<SectionDetail> getSectionDetails() {
-        return sectionDetails;
+    public String getSearchWord() {
+        return searchWord;
     }
 
-    public void setSectionDetails(RealmList<SectionDetail> sectionDetails) {
-        this.sectionDetails = sectionDetails;
+    public void setSearchWord(String searchWord) {
+        this.searchWord = searchWord;
+    }
+
+    public RealmList<SectionDetail> getSectionDetails() {
+        return sectionDetails;
     }
 }

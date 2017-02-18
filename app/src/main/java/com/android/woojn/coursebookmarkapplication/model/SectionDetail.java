@@ -11,12 +11,22 @@ public class SectionDetail extends RealmObject {
 
     @PrimaryKey
     private int id;
+    private String url;
     private String title;
     private String desc;
     private String imageUrl;
+    private boolean visited;
 
     public int getId() {
         return id;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getTitle() {
@@ -41,5 +51,13 @@ public class SectionDetail extends RealmObject {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 }

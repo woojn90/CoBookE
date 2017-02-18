@@ -3,6 +3,7 @@
     package="com.android.woojn.coursebookmarkapplication">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:name=".MyApplication"
@@ -11,31 +12,35 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".MainActivity"
-            android:launchMode="singleTop">
+        <activity android:name=".activity.MainActivity"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name=".CourseActivity"
+        <activity android:name=".activity.CourseActivity"
             android:label="@string/action_course"
-            android:windowSoftInputMode="adjustPan">
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
-
-        <activity android:name=".SettingsActivity"
+        <activity android:name=".activity.WebActivity"
+            android:label="@string/action_search"
+            android:configChanges="orientation|screenSize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.CourseActivity"/>
+        </activity>
+        <activity android:name=".activity.SettingsActivity"
             android:label="@string/action_setting"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
-
     </application>
-
 </manifest>

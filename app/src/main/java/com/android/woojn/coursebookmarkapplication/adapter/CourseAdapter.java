@@ -1,10 +1,13 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
+import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
+
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.woojn.coursebookmarkapplication.R;
@@ -22,16 +25,15 @@ import io.realm.RealmRecyclerViewAdapter;
 
 public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapter.CourseViewHolder> {
 
-    private OnRecyclerViewClickListener mListener;
+    private final OnRecyclerViewClickListener mListener;
 
     public CourseAdapter(Context context, OrderedRealmCollection<Course> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
-        this.mListener = listener;
+        mListener = listener;
     }
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, int viewId);
-        void onItemLongClick(int id, int viewId);
     }
 
     @Override
@@ -43,54 +45,73 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     @Override
     public void onBindViewHolder(CourseViewHolder holder, int position) {
-        Course course = getData().get(position);
-
-        holder.itemView.setTag(course.getId());
-        holder.textViewCourseTitle.setText(course.getTitle());
-        holder.textViewCourseDesc.setText(course.getDesc());
-        holder.textViewCourseFavorite.setText(
-                course.isFavorite() ? "Y" : "N");
+        if (getData() != null) {
+            Course course = getData().get(position);
+            holder.itemView.setTag(course.getId());
+            holder.textViewCourseTitle.setText(course.getTitle());
+            String desc = course.getDesc();
+            if (desc != null && !desc.isEmpty()) {
+                holder.textViewCourseDesc.setVisibility(View.VISIBLE);
+                holder.textViewCourseDesc.setText(course.getDesc());
+            } else {
+                holder.textViewCourseDesc.setVisibility(View.GONE);
+            }
+            if (course.isFavorite()) {
+                holder.imageViewFavoriteN.setVisibility(View.GONE);
+                holder.imageViewFavoriteY.setVisibility(View.VISIBLE);
+            } else {
+                holder.imageViewFavoriteY.setVisibility(View.GONE);
+                holder.imageViewFavoriteN.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
-    class CourseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class CourseViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
 
         @BindView(R.id.tv_course_title)
         TextView textViewCourseTitle;
         @BindView(R.id.tv_course_desc)
         TextView textViewCourseDesc;
-        // TODO: 별 모양 Image로 변경 (로직도 적용)
-        @BindView(R.id.tv_course_favorite)
-        TextView textViewCourseFavorite;
+        @BindView(R.id.iv_favorite_y_main)
+        ImageView imageViewFavoriteY;
+        @BindView(R.id.iv_favorite_n_main)
+        ImageView imageViewFavoriteN;
 
         public CourseViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
-        }
-
-        @OnClick(R.id.tv_course_favorite)
-        public void onClick(View view) {
-            int id = (int) itemView.getTag();
-            int viewId = view.getId();
-
-            mListener.onItemClick(id, viewId);
-
-            switch (viewId) {
-                case R.id.tv_course_favorite:
-                    // TODO: 이미지 변경
-                    break;
-            }
         }
 
         @Override
-        public boolean onLongClick(View view) {
-            int id = (int) itemView.getTag();
-            int viewId = view.getId();
+        public void onClick(View view) {
+            mListener.onItemClick((int) itemView.getTag(), DEFAULT_VIEW_ID);
+        }
 
-            mListener.onItemLongClick(id, viewId);
-            return true;
+        @OnClick(R.id.iv_favorite_y_main)
+        public void onClickImageViewFavoriteY(View view) {
+            imageViewFavoriteY.setVisibility(View.GONE);
+            imageViewFavoriteN.setVisibility(View.VISIBLE);
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
+        }
+
+        @OnClick(R.id.iv_favorite_n_main)
+        public void onClickImageViewFavoriteN(View view) {
+            imageViewFavoriteN.setVisibility(View.GONE);
+            imageViewFavoriteY.setVisibility(View.VISIBLE);
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
+        }
+
+        @OnClick(R.id.btn_update_course)
+        public void onClickButtonUpdateCourse(View view) {
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
+        }
+
+        @OnClick(R.id.btn_delete_course)
+        public void onClickButtonDeleteCourse(View view) {
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
         }
     }
 }

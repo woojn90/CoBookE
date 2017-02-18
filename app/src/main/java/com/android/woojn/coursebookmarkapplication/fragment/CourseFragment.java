@@ -1,8 +1,8 @@
 package com.android.woojn.coursebookmarkapplication.fragment;
 
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.COURSE_ID;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.ID;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.VIEW_ID_OF_ITEM_VIEW;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
 
 import android.content.DialogInterface;
@@ -75,16 +75,16 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
 
     @Override
     public void onItemClick(int id, int viewId) {
-        Course course = mRealm.where(Course.class).equalTo(ID, id).findFirst();
+        Course course = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, id).findFirst();
         switch (viewId) {
-            case VIEW_ID_OF_ITEM_VIEW:
+            case DEFAULT_VIEW_ID:
                 Intent updateIntent = new Intent(getContext(), CourseActivity.class);
-                updateIntent.putExtra(COURSE_ID, id);
+                updateIntent.putExtra(KEY_COURSE_ID, id);
                 startActivity(updateIntent);
                 break;
             case R.id.iv_favorite_y_main:
             case R.id.iv_favorite_n_main:
-                updateCourseFavoriteById(course);
+                toggleCourseFavorited(course);
                 break;
             case R.id.btn_update_course:
                 showCourseUpdateDialog(course, course.getTitle(), course.getSearchWord(), course.getDesc());
@@ -95,7 +95,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         }
     }
 
-    private void makeToastAfterCancel(int resId) {
+    private void showToastByForce(int resId) {
         if (mToast != null) {
             mToast.cancel();
         }
@@ -103,16 +103,16 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         mToast.show();
     }
 
-    private void updateCourseFavoriteById(final Course course) {
+    private void toggleCourseFavorited(final Course course) {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 if (course.isFavorite()) {
                     course.setFavorite(false);
-                    makeToastAfterCancel(R.string.msg_favorite_n);
+                    showToastByForce(R.string.msg_favorite_n);
                 } else {
                     course.setFavorite(true);
-                    makeToastAfterCancel(R.string.msg_favorite_y);
+                    showToastByForce(R.string.msg_favorite_y);
                 }
             }
         });

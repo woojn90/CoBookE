@@ -1,11 +1,11 @@
 package com.android.woojn.coursebookmarkapplication.activity;
 
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.COURSE_ID;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.ID;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY_WITH_SAVE;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.SECTION_ID;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.STRING_URL;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
+import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
 import static com.android.woojn.coursebookmarkapplication.R.id.rv_course_section_list;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
@@ -93,15 +93,15 @@ public class CourseActivity extends AppCompatActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        int courseId = getIntent().getIntExtra(COURSE_ID, 0);
+        int courseId = getIntent().getIntExtra(KEY_COURSE_ID, 0);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         mRealm = Realm.getDefaultInstance();
-        mCourse = mRealm.where(Course.class).equalTo(ID, courseId).findFirst();
+        mCourse = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, courseId).findFirst();
 
         setAllTextView();
-        setFavoriteImageView(mCourse.isFavorite());
+        toggleImageViewFavorited(mCourse.isFavorite());
         mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections(), this));
         setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
@@ -112,8 +112,9 @@ public class CourseActivity extends AppCompatActivity
         super.onResume();
         for (Section section : mCourse.getSections()) {
             for (SectionDetail sectionDetail : section.getSectionDetails()) {
-                int sectionDetailId = sectionDetail.getId();
-                setSectionDetailByUrl(sectionDetailId);
+                if (!sectionDetail.isVisited()) {
+                    retrieveSectionDetailById(sectionDetail.getId());
+                }
             }
         }
     }
@@ -134,9 +135,6 @@ public class CourseActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
             case R.id.action_update:
                 showCourseDialog(mCourse.getTitle(), mCourse.getSearchWord(), mCourse.getDesc());
                 break;
@@ -154,7 +152,7 @@ public class CourseActivity extends AppCompatActivity
     public void onItemClick(final int id, View view) {
         switch (view.getId()) {
             case R.id.btn_search_section_detail:
-                searchByWebView(id);
+                searchAndShowResults(id);
                 break;
             case R.id.btn_delete_section:
                 deleteSection(id);
@@ -183,7 +181,7 @@ public class CourseActivity extends AppCompatActivity
 
     @OnClick({R.id.iv_favorite_y_course, R.id.iv_favorite_n_course})
     protected void onClickTextViewCourseFavorite() {
-        updateCourseFavorite();
+        toggleCourseFavorited();
     }
 
     @OnClick(R.id.fab_insert_section)
@@ -192,7 +190,7 @@ public class CourseActivity extends AppCompatActivity
         insertSection(newSectionId);
     }
 
-    private void makeToastAfterCancel(int resId) {
+    private void showToastByForce(int resId) {
         if (mToast != null) {
             mToast.cancel();
         }
@@ -200,7 +198,7 @@ public class CourseActivity extends AppCompatActivity
         mToast.show();
     }
 
-    private void setFavoriteImageView(boolean isFavorite) {
+    private void toggleImageViewFavorited(boolean isFavorite) {
         if (isFavorite) {
             mImageViewFavoriteN.setVisibility(View.GONE);
             mImageViewFavoriteY.setVisibility(View.VISIBLE);
@@ -223,18 +221,18 @@ public class CourseActivity extends AppCompatActivity
         }
     }
 
-    private void updateCourseFavorite() {
+    private void toggleCourseFavorited() {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 if (mCourse.isFavorite()) {
                     mCourse.setFavorite(false);
-                    makeToastAfterCancel(R.string.msg_favorite_n);
+                    showToastByForce(R.string.msg_favorite_n);
                 } else {
                     mCourse.setFavorite(true);
-                    makeToastAfterCancel(R.string.msg_favorite_y);
+                    showToastByForce(R.string.msg_favorite_y);
                 }
-                setFavoriteImageView(mCourse.isFavorite());
+                toggleImageViewFavorited(mCourse.isFavorite());
             }
         });
     }
@@ -263,14 +261,14 @@ public class CourseActivity extends AppCompatActivity
     }
 
     private void updateSection(int sectionId) {
-        Section section = mRealm.where(Section.class).equalTo(ID, sectionId).findFirst();
+        Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
         String beforeTitle = section.getTitle();
         String beforeSearchWord = section.getSearchWord();
         showSectionDialog(sectionId, true, beforeTitle, beforeSearchWord);
     }
 
     private void deleteSection(int sectionId) {
-        final Section section = mRealm.where(Section.class).equalTo(ID, sectionId).findFirst();
+        final Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.msg_delete_confirm);
         builder.setNegativeButton(R.string.string_cancel, null);
@@ -289,8 +287,8 @@ public class CourseActivity extends AppCompatActivity
         builder.show();
     }
 
-    private void searchByWebView(int sectionId) {
-        Section section = mRealm.where(Section.class).equalTo(ID, sectionId).findFirst();
+    private void searchAndShowResults(int sectionId) {
+        Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
 
         String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_search_engine),
                 getString(R.string.pref_value_search_engine_naver_total));
@@ -301,9 +299,9 @@ public class CourseActivity extends AppCompatActivity
         }
 
         Intent webIntent = new Intent(this, WebActivity.class);
-        webIntent.putExtra(REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
-        webIntent.putExtra(STRING_URL, searchEngine + query);
-        webIntent.putExtra(SECTION_ID, sectionId);
+        webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
+        webIntent.putExtra(KEY_STRING_URL, searchEngine + query);
+        webIntent.putExtra(KEY_SECTION_ID, sectionId);
         startActivity(webIntent);
     }
 
@@ -397,7 +395,7 @@ public class CourseActivity extends AppCompatActivity
                 Section section;
                 mRealm.beginTransaction();
                 if (isCreated) {
-                    section = mRealm.where(Section.class).equalTo(ID, sectionId).findFirst();
+                    section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
                     section.setTitle(title);
                     section.setSearchWord(searchWord);
                 }
@@ -446,18 +444,19 @@ public class CourseActivity extends AppCompatActivity
         editTextSearchWord.addTextChangedListener(textWatcher);
     }
 
-    private void setSectionDetailByUrl(int sectionDetailId) {
+    private void retrieveSectionDetailById(int sectionDetailId) {
         // TODO: refresh (이미 로딩된 항목 처리)
-        JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-        jsoupAsyncTask.execute(sectionDetailId, null, null);
+        ParseAsyncTask parseAsyncTask = new ParseAsyncTask();
+        parseAsyncTask.execute(sectionDetailId, null, null);
     }
 
-    private class JsoupAsyncTask extends AsyncTask<Integer, Void, Void> {
+    private class ParseAsyncTask extends AsyncTask<Integer, Void, Void> {
         @Override
         protected Void doInBackground(Integer... params) {
             try {
                 Realm realm = Realm.getDefaultInstance();
-                SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(ID, params[0]).findFirst();
+                SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(
+                        FIELD_NAME_ID, params[0]).findFirst();
 
                 Document doc = Jsoup.connect(sectionDetail.getUrl()).get();
 
@@ -468,8 +467,7 @@ public class CourseActivity extends AppCompatActivity
                 }
 
                 realm.beginTransaction();
-                for (int i = 0; i < ogTags.size(); i++) {
-                    Element tag = ogTags.get(i);
+                for (Element tag : ogTags) {
                     String property = tag.attr("property");
                     String content = tag.attr("content");
 
@@ -481,6 +479,8 @@ public class CourseActivity extends AppCompatActivity
                         sectionDetail.setImageUrl(content);
                     }
                 }
+                // TODO: 저장된 값이 없어도 방문한 것으로 처리할 지 확인
+                sectionDetail.setVisited(true);
                 realm.commitTransaction();
                 realm.close();
 

@@ -1,17 +1,16 @@
 package com.android.woojn.coursebookmarkapplication.activity;
 
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.ID;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY_WITH_SAVE;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.SECTION_ID;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.STRING_URL;
+import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
+import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
+import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -58,8 +57,13 @@ public class WebActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        mSectionId = getIntent().getIntExtra(SECTION_ID, 0);
-        String stringUrl = getIntent().getStringExtra(STRING_URL);
+        mSectionId = getIntent().getIntExtra(KEY_SECTION_ID, 0);
+        String stringUrl = getIntent().getStringExtra(KEY_STRING_URL);
+        if (stringUrl == null || stringUrl.length() == 0) {
+            // TODO: 넘어온 url이 없을 경우 (Toast 등 처리)
+            finish();
+        }
+
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadUrl(stringUrl);
         mWebView.setWebViewClient(new WebViewClient() {
@@ -96,7 +100,7 @@ public class WebActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_web, menu);
 
-        int requestCode = getIntent().getIntExtra(REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
+        int requestCode = getIntent().getIntExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
         if (requestCode == REQUEST_WEB_ACTIVITY_WITHOUT_SAVE) {
             menu.findItem(R.id.action_save).setVisible(false);
         }
@@ -106,9 +110,6 @@ public class WebActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                break;
             case R.id.action_refresh:
                 mWebView.reload();
                 break;
@@ -128,7 +129,7 @@ public class WebActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    private void makeToastAfterCancel(int resId) {
+    private void showToastByForce(int resId) {
         if (mToast != null) {
             mToast.cancel();
         }
@@ -139,13 +140,14 @@ public class WebActivity extends AppCompatActivity {
     private void saveThisPage() {
         int newSectionDetailId = getNewIdByClass(SectionDetail.class);
         Realm realm = Realm.getDefaultInstance();
-        Section section = realm.where(Section.class).equalTo(ID, mSectionId).findFirst();
+        Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, mSectionId).findFirst();
         realm.beginTransaction();
         SectionDetail sectionDetail = realm.createObject(SectionDetail.class, newSectionDetailId);
         sectionDetail.setUrl(mWebView.getUrl());
+        sectionDetail.setVisited(false);
         section.getSectionDetails().add(sectionDetail);
         realm.commitTransaction();
 
-        makeToastAfterCancel(R.string.msg_save);
+        showToastByForce(R.string.msg_save);
     }
 }

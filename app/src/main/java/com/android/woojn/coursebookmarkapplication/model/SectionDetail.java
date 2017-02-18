@@ -15,6 +15,7 @@ public class SectionDetail extends RealmObject {
     private String title;
     private String desc;
     private String imageUrl;
+    private boolean visited;
 
     public int getId() {
         return id;
@@ -52,4 +53,11 @@ public class SectionDetail extends RealmObject {
         this.imageUrl = imageUrl;
     }
 
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
 }

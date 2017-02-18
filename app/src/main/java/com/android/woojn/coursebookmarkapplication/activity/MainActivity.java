@@ -1,9 +1,8 @@
 package com.android.woojn.coursebookmarkapplication.activity;
 
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.COURSE_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,7 +19,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.android.woojn.coursebookmarkapplication.R;
@@ -107,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 int newCourseId = getNewIdByClass(Course.class);
 
                 Intent insertIntent = new Intent(MainActivity.this, CourseActivity.class);
-                insertIntent.putExtra(COURSE_ID, newCourseId);
+                insertIntent.putExtra(KEY_COURSE_ID, newCourseId);
                 startActivity(insertIntent);
 
                 Realm realm = Realm.getDefaultInstance();

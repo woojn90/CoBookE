@@ -1,6 +1,6 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.VIEW_ID_OF_ITEM_VIEW;
+import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -87,7 +87,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
         @Override
         public void onClick(View view) {
-            mListener.onItemClick((int) itemView.getTag(), VIEW_ID_OF_ITEM_VIEW);
+            mListener.onItemClick((int) itemView.getTag(), DEFAULT_VIEW_ID);
         }
 
         @OnClick(R.id.iv_favorite_y_main)

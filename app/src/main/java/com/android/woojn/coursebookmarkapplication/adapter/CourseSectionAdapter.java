@@ -1,18 +1,17 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.ID;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
+import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
+import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
 
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.STRING_URL;
-import static com.android.woojn.coursebookmarkapplication.ConstantClass.VIEW_ID_OF_ITEM_VIEW;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
+import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,15 +95,16 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
         @Override
         public void onItemClick(int id, int viewId) {
             switch (viewId) {
-                case VIEW_ID_OF_ITEM_VIEW:
+                case DEFAULT_VIEW_ID:
                     Realm realm = Realm.getDefaultInstance();
-                    SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(ID, id).findFirst();
-                    realm.close();
+                    SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(
+                            FIELD_NAME_ID, id).findFirst();
                     String stringUrl = sectionDetail.getUrl();
+                    realm.close();
 
                     Intent webIntent = new Intent(mContext, WebActivity.class);
-                    webIntent.putExtra(REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITHOUT_SAVE);
-                    webIntent.putExtra(STRING_URL, stringUrl);
+                    webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITHOUT_SAVE);
+                    webIntent.putExtra(KEY_STRING_URL, stringUrl);
                     mContext.startActivity(webIntent);
                     break;
                 case R.id.btn_share_section_detail:
@@ -118,7 +118,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
         private void deleteSectionDetail(int sectionDetailId) {
             Realm realm = Realm.getDefaultInstance();
-            SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(ID, sectionDetailId).findFirst();
+            SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(FIELD_NAME_ID, sectionDetailId).findFirst();
             realm.beginTransaction();
             sectionDetail.deleteFromRealm();
             realm.commitTransaction();

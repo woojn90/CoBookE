@@ -12,11 +12,19 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_search">
         <ListPreference
-            android:key="@string/pref_key_search_engine"
-            android:title="@string/pref_label_search_engine"
-            android:defaultValue="@string/pref_value_search_engine_naver_total"
-            android:entries="@array/pref_labels_search_engine"
-            android:entryValues="@array/pref_values_search_engine"
+            android:key="@string/pref_key_home_page"
+            android:title="@string/pref_label_home_page"
+            android:defaultValue="@string/pref_value_home_page_naver"
+            android:entries="@array/pref_labels_home_page"
+            android:entryValues="@array/pref_values_home_page"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+        <ListPreference
+            android:key="@string/pref_key_target_of_auto_search"
+            android:title="@string/pref_label_target_of_auto_search"
+            android:defaultValue="@string/pref_value_target_of_auto_search_naver_total"
+            android:entries="@array/pref_labels_target_of_auto_search"
+            android:entryValues="@array/pref_values_target_of_auto_search"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"/>
     </PreferenceCategory>

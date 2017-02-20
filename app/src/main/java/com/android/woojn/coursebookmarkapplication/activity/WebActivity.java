@@ -1,16 +1,20 @@
 package com.android.woojn.coursebookmarkapplication.activity;
 
+import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
+import static com.android.woojn.coursebookmarkapplication.Constants
+        .REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
+import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 
 import android.annotation.TargetApi;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -25,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
+import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
 import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
 
@@ -43,8 +48,8 @@ public class WebActivity extends AppCompatActivity {
     @BindView(R.id.web_view)
     protected WebView mWebView;
 
+    private SharedPreferences mSharedPreferences;
     private int mSectionId;
-    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +62,14 @@ public class WebActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        mSectionId = getIntent().getIntExtra(KEY_SECTION_ID, 0);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mSectionId = getIntent().getIntExtra(KEY_SECTION_ID, DEFAULT_SECTION_ID);
         String stringUrl = getIntent().getStringExtra(KEY_STRING_URL);
         if (stringUrl == null || stringUrl.length() == 0) {
-            // TODO: 넘어온 url이 없을 경우 (Toast 등 처리)
-            finish();
+            Toast.makeText(this, R.string.msg_invalid_url, Toast.LENGTH_LONG).show();
+            stringUrl = mSharedPreferences.getString(getString(R.string.pref_key_home_page)
+                    , getString(R.string.pref_value_home_page_naver));
         }
 
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -85,7 +93,6 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 mProgressBarWebLoading.setProgress(newProgress);
-
                 if (newProgress >= 100) {
                     mProgressBarWebLoading.setVisibility(View.GONE);
                 } else {
@@ -103,6 +110,7 @@ public class WebActivity extends AppCompatActivity {
         int requestCode = getIntent().getIntExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
         if (requestCode == REQUEST_WEB_ACTIVITY_WITHOUT_SAVE) {
             menu.findItem(R.id.action_save).setVisible(false);
+            // TODO: 목록 띄워서 저장 가능하게
         }
         return true;
     }
@@ -129,25 +137,26 @@ public class WebActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    private void showToastByForce(int resId) {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-        mToast = Toast.makeText(this, resId, Toast.LENGTH_LONG);
-        mToast.show();
-    }
-
     private void saveThisPage() {
-        int newSectionDetailId = getNewIdByClass(SectionDetail.class);
         Realm realm = Realm.getDefaultInstance();
-        Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, mSectionId).findFirst();
-        realm.beginTransaction();
-        SectionDetail sectionDetail = realm.createObject(SectionDetail.class, newSectionDetailId);
-        sectionDetail.setUrl(mWebView.getUrl());
-        sectionDetail.setVisited(false);
-        section.getSectionDetails().add(sectionDetail);
-        realm.commitTransaction();
-
-        showToastByForce(R.string.msg_save);
+        if (mSectionId != DEFAULT_SECTION_ID) {
+            int newSectionDetailId = getNewIdByClass(SectionDetail.class);
+            Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, mSectionId).findFirst();
+            realm.beginTransaction();
+            SectionDetail sectionDetail = realm.createObject(SectionDetail.class, newSectionDetailId);
+            sectionDetail.setUrl(mWebView.getUrl());
+            sectionDetail.setVisited(false);
+            section.getSectionDetails().add(sectionDetail);
+            realm.commitTransaction();
+        } else {
+            int newItemId = getNewIdByClass(Item.class);
+            realm.beginTransaction();
+            Item item = realm.createObject(Item.class, newItemId);
+            item.setUrl(mWebView.getUrl());
+            item.setVisited(false);
+            realm.commitTransaction();
+        }
+        realm.close();
+        Toast.makeText(this, R.string.msg_save, Toast.LENGTH_LONG).show();
     }
 }

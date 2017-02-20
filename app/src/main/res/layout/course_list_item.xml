@@ -6,7 +6,8 @@
     android:orientation="horizontal"
     android:padding="@dimen/margin_basic_of_recycler_view_item"
     android:gravity="center_vertical"
-    android:baselineAligned="false">
+    android:baselineAligned="false"
+    android:background="@android:color/background_light">
 
     <FrameLayout
         android:layout_width="28dp"

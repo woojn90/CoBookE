@@ -83,7 +83,6 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
         public CourseSectionViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
             recyclerViewCourseSectionDetail.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         }
 

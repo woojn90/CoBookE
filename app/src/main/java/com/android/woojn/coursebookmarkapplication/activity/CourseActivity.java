@@ -1,17 +1,15 @@
 package com.android.woojn.coursebookmarkapplication.activity;
 
-import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
-import static com.android.woojn.coursebookmarkapplication.R.id.rv_course_section_list;
+import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
+import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
 
-
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,7 +29,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -74,13 +71,13 @@ public class CourseActivity extends AppCompatActivity
     protected ImageView mImageViewFavoriteN;
     @BindView(R.id.tv_course_section_empty)
     protected TextView mTextViewCourseSectionEmpty;
-    @BindView(rv_course_section_list)
+    @BindView(R.id.rv_course_section_list)
     protected RecyclerView mRecyclerViewCourseSection;
 
-    private SharedPreferences mSharedPreferences;
     private Realm mRealm;
-    private Toast mToast;
     private Course mCourse;
+    private SharedPreferences mSharedPreferences;
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +92,10 @@ public class CourseActivity extends AppCompatActivity
 
         int courseId = getIntent().getIntExtra(KEY_COURSE_ID, 0);
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         mRealm = Realm.getDefaultInstance();
         mCourse = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, courseId).findFirst();
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         setAllTextView();
         toggleImageViewFavorited(mCourse.isFavorite());
@@ -163,10 +160,10 @@ public class CourseActivity extends AppCompatActivity
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
-                            case R.id.item_section_update:
+                            case R.id.item_update_section:
                                 updateSection(id);
                                 return true;
-                            case R.id.item_section_share:
+                            case R.id.item_share_section:
                                 // TODO: 섹션 공유
                                 return true;
                         }
@@ -175,6 +172,7 @@ public class CourseActivity extends AppCompatActivity
                 });
                 popupMenu.inflate(R.menu.menu_in_section_view);
                 popupMenu.show();
+                showPopupMenuIcon(popupMenu);
                 break;
         }
     }
@@ -290,11 +288,11 @@ public class CourseActivity extends AppCompatActivity
     private void searchAndShowResults(int sectionId) {
         Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
 
-        String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_search_engine),
-                getString(R.string.pref_value_search_engine_naver_total));
+        String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_target_of_auto_search),
+                getString(R.string.pref_value_target_of_auto_search_naver_total));
         String query = mCourse.getSearchWord() + " " + section.getSearchWord();
 
-        if (getString(R.string.pref_value_search_engine_instagram).equals(searchEngine)) {
+        if (getString(R.string.pref_value_target_of_auto_search_instagram).equals(searchEngine)) {
             query = query.replace(" ", "");
         }
 
@@ -376,9 +374,6 @@ public class CourseActivity extends AppCompatActivity
         final EditText editTextTitle = (EditText) dialogView.findViewById(R.id.et_section_title);
         final EditText editTextSearchWord = (EditText) dialogView.findViewById(R.id.et_section_search_word);
 
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editTextTitle, 0);
-
         if (isCreated) {
             editTextTitle.setText(beforeTitle);
             editTextSearchWord.setText(beforeSearchWord);
@@ -445,7 +440,6 @@ public class CourseActivity extends AppCompatActivity
     }
 
     private void retrieveSectionDetailById(int sectionDetailId) {
-        // TODO: refresh (이미 로딩된 항목 처리)
         ParseAsyncTask parseAsyncTask = new ParseAsyncTask();
         parseAsyncTask.execute(sectionDetailId, null, null);
     }
@@ -463,6 +457,9 @@ public class CourseActivity extends AppCompatActivity
                 Elements ogTags = doc.select("meta[property^=og:]");
                 if (ogTags.size() <= 0) {
                     // TODO: og: 태그 없으면 title 등 다른 tag로 찾기
+                    realm.beginTransaction();
+                    sectionDetail.setVisited(true);
+                    realm.commitTransaction();
                     return null;
                 }
 

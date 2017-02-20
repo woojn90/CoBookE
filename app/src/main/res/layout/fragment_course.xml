@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/margin_basic_of_layout_inside_tab">
-    <!-- 코스가 있을 경우 -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_course_list"
         android:layout_width="match_parent"

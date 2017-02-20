@@ -81,7 +81,6 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
         public CourseViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
             itemView.setOnClickListener(this);
         }
 

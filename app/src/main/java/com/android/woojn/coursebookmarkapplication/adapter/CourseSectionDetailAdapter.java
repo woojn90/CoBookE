@@ -112,7 +112,6 @@ public class CourseSectionDetailAdapter extends RealmRecyclerViewAdapter<Section
         public CourseSectionDetailViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
             itemView.setOnClickListener(this);
         }
 

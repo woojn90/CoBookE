@@ -9,16 +9,27 @@
         <item>1</item>
     </string-array>
 
-    <string-array name="pref_labels_search_engine">
-        <item>@string/pref_label_search_engine_naver_total</item>
-        <item>@string/pref_label_search_engine_naver_blog</item>
-        <item>@string/pref_label_search_engine_google</item>
-        <item>@string/pref_label_search_engine_instagram</item>
+    <string-array name="pref_labels_home_page">
+        <item>@string/pref_label_home_page_naver</item>
+        <item>@string/pref_label_home_page_google</item>
+        <item>@string/pref_label_home_page_daum</item>
     </string-array>
-    <string-array name="pref_values_search_engine">
-        <item>@string/pref_value_search_engine_naver_total</item>
-        <item>@string/pref_value_search_engine_naver_blog</item>
-        <item>@string/pref_value_search_engine_google</item>
-        <item>@string/pref_value_search_engine_instagram</item>
+    <string-array name="pref_values_home_page">
+        <item>@string/pref_value_home_page_naver</item>
+        <item>@string/pref_value_home_page_google</item>
+        <item>@string/pref_value_home_page_daum</item>
+    </string-array>
+
+    <string-array name="pref_labels_target_of_auto_search">
+        <item>@string/pref_label_target_of_auto_search_naver_total</item>
+        <item>@string/pref_label_target_of_auto_search_naver_blog</item>
+        <item>@string/pref_label_target_of_auto_search_google</item>
+        <item>@string/pref_label_target_of_auto_search_instagram</item>
+    </string-array>
+    <string-array name="pref_values_target_of_auto_search">
+        <item>@string/pref_value_target_of_auto_search_naver_total</item>
+        <item>@string/pref_value_target_of_auto_search_naver_blog</item>
+        <item>@string/pref_value_target_of_auto_search_google</item>
+        <item>@string/pref_value_target_of_auto_search_instagram</item>
     </string-array>
 </resources>

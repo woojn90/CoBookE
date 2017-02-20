@@ -12,6 +12,9 @@ public class Constants {
     public static final String KEY_REQUEST_WEB_ACTIVITY = "requestWebActivity";
 
     public static final int DEFAULT_VIEW_ID = 0;
+    public static final int DEFAULT_SECTION_ID = 0;
     public static final int REQUEST_WEB_ACTIVITY_WITH_SAVE = 1000;
     public static final int REQUEST_WEB_ACTIVITY_WITHOUT_SAVE = REQUEST_WEB_ACTIVITY_WITH_SAVE + 1;
+    public static final int PAGE_COURSE = 0;
+    public static final int PAGE_ITEM = 1;
 }

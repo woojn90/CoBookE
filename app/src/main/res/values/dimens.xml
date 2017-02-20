@@ -1,6 +1,7 @@
 <resources>
     <dimen name="margin_basic_of_activity">8dp</dimen>
     <dimen name="margin_basic_of_layout_inside_tab">4dp</dimen>
-    <dimen name="margin_basic_of_recycler_view_item">5dp</dimen>
+    <dimen name="margin_basic_of_recycler_view_item">8dp</dimen>
+    <dimen name="margin_basic_of_item_inside_recycler_view_item">4dp</dimen>
     <dimen name="margin_left_of_edit_text">8dp</dimen>
 </resources>

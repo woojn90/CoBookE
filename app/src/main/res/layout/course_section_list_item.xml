@@ -56,7 +56,6 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="192dp">
-        <!-- 섹션 항목이 있을 경우 -->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_course_section_detail_list"
             android:layout_width="wrap_content"

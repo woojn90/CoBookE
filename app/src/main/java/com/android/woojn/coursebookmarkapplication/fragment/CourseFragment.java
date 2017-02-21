@@ -1,13 +1,15 @@
 package com.android.woojn.coursebookmarkapplication.fragment;
 
-import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
-import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +32,7 @@ import com.android.woojn.coursebookmarkapplication.model.Course;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
+import io.realm.Sort;
 
 /**
  * Created by wjn on 2017-02-16.
@@ -41,6 +44,8 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
     protected TextView mTextViewCourseEmpty;
     @BindView(R.id.rv_course_list)
     protected RecyclerView mRecyclerViewCourse;
+
+    private FloatingActionButton mFabInsertCourse;
 
     private Realm mRealm;
     private Toast mToast;
@@ -57,7 +62,17 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         ButterKnife.bind(this, rootView);
 
         mRecyclerViewCourse.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerViewCourse.setAdapter(new CourseAdapter(getContext(), mRealm.where(Course.class).findAllAsync(), this));
+        mRecyclerViewCourse.setAdapter(new CourseAdapter(getContext(), mRealm.where(Course.class).findAllAsync()
+                .sort(FIELD_NAME_ID, Sort.DESCENDING), this));
+
+        mFabInsertCourse = (FloatingActionButton) getActivity().findViewById(R.id.fab_insert_course);
+        mFabInsertCourse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int newCourseId = getNewIdByClass(Course.class);
+                showCourseDialog(newCourseId, false, "", "", "");
+            }
+        });
         return rootView;
     }
 
@@ -87,7 +102,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                 toggleCourseFavorited(course);
                 break;
             case R.id.btn_update_course:
-                showCourseUpdateDialog(course, course.getTitle(), course.getSearchWord(), course.getDesc());
+                updateCourse(course);
                 break;
             case R.id.btn_delete_course:
                 deleteCourse(course);
@@ -118,6 +133,10 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         });
     }
 
+    private void updateCourse(Course course) {
+        showCourseDialog(course.getId(), true, course.getTitle(), course.getSearchWord(), course.getDesc());
+    }
+
     private void deleteCourse(final Course course) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage(R.string.msg_delete_confirm);
@@ -137,7 +156,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         builder.show();
     }
 
-    private void showCourseUpdateDialog(final Course course, final String beforeTitle, final String beforeSearchWord, final String beforeDesc) {
+    private void showCourseDialog(final int courseId, final boolean isCreated, final String beforeTitle, final String beforeSearchWord, final String beforeDesc) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_course, null);
         builder.setView(dialogView);
@@ -145,24 +164,41 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         final EditText editTextSearchWord = (EditText) dialogView.findViewById(R.id.et_course_search_word);
         final EditText editTextDesc = (EditText) dialogView.findViewById(R.id.et_course_desc);
 
-        editTextTitle.setText(beforeTitle);
-        editTextSearchWord.setText(beforeSearchWord);
-        editTextDesc.setText(beforeDesc);
+        if (isCreated) {
+            editTextTitle.setText(beforeTitle);
+            editTextSearchWord.setText(beforeSearchWord);
+            editTextDesc.setText(beforeDesc);
+        }
 
         builder.setTitle(R.string.string_course_info);
         builder.setNegativeButton(R.string.string_cancel, null);
-        builder.setPositiveButton(R.string.string_update, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(isCreated ? R.string.string_update : R.string.string_register, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String title = editTextTitle.getText().toString();
                 String searchWord = editTextSearchWord.getText().toString();
                 String Desc = editTextDesc.getText().toString();
 
+                Course course;
                 mRealm.beginTransaction();
-                course.setTitle(title);
-                course.setSearchWord(searchWord);
-                course.setDesc(Desc);
+                if (isCreated) {
+                    course = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, courseId).findFirst();
+                    course.setTitle(title);
+                    course.setSearchWord(searchWord);
+                    course.setDesc(Desc);
+                }
+                else {
+                    course = mRealm.createObject(Course.class, courseId);
+                    course.setTitle(title);
+                    course.setSearchWord(searchWord);
+                    course.setDesc(Desc);
+
+                    Intent insertIntent = new Intent(getContext(), CourseActivity.class);
+                    insertIntent.putExtra(KEY_COURSE_ID, courseId);
+                    startActivity(insertIntent);
+                }
                 mRealm.commitTransaction();
+                setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
             }
         });
 
@@ -184,7 +220,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                 String afterDesc = editTextDesc.getText().toString();
 
                 if (!afterTitle.trim().isEmpty() && !afterSearchWord.trim().isEmpty()
-                        && (!beforeTitle.equals(afterTitle) || !beforeSearchWord.equals(afterSearchWord)) || !beforeDesc.equals(afterDesc)) {
+                        && (!beforeTitle.equals(afterTitle) || !beforeSearchWord.equals(afterSearchWord) || !beforeDesc.equals(afterDesc))) {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);

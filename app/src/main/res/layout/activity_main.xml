@@ -24,7 +24,7 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_for_course_fragment"
+        android:id="@+id/fab_insert_course"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -32,12 +32,12 @@
         android:src="@drawable/ic_fab_add"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_for_item_fragment"
+        android:id="@+id/fab_expand_items"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_fab_add"/>
+        android:src="@drawable/ic_fab_expand"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_toggle_grid"
         android:layout_width="wrap_content"
@@ -46,6 +46,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
         android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_fab_grid_3x3"
         android:visibility="invisible"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_insert_folder"
@@ -58,14 +59,14 @@
         android:src="@drawable/ic_fab_insert_folder"
         android:visibility="invisible"/>
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_search_browser"
+        android:id="@+id/fab_browser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="85dp"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
         android:layout_gravity="bottom|end"
-        android:src="@drawable/ic_fab_search_browser"
+        android:src="@drawable/ic_fab_browser"
         android:visibility="invisible"/>
 
 </FrameLayout>

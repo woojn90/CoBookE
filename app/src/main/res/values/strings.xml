@@ -40,13 +40,10 @@
     <string name="hint_section_title">예1) 근처 카페, 예2) 식당</string>
     <string name="hint_section_search_word">예1) 11번 출구 카페, 예2) 맛집</string>
 
-    <string name="content_desc_favorite_y">favorite on</string>
-    <string name="content_desc_favorite_n">favorite off</string>
+    <string name="content_desc_favorite_y">즐겨찾기 on</string>
+    <string name="content_desc_favorite_n">즐겨찾기 off</string>
     <string name="content_desc_url_preview">URL Preview</string>
     <string name="content_desc_folder">folder Image</string>
-    <string name="content_desc_home">home</string>
-    <string name="up_arrow_enable">up arrow enable</string>
-    <string name="up_arrow_disable">up arrow disable</string>
 
     <!-- Toast -->
     <string name="msg_favorite_y">즐겨찾기에 추가되었습니다.</string>

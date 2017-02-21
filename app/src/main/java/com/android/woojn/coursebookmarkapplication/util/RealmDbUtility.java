@@ -2,7 +2,6 @@ package com.android.woojn.coursebookmarkapplication.util;
 
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -62,18 +61,6 @@ public class RealmDbUtility {
             } else {
                 textViewEmpty.setVisibility(View.VISIBLE);
             }
-        }
-        realm.close();
-    }
-
-    public static void setTextViewEmptyVisibilityByFolderId(int folderId, TextView textViewEmpty) {
-        Realm realm = Realm.getDefaultInstance();
-
-        Folder parentFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, folderId).findFirst();
-        if (parentFolder.getItems().size() > 0 || parentFolder.getFolders().size() > 0) {
-            textViewEmpty.setVisibility(View.GONE);
-        } else {
-            textViewEmpty.setVisibility(View.VISIBLE);
         }
         realm.close();
     }

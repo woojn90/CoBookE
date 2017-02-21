@@ -98,9 +98,9 @@ public class CourseActivity extends AppCompatActivity
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         setAllTextView();
-        toggleImageViewFavorited(mCourse.isFavorite());
+        toggleFavoriteImageView(mCourse.isFavorite());
         mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections(), this));
+        mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections().sort(FIELD_NAME_ID), this));
         setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
     }
 
@@ -146,13 +146,14 @@ public class CourseActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemClick(final int id, View view) {
+    public void onItemClick(int id, View view) {
+        final Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, id).findFirst();
         switch (view.getId()) {
             case R.id.btn_search_section_detail:
-                searchAndShowResults(id);
+                searchAndShowResults(section);
                 break;
             case R.id.btn_delete_section:
-                deleteSection(id);
+                deleteSection(section);
                 break;
             case R.id.btn_section_overflow:
                 PopupMenu popupMenu = new PopupMenu(this, view);
@@ -161,7 +162,7 @@ public class CourseActivity extends AppCompatActivity
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.item_update_section:
-                                updateSection(id);
+                                updateSection(section);
                                 return true;
                             case R.id.item_share_section:
                                 // TODO: 섹션 공유
@@ -196,7 +197,7 @@ public class CourseActivity extends AppCompatActivity
         mToast.show();
     }
 
-    private void toggleImageViewFavorited(boolean isFavorite) {
+    private void toggleFavoriteImageView(boolean isFavorite) {
         if (isFavorite) {
             mImageViewFavoriteN.setVisibility(View.GONE);
             mImageViewFavoriteY.setVisibility(View.VISIBLE);
@@ -230,7 +231,7 @@ public class CourseActivity extends AppCompatActivity
                     mCourse.setFavorite(true);
                     showToastByForce(R.string.msg_favorite_y);
                 }
-                toggleImageViewFavorited(mCourse.isFavorite());
+                toggleFavoriteImageView(mCourse.isFavorite());
             }
         });
     }
@@ -258,15 +259,11 @@ public class CourseActivity extends AppCompatActivity
         showSectionDialog(sectionId, false, "", "");
     }
 
-    private void updateSection(int sectionId) {
-        Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
-        String beforeTitle = section.getTitle();
-        String beforeSearchWord = section.getSearchWord();
-        showSectionDialog(sectionId, true, beforeTitle, beforeSearchWord);
+    private void updateSection(Section section) {
+        showSectionDialog(section.getId(), true, section.getTitle(), section.getSearchWord());
     }
 
-    private void deleteSection(int sectionId) {
-        final Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
+    private void deleteSection(final Section section) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.msg_delete_confirm);
         builder.setNegativeButton(R.string.string_cancel, null);
@@ -285,9 +282,7 @@ public class CourseActivity extends AppCompatActivity
         builder.show();
     }
 
-    private void searchAndShowResults(int sectionId) {
-        Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
-
+    private void searchAndShowResults(Section section) {
         String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_target_of_auto_search),
                 getString(R.string.pref_value_target_of_auto_search_naver_total));
         String query = mCourse.getSearchWord() + " " + section.getSearchWord();
@@ -299,7 +294,7 @@ public class CourseActivity extends AppCompatActivity
         Intent webIntent = new Intent(this, WebActivity.class);
         webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
         webIntent.putExtra(KEY_STRING_URL, searchEngine + query);
-        webIntent.putExtra(KEY_SECTION_ID, sectionId);
+        webIntent.putExtra(KEY_SECTION_ID, section.getId());
         startActivity(webIntent);
     }
 
@@ -351,7 +346,7 @@ public class CourseActivity extends AppCompatActivity
                 String afterDesc = editTextDesc.getText().toString();
 
                 if (!afterTitle.trim().isEmpty() && !afterSearchWord.trim().isEmpty()
-                        && (!beforeTitle.equals(afterTitle) || !beforeSearchWord.equals(afterSearchWord)) || !beforeDesc.equals(afterDesc)) {
+                        && (!beforeTitle.equals(afterTitle) || !beforeSearchWord.equals(afterSearchWord) || !beforeDesc.equals(afterDesc))) {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -399,8 +394,7 @@ public class CourseActivity extends AppCompatActivity
                     section.setTitle(title);
                     section.setSearchWord(searchWord);
                     mCourse.getSections().add(section);
-                    mRecyclerViewCourseSection.smoothScrollBy(
-                            mRecyclerViewCourseSection.getLeft(), mRecyclerViewCourseSection.getBottom());
+                    // TODO: recyclerView scroll 맨 밑으로
                 }
                 mRealm.commitTransaction();
                 setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);

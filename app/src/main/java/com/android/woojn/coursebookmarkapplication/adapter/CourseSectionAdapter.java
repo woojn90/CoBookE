@@ -28,6 +28,7 @@ import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
+import io.realm.Sort;
 
 /**
  * Created by wjn on 2017-02-07.
@@ -62,7 +63,8 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             holder.itemView.setTag(section.getId());
             holder.textViewSectionTitle.setText(section.getTitle());
             holder.textViewSectionSearchWord.setText("(" + section.getSearchWord() + ")");
-            CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, section.getSectionDetails(), holder);
+            CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, section.getSectionDetails()
+                    .sort(FIELD_NAME_ID, Sort.DESCENDING), holder);
             holder.recyclerViewCourseSectionDetail.setAdapter(adapter);
             setTextViewEmptyVisibility(SectionDetail.class, section.getId(), holder.textViewCourseSectionDetailEmpty);
         }

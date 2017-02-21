@@ -11,6 +11,7 @@ import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibilityByFolderId;
+import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,12 +27,14 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -296,7 +299,7 @@ public class ItemFragment extends Fragment
                         Item item = mRealm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
                         switch (menuItem.getItemId()) {
                             case R.id.item_share_item:
-                                // TODO: share
+                                shareTextByRealmObject(getContext(), item);
                                 return true;
                             case R.id.item_delete_item:
                                 deleteItem(item);
@@ -450,6 +453,19 @@ public class ItemFragment extends Fragment
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
+        editTextTitle.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editTextTitle.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE){
+                    if (alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled()) {
+                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override

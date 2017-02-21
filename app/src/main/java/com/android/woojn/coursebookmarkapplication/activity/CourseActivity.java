@@ -8,8 +8,8 @@ import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_U
 import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
-        .setTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,11 +24,13 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -94,7 +96,8 @@ public class CourseActivity extends AppCompatActivity
         setAllTextView();
         toggleFavoriteImageView(mCourse.isFavorite());
         mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections().sort(FIELD_NAME_ID), this));
+        mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections()
+                .sort(FIELD_NAME_ID), this));
         setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
     }
 
@@ -133,7 +136,7 @@ public class CourseActivity extends AppCompatActivity
                 deleteCourse();
                 break;
             case R.id.action_share:
-                // TODO: 코스 공유
+                shareTextByRealmObject(this, mCourse);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -159,7 +162,7 @@ public class CourseActivity extends AppCompatActivity
                                 updateSection(section);
                                 return true;
                             case R.id.item_share_section:
-                                // TODO: 섹션 공유
+                                shareTextByRealmObject(CourseActivity.this, section);
                                 return true;
                         }
                         return false;
@@ -327,6 +330,21 @@ public class CourseActivity extends AppCompatActivity
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
+        editTextTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        editTextSearchWord.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        editTextDesc.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editTextDesc.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE){
+                    if (alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled()) {
+                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -399,6 +417,20 @@ public class CourseActivity extends AppCompatActivity
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
+        editTextTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        editTextSearchWord.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editTextSearchWord.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE){
+                    if (alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled()) {
+                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override

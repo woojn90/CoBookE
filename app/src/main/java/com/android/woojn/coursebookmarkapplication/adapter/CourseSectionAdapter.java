@@ -4,10 +4,9 @@ import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
-import static com.android.woojn.coursebookmarkapplication.Constants
-        .REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
-        .setTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.Context;
 import android.content.Intent;
@@ -96,31 +95,29 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
         @Override
         public void onItemClick(int id, int viewId) {
+            Realm realm = Realm.getDefaultInstance();
+            Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
+
             switch (viewId) {
                 case DEFAULT_VIEW_ID:
-                    Realm realm = Realm.getDefaultInstance();
-                    Item item = realm.where(Item.class).equalTo(
-                            FIELD_NAME_ID, id).findFirst();
                     String stringUrl = item.getUrl();
-                    realm.close();
-
                     Intent webIntent = new Intent(mContext, WebActivity.class);
                     webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITHOUT_SAVE);
                     webIntent.putExtra(KEY_STRING_URL, stringUrl);
                     mContext.startActivity(webIntent);
                     break;
                 case R.id.btn_share_section_item:
-                    // TODO: 섹션 항목 공유
+                    shareTextByRealmObject(mContext, item);
                     break;
                 case R.id.btn_delete_section_item:
-                    deleteSectionItem(id);
+                    deleteSectionItem(item);
                     break;
             }
+            realm.close();
         }
 
-        private void deleteSectionItem(int itemId) {
+        private void deleteSectionItem(Item item) {
             Realm realm = Realm.getDefaultInstance();
-            Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, itemId).findFirst();
             realm.beginTransaction();
             item.deleteFromRealm();
             realm.commitTransaction();

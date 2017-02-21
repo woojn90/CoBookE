@@ -12,6 +12,7 @@ import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -38,7 +40,6 @@ import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.model.Folder;
 import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
-import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,8 +60,8 @@ public class WebActivity extends AppCompatActivity {
     protected Button mButtonPageBack;
     @BindView(R.id.btn_page_forward)
     protected Button mButtonPageForward;
-    @BindView(R.id.et_url)
-    protected EditText mEditTextUrl;
+    @BindView(R.id.et_web_address)
+    protected EditText mEditTextWebAddress;
 
     private SharedPreferences mSharedPreferences;
     private int mSectionId;
@@ -79,6 +80,23 @@ public class WebActivity extends AppCompatActivity {
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        mEditTextWebAddress.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        mEditTextWebAddress.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String stringUrl = mEditTextWebAddress.getText().toString();
+                    mWebView.loadUrl(stringUrl);
+                    setButtonsEnable();
+                    mEditTextWebAddress.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mEditTextWebAddress.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        });
+
         mSectionId = getIntent().getIntExtra(KEY_SECTION_ID, DEFAULT_SECTION_ID);
         mFolderId = getIntent().getIntExtra(KEY_FOLDER_ID, DEFAULT_FOLDER_ID);
         String stringUrl = getIntent().getStringExtra(KEY_STRING_URL);
@@ -95,7 +113,7 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
-                mEditTextUrl.setText(mWebView.getUrl());
+                mEditTextWebAddress.setText(mWebView.getUrl());
                 setButtonsEnable();
                 return true;
             }
@@ -104,7 +122,7 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 view.loadUrl(request.getUrl().toString());
-                mEditTextUrl.setText(mWebView.getUrl());
+                mEditTextWebAddress.setText(mWebView.getUrl());
                 return true;
             }
 
@@ -123,20 +141,6 @@ public class WebActivity extends AppCompatActivity {
                 } else {
                     mProgressBarWebLoading.setVisibility(View.VISIBLE);
                 }
-            }
-        });
-
-        mEditTextUrl.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                int result = actionId & EditorInfo.IME_MASK_ACTION;
-                if (result == EditorInfo.IME_ACTION_DONE) {
-                    String stringUrl = mEditTextUrl.getText().toString();
-                    mWebView.loadUrl(stringUrl);
-                    setButtonsEnable();
-                    return true;
-                }
-                return false;
             }
         });
     }
@@ -219,22 +223,22 @@ public class WebActivity extends AppCompatActivity {
 
     private void saveThisPage() {
         Realm realm = Realm.getDefaultInstance();
+        int newItemId = getNewIdByClass(Item.class);
+
+        realm.beginTransaction();
+        Item item = realm.createObject(Item.class, newItemId);
+        item.setUrl(mWebView.getUrl());
+        item.setVisited(false);
+        realm.commitTransaction();
+
         if (mSectionId != DEFAULT_SECTION_ID) {
-            int newSectionDetailId = getNewIdByClass(SectionDetail.class);
             Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, mSectionId).findFirst();
             realm.beginTransaction();
-            SectionDetail sectionDetail = realm.createObject(SectionDetail.class, newSectionDetailId);
-            sectionDetail.setUrl(mWebView.getUrl());
-            sectionDetail.setVisited(false);
-            section.getSectionDetails().add(sectionDetail);
+            section.getItems().add(item);
             realm.commitTransaction();
         } else {
             Folder parentFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, mFolderId).findFirst();
-            int newItemId = getNewIdByClass(Item.class);
             realm.beginTransaction();
-            Item item = realm.createObject(Item.class, newItemId);
-            item.setUrl(mWebView.getUrl());
-            item.setVisited(false);
             parentFolder.getItems().add(item);
             realm.commitTransaction();
         }

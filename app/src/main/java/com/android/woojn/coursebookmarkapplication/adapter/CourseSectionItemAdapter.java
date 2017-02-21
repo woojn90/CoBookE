@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.woojn.coursebookmarkapplication.R;
-import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
+import com.android.woojn.coursebookmarkapplication.model.Item;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -30,11 +30,11 @@ import io.realm.RealmRecyclerViewAdapter;
  * Created by wjn on 2017-02-07.
  */
 
-public class CourseSectionDetailAdapter extends RealmRecyclerViewAdapter<SectionDetail, CourseSectionDetailAdapter.CourseSectionDetailViewHolder> {
+public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, CourseSectionItemAdapter.CourseSectionItemViewHolder> {
 
     private final OnRecyclerViewClickListener mListener;
 
-    public CourseSectionDetailAdapter(Context context, OrderedRealmCollection<SectionDetail> data, OnRecyclerViewClickListener listener) {
+    public CourseSectionItemAdapter(Context context, OrderedRealmCollection<Item> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
         mListener = listener;
     }
@@ -44,72 +44,72 @@ public class CourseSectionDetailAdapter extends RealmRecyclerViewAdapter<Section
     }
 
     @Override
-    public CourseSectionDetailViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CourseSectionItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.course_section_detail_list_item, parent, false);
-        return new CourseSectionDetailViewHolder(view);
+        View view = inflater.inflate(R.layout.course_section_item_list_item, parent, false);
+        return new CourseSectionItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final CourseSectionDetailViewHolder holder, int position) {
+    public void onBindViewHolder(final CourseSectionItemViewHolder holder, int position) {
         if (getData() != null) {
-            SectionDetail sectionDetail = getData().get(position);
+            Item item = getData().get(position);
 
-            if (sectionDetail.isVisited()) {
-                holder.itemView.setTag(sectionDetail.getId());
-                holder.textViewSectionDetailTitle.setText(sectionDetail.getTitle());
-                holder.textViewSectionDetailDesc.setText(sectionDetail.getDesc());
-                holder.textViewSectionDetailUrl.setText(sectionDetail.getUrl());
+            if (item.isVisited()) {
+                holder.itemView.setTag(item.getId());
+                holder.textViewSectionItemTitle.setText(item.getTitle());
+                holder.textViewSectionItemDesc.setText(item.getDesc());
+                holder.textViewSectionItemUrl.setText(item.getUrl());
 
                 Glide.with(this.context)
-                        .load(sectionDetail.getImageUrl())
+                        .load(item.getImageUrl())
                         .listener(new RequestListener<String, GlideDrawable>() {
                             @Override
                             public boolean onException(Exception e, String model,
                                     Target<GlideDrawable> target, boolean isFirstResource) {
-                                holder.progressBarSectionDetailPreview.setVisibility(View.INVISIBLE);
+                                holder.progressBarSectionItemPreview.setVisibility(View.INVISIBLE);
                                 return false;
                             }
 
                             @Override
                             public boolean onResourceReady(GlideDrawable resource, String model,
                                     Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                holder.progressBarSectionDetailPreview.setVisibility(View.INVISIBLE);
+                                holder.progressBarSectionItemPreview.setVisibility(View.INVISIBLE);
                                 return false;
                             }
                         })
                         .thumbnail(0.1f)
                         .centerCrop()
-                        .into(holder.imageViewSectionDetailPreview);
+                        .into(holder.imageViewSectionItemPreview);
 
-                holder.progressBarSectionDetail.setVisibility(View.INVISIBLE);
-                holder.linearLayoutSectionDetail.setVisibility(View.VISIBLE);
+                holder.progressBarSectionItem.setVisibility(View.INVISIBLE);
+                holder.linearLayoutSectionItem.setVisibility(View.VISIBLE);
             } else {
-                holder.linearLayoutSectionDetail.setVisibility(View.INVISIBLE);
-                holder.progressBarSectionDetail.setVisibility(View.VISIBLE);
+                holder.linearLayoutSectionItem.setVisibility(View.INVISIBLE);
+                holder.progressBarSectionItem.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    class CourseSectionDetailViewHolder extends RecyclerView.ViewHolder
+    class CourseSectionItemViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        @BindView(R.id.layout_section_detail)
-        LinearLayout linearLayoutSectionDetail;
-        @BindView(R.id.pg_section_detail)
-        ProgressBar progressBarSectionDetail;
-        @BindView(R.id.tv_section_detail_title)
-        TextView textViewSectionDetailTitle;
-        @BindView(R.id.tv_section_detail_desc)
-        TextView textViewSectionDetailDesc;
-        @BindView(R.id.tv_section_detail_url)
-        TextView textViewSectionDetailUrl;
-        @BindView(R.id.iv_section_detail_preview)
-        ImageView imageViewSectionDetailPreview;
-        @BindView(R.id.pg_section_detail_preview)
-        ProgressBar progressBarSectionDetailPreview;
+        @BindView(R.id.layout_section_item)
+        LinearLayout linearLayoutSectionItem;
+        @BindView(R.id.pg_section_item)
+        ProgressBar progressBarSectionItem;
+        @BindView(R.id.tv_section_item_title)
+        TextView textViewSectionItemTitle;
+        @BindView(R.id.tv_section_item_desc)
+        TextView textViewSectionItemDesc;
+        @BindView(R.id.tv_section_item_url)
+        TextView textViewSectionItemUrl;
+        @BindView(R.id.iv_section_item_preview)
+        ImageView imageViewSectionItemPreview;
+        @BindView(R.id.pg_section_item_preview)
+        ProgressBar progressBarSectionItemPreview;
 
-        public CourseSectionDetailViewHolder(View itemView) {
+        public CourseSectionItemViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
@@ -120,12 +120,12 @@ public class CourseSectionDetailAdapter extends RealmRecyclerViewAdapter<Section
             mListener.onItemClick((int) itemView.getTag(), DEFAULT_VIEW_ID);
         }
 
-        @OnClick(R.id.btn_share_section_detail)
+        @OnClick(R.id.btn_share_section_item)
         public void onClickButtonShareSectionDetail(View view) {
             mListener.onItemClick((int) itemView.getTag(), view.getId());
         }
 
-        @OnClick(R.id.btn_delete_section_detail)
+        @OnClick(R.id.btn_delete_section_item)
         public void onClickButtonDeleteSectionDetail(View view) {
             mListener.onItemClick((int) itemView.getTag(), view.getId());
         }

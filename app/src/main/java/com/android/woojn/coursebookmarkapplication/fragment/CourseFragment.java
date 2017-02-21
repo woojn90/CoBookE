@@ -16,10 +16,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -207,6 +209,21 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
+        editTextTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        editTextSearchWord.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        editTextDesc.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editTextDesc.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE){
+                    if (alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled()) {
+                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override

@@ -2,7 +2,6 @@ package com.android.woojn.coursebookmarkapplication.util;
 
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -10,7 +9,6 @@ import com.android.woojn.coursebookmarkapplication.model.Course;
 import com.android.woojn.coursebookmarkapplication.model.Folder;
 import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
-import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
 
 import io.realm.Realm;
 import io.realm.RealmModel;
@@ -44,14 +42,8 @@ public class RealmDbUtility {
             } else {
                 textViewEmpty.setVisibility(View.VISIBLE);
             }
-        } else if (clazz.equals(SectionDetail.class)) {
-            if (realm.where(Section.class).equalTo(FIELD_NAME_ID, parentId).findFirst().getSectionDetails().size() > 0) {
-                textViewEmpty.setVisibility(View.GONE);
-            } else {
-                textViewEmpty.setVisibility(View.VISIBLE);
-            }
-        } else if (clazz.equals(Folder.class) || clazz.equals(Item.class)) {
-            if (realm.where(Folder.class).count() > 0 || realm.where(Item.class).count() > 0) {
+        } else if (clazz.equals(Item.class)) {
+            if (realm.where(Section.class).equalTo(FIELD_NAME_ID, parentId).findFirst().getItems().size() > 0) {
                 textViewEmpty.setVisibility(View.GONE);
             } else {
                 textViewEmpty.setVisibility(View.VISIBLE);

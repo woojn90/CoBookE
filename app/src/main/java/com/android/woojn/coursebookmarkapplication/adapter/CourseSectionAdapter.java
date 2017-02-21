@@ -1,12 +1,13 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
+import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
-
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
-import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.Constants
+        .REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
+        .setTextViewEmptyVisibility;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,8 +20,8 @@ import android.widget.TextView;
 
 import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.activity.WebActivity;
+import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
-import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,23 +64,23 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             holder.itemView.setTag(section.getId());
             holder.textViewSectionTitle.setText(section.getTitle());
             holder.textViewSectionSearchWord.setText("(" + section.getSearchWord() + ")");
-            CourseSectionDetailAdapter adapter = new CourseSectionDetailAdapter(mContext, section.getSectionDetails()
+            CourseSectionItemAdapter adapter = new CourseSectionItemAdapter(mContext, section.getItems()
                     .sort(FIELD_NAME_ID, Sort.DESCENDING), holder);
             holder.recyclerViewCourseSectionDetail.setAdapter(adapter);
-            setTextViewEmptyVisibility(SectionDetail.class, section.getId(), holder.textViewCourseSectionDetailEmpty);
+            setTextViewEmptyVisibility(Item.class, section.getId(), holder.textViewCourseSectionDetailEmpty);
         }
     }
 
     class CourseSectionViewHolder extends RecyclerView.ViewHolder
-        implements CourseSectionDetailAdapter.OnRecyclerViewClickListener {
+        implements CourseSectionItemAdapter.OnRecyclerViewClickListener {
 
         @BindView(R.id.tv_section_title)
         TextView textViewSectionTitle;
         @BindView(R.id.tv_section_search_word)
         TextView textViewSectionSearchWord;
-        @BindView(R.id.tv_course_section_detail_empty)
+        @BindView(R.id.tv_section_item_empty)
         TextView textViewCourseSectionDetailEmpty;
-        @BindView(R.id.rv_course_section_detail_list)
+        @BindView(R.id.rv_section_item_list)
         RecyclerView recyclerViewCourseSectionDetail;
 
         public CourseSectionViewHolder(View itemView) {
@@ -88,7 +89,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             recyclerViewCourseSectionDetail.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         }
 
-        @OnClick({R.id.btn_search_section_detail, R.id.btn_delete_section, R.id.btn_section_overflow})
+        @OnClick({R.id.btn_search_section_item, R.id.btn_delete_section, R.id.btn_section_overflow})
         public void onClick(View view) {
             mListener.onItemClick((int) itemView.getTag(), view);
         }
@@ -98,9 +99,9 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             switch (viewId) {
                 case DEFAULT_VIEW_ID:
                     Realm realm = Realm.getDefaultInstance();
-                    SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(
+                    Item item = realm.where(Item.class).equalTo(
                             FIELD_NAME_ID, id).findFirst();
-                    String stringUrl = sectionDetail.getUrl();
+                    String stringUrl = item.getUrl();
                     realm.close();
 
                     Intent webIntent = new Intent(mContext, WebActivity.class);
@@ -108,23 +109,23 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
                     webIntent.putExtra(KEY_STRING_URL, stringUrl);
                     mContext.startActivity(webIntent);
                     break;
-                case R.id.btn_share_section_detail:
+                case R.id.btn_share_section_item:
                     // TODO: 섹션 항목 공유
                     break;
-                case R.id.btn_delete_section_detail:
-                    deleteSectionDetail(id);
+                case R.id.btn_delete_section_item:
+                    deleteSectionItem(id);
                     break;
             }
         }
 
-        private void deleteSectionDetail(int sectionDetailId) {
+        private void deleteSectionItem(int itemId) {
             Realm realm = Realm.getDefaultInstance();
-            SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(FIELD_NAME_ID, sectionDetailId).findFirst();
+            Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, itemId).findFirst();
             realm.beginTransaction();
-            sectionDetail.deleteFromRealm();
+            item.deleteFromRealm();
             realm.commitTransaction();
             realm.close();
-            setTextViewEmptyVisibility(SectionDetail.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
+            setTextViewEmptyVisibility(Item.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
         }
     }
 }

@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_basic_of_item_inside_recycler_view_item">
         <LinearLayout
-            android:id="@+id/layout_section_detail"
+            android:id="@+id/layout_section_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -32,16 +32,16 @@
                     android:orientation="vertical">
                     <TextView
                         style="@style/TextViewTitle"
-                        android:id="@+id/tv_section_detail_title"
+                        android:id="@+id/tv_section_item_title"
                         android:textSize="15sp"
                         tools:text="Title"/>
                     <TextView
                         style="@style/TextViewDesc"
-                        android:id="@+id/tv_section_detail_desc"
+                        android:id="@+id/tv_section_item_desc"
                         android:textSize="14sp"
                         tools:text="Description"/>
                     <TextView
-                        android:id="@+id/tv_section_detail_url"
+                        android:id="@+id/tv_section_item_url"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="12sp"
@@ -51,12 +51,12 @@
                         tools:text="https://www.naver.com"/>
                 </LinearLayout>
                 <Button
-                    android:id="@+id/btn_delete_section_detail"
+                    android:id="@+id/btn_delete_section_item"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:background="@drawable/ic_trash_can"/>
                 <Button
-                    android:id="@+id/btn_share_section_detail"
+                    android:id="@+id/btn_share_section_item"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:layout_marginLeft="3dp"
@@ -69,14 +69,14 @@
                 android:layout_height="110dp"
                 android:layout_marginTop="5dp">
                 <ImageView
-                    android:id="@+id/iv_section_detail_preview"
+                    android:id="@+id/iv_section_item_preview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/content_desc_url_preview"
                     tools:background="@color/cardview_dark_background"/>
                 <ProgressBar
                     style="@android:style/Widget.ProgressBar.Small"
-                    android:id="@+id/pg_section_detail_preview"
+                    android:id="@+id/pg_section_item_preview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"/>
@@ -85,7 +85,7 @@
 
         <ProgressBar
             style="@android:style/Widget.ProgressBar.Small"
-            android:id="@+id/pg_section_detail"
+            android:id="@+id/pg_section_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"/>

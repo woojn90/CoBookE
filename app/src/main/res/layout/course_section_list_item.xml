@@ -33,7 +33,7 @@
                 tools:text="(Search Word)"/>
         </LinearLayout>
         <Button
-            android:id="@+id/btn_search_section_detail"
+            android:id="@+id/btn_search_section_item"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="3dp"
@@ -57,13 +57,13 @@
         android:layout_width="match_parent"
         android:layout_height="192dp">
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_course_section_detail_list"
+            android:id="@+id/rv_section_item_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"/>
         <!-- 섹션 항목이 없을 경우 -->
         <TextView
-            android:id="@+id/tv_course_section_detail_empty"
+            android:id="@+id/tv_section_item_empty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"

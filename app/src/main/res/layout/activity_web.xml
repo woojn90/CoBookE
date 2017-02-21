@@ -30,16 +30,17 @@
                 android:layout_height="26dp"
                 android:background="@drawable/ic_home_white"/>
             <EditText
-                android:id="@+id/et_url"
+                android:id="@+id/et_web_address"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
                 android:textSize="16sp"
-                android:selectAllOnFocus="true"
+                android:background="@android:color/white"
                 android:maxLines="1"
-                android:background="@android:color/white"/>
+                android:selectAllOnFocus="true"
+                android:inputType="text"/>
             <Button
                 android:id="@+id/btn_refresh"
                 android:layout_width="26dp"

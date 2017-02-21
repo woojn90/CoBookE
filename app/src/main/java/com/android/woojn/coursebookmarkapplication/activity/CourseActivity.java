@@ -8,12 +8,12 @@ import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_U
 import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
+        .setTextViewEmptyVisibility;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -36,16 +36,10 @@ import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.adapter.CourseSectionAdapter;
+import com.android.woojn.coursebookmarkapplication.async.ParseAsyncTask;
 import com.android.woojn.coursebookmarkapplication.model.Course;
+import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
-import com.android.woojn.coursebookmarkapplication.model.SectionDetail;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,9 +63,9 @@ public class CourseActivity extends AppCompatActivity
     protected ImageView mImageViewFavoriteY;
     @BindView(R.id.iv_favorite_n_course)
     protected ImageView mImageViewFavoriteN;
-    @BindView(R.id.tv_course_section_empty)
+    @BindView(R.id.tv_section_empty)
     protected TextView mTextViewCourseSectionEmpty;
-    @BindView(R.id.rv_course_section_list)
+    @BindView(R.id.rv_section_list)
     protected RecyclerView mRecyclerViewCourseSection;
 
     private Realm mRealm;
@@ -108,9 +102,9 @@ public class CourseActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         for (Section section : mCourse.getSections()) {
-            for (SectionDetail sectionDetail : section.getSectionDetails()) {
-                if (!sectionDetail.isVisited()) {
-                    retrieveSectionDetailById(sectionDetail.getId());
+            for (Item item : section.getItems()) {
+                if (!item.isVisited()) {
+                    retrieveSectionItemById(item.getId());
                 }
             }
         }
@@ -149,7 +143,7 @@ public class CourseActivity extends AppCompatActivity
     public void onItemClick(int id, View view) {
         final Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, id).findFirst();
         switch (view.getId()) {
-            case R.id.btn_search_section_detail:
+            case R.id.btn_search_section_item:
                 searchAndShowResults(section);
                 break;
             case R.id.btn_delete_section:
@@ -180,7 +174,7 @@ public class CourseActivity extends AppCompatActivity
 
     @OnClick({R.id.iv_favorite_y_course, R.id.iv_favorite_n_course})
     protected void onClickTextViewCourseFavorite() {
-        toggleCourseFavorited();
+        toggleCourseFavorite();
     }
 
     @OnClick(R.id.fab_insert_section)
@@ -220,7 +214,7 @@ public class CourseActivity extends AppCompatActivity
         }
     }
 
-    private void toggleCourseFavorited() {
+    private void toggleCourseFavorite() {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -394,7 +388,6 @@ public class CourseActivity extends AppCompatActivity
                     section.setTitle(title);
                     section.setSearchWord(searchWord);
                     mCourse.getSections().add(section);
-                    // TODO: recyclerView scroll 맨 밑으로
                 }
                 mRealm.commitTransaction();
                 setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
@@ -433,58 +426,8 @@ public class CourseActivity extends AppCompatActivity
         editTextSearchWord.addTextChangedListener(textWatcher);
     }
 
-    private void retrieveSectionDetailById(int sectionDetailId) {
+    private void retrieveSectionItemById(int itemId) {
         ParseAsyncTask parseAsyncTask = new ParseAsyncTask();
-        parseAsyncTask.execute(sectionDetailId, null, null);
+        parseAsyncTask.execute(itemId, null, null);
     }
-
-    private class ParseAsyncTask extends AsyncTask<Integer, Void, Void> {
-        @Override
-        protected Void doInBackground(Integer... params) {
-            try {
-                Realm realm = Realm.getDefaultInstance();
-                SectionDetail sectionDetail = realm.where(SectionDetail.class).equalTo(
-                        FIELD_NAME_ID, params[0]).findFirst();
-
-                Document doc = Jsoup.connect(sectionDetail.getUrl()).get();
-
-                Elements ogTags = doc.select("meta[property^=og:]");
-                if (ogTags.size() <= 0) {
-                    // TODO: og: 태그 없으면 title 등 다른 tag로 찾기
-                    realm.beginTransaction();
-                    sectionDetail.setVisited(true);
-                    realm.commitTransaction();
-                    return null;
-                }
-
-                realm.beginTransaction();
-                for (Element tag : ogTags) {
-                    String property = tag.attr("property");
-                    String content = tag.attr("content");
-
-                    if ("og:title".equals(property)) {
-                        sectionDetail.setTitle(content);
-                    } else if ("og:description".equals(property)) {
-                        sectionDetail.setDesc(content);
-                    } else if ("og:image".equals(property)) {
-                        sectionDetail.setImageUrl(content);
-                    }
-                }
-                // TODO: 저장된 값이 없어도 방문한 것으로 처리할 지 확인
-                sectionDetail.setVisited(true);
-                realm.commitTransaction();
-                realm.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-    }
-
 }

@@ -101,7 +101,7 @@ public class WebActivity extends AppCompatActivity {
         mFolderId = getIntent().getIntExtra(KEY_FOLDER_ID, DEFAULT_FOLDER_ID);
         String stringUrl = getIntent().getStringExtra(KEY_STRING_URL);
         if (stringUrl == null || stringUrl.length() == 0) {
-            Toast.makeText(this, R.string.msg_invalid_url, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.msg_invalid_url_home, Toast.LENGTH_LONG).show();
             stringUrl = mSharedPreferences.getString(getString(R.string.pref_key_home_page)
                     , getString(R.string.pref_value_home_page_naver));
         }
@@ -209,7 +209,7 @@ public class WebActivity extends AppCompatActivity {
             mButtonPageBack.setAlpha(1);
         } else {
             mButtonPageBack.setEnabled(false);
-            mButtonPageBack.setAlpha(0.5f);
+            mButtonPageBack.setAlpha(0.3f);
         }
 
         if (mWebView.canGoForward()) {
@@ -217,7 +217,7 @@ public class WebActivity extends AppCompatActivity {
             mButtonPageForward.setAlpha(1);
         } else {
             mButtonPageForward.setEnabled(false);
-            mButtonPageForward.setAlpha(0.5f);
+            mButtonPageForward.setAlpha(0.3f);
         }
     }
 

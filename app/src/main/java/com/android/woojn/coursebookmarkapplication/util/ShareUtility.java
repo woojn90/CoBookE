@@ -43,7 +43,7 @@ public class ShareUtility {
             Course course = (Course) realmObject;
             textToShare.append(course.getTitle());
             if (!course.getDesc().isEmpty()) {
-                textToShare.append("\n" + course.getDesc());
+                textToShare.append("\n- " + course.getDesc());
             }
 
             for (Section section : course.getSections()) {

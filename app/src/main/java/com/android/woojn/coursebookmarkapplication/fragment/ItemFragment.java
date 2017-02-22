@@ -10,7 +10,7 @@ import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_U
 import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibilityByFolderId;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibilityByFolderId;
 import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.Context;
@@ -55,6 +55,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
@@ -99,13 +100,6 @@ public class ItemFragment extends Fragment
         super.onCreate(savedInstanceState);
         mRealm = Realm.getDefaultInstance();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
-        if (mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, DEFAULT_FOLDER_ID).findAll().size() == 0) {
-            mRealm.beginTransaction();
-            Folder folder = mRealm.createObject(Folder.class, DEFAULT_FOLDER_ID);
-            folder.setTitle(getString(R.string.string_home));
-            mRealm.commitTransaction();
-        }
     }
 
     @Override
@@ -119,6 +113,18 @@ public class ItemFragment extends Fragment
         currentFolderId = DEFAULT_FOLDER_ID;
         setRecyclerViewAdapter();
 
+        mItems.addChangeListener(new RealmChangeListener<RealmResults<Item>>() {
+            @Override
+            public void onChange(RealmResults<Item> element) {
+                updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
+            }
+        });
+        mFolders.addChangeListener(new RealmChangeListener<RealmResults<Folder>>() {
+            @Override
+            public void onChange(RealmResults<Folder> element) {
+                updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
+            }
+        });
 
         mFabExpandItems = (FloatingActionButton) getActivity().findViewById(R.id.fab_expand_items);
         mFabExpandItems.setOnClickListener(new View.OnClickListener() {
@@ -159,7 +165,7 @@ public class ItemFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        setTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
+        setRecyclerViewAdapter();
         RealmResults<Item> items = mRealm.where(Item.class).findAll();
         for (Item item : items) {
             if (!item.isVisited()) {
@@ -336,7 +342,7 @@ public class ItemFragment extends Fragment
         mRecyclerViewFolder.setAdapter(new FolderAdapter(getContext(), mFolders, this));
         mRecyclerViewItem.setAdapter(new ItemAdapter(getContext(), mItems, this));
 
-        setTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
+        updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
     private void animateFabInItemTab() {
@@ -381,7 +387,6 @@ public class ItemFragment extends Fragment
         folder.setTitle("New Folder");
         parentFolder.getFolders().add(folder);
         mRealm.commitTransaction();
-        setTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
     private void toggleUpArrowImageView() {
@@ -418,14 +423,12 @@ public class ItemFragment extends Fragment
         mRealm.beginTransaction();
         item.deleteFromRealm();
         mRealm.commitTransaction();
-        setTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
     private void deleteFolder(Folder folder) {
         mRealm.beginTransaction();
         deleteItemsAndFoldersInsideFolder(folder);
         mRealm.commitTransaction();
-        setTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
     /**
@@ -515,8 +518,7 @@ public class ItemFragment extends Fragment
     }
 
     private void retrieveItemById(int itemId) {
-        ParseAsyncTask parseAsyncTask = new ParseAsyncTask();
-        parseAsyncTask.execute(itemId, null, null);
+        new ParseAsyncTask().execute(itemId, null, null);
     }
 
     private void showDefaultWebPage() {

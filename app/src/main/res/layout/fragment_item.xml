@@ -24,21 +24,21 @@
                         android:id="@+id/iv_up_arrow_enable"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/ic_up_arrow_enable"
+                        android:background="@drawable/ic_up_enable"
                         android:contentDescription="@string/up_arrow_enable"
                         android:visibility="gone"/>
                     <ImageView
                         android:id="@+id/iv_up_arrow_disable"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/ic_up_arrow_disable"
+                        android:background="@drawable/ic_up_disable"
                         android:contentDescription="@string/up_arrow_disable"/>
                 </FrameLayout>
                 <ImageView
                     android:id="@+id/iv_home"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:background="@drawable/ic_home_black"
+                    android:background="@drawable/ic_home"
                     android:contentDescription="@string/content_desc_home"/>
             </LinearLayout>
         </HorizontalScrollView>

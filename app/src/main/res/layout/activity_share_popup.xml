@@ -52,15 +52,11 @@
                     android:textSize="14sp"
                     tools:text="Description"/>
                 <TextView
+                    style="@style/TextViewUrl"
                     android:id="@+id/tv_share_url"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_marginStart="5dp"
                     android:textSize="12sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:maxLines="1"
-                    android:ellipsize="end"
                     tools:text="http://m.naver.com"/>
 
                 <FrameLayout
@@ -95,20 +91,21 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <Spinner
+            android:id="@+id/sp_share_dropdown"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"/>
         <Button
             style="?android:attr/borderlessButtonStyle"
             android:id="@+id/btn_share_save"
-            android:layout_width="120dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="@string/string_save"
-            android:textColor="@color/colorAccent"/>
-        <Button
-            style="?android:attr/borderlessButtonStyle"
-            android:id="@+id/btn_share_save_and_run"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:text="@string/string_save_and_run"
             android:textColor="@color/colorAccent"/>
     </LinearLayout>
 

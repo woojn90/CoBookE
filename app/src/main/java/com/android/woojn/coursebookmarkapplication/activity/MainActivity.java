@@ -5,6 +5,7 @@ import static com.android.woojn.coursebookmarkapplication.Constants.PAGE_COURSE;
 import static com.android.woojn.coursebookmarkapplication.Constants.PAGE_ITEM;
 import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.currentFolderId;
 import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.isFabOpen;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.insertDefaultFolderIfNeeded;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        insertDefaultFolderIfNeeded(this);
 
         mTabLayout.addTab(mTabLayout.newTab());
         mTabLayout.addTab(mTabLayout.newTab());

@@ -28,7 +28,7 @@
                 android:id="@+id/btn_page_home"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
-                android:background="@drawable/ic_home_white"/>
+                android:background="@drawable/ic_home"/>
             <EditText
                 android:id="@+id/et_web_address"
                 android:layout_width="0dp"
@@ -38,6 +38,7 @@
                 android:layout_marginRight="6dp"
                 android:padding="4dp"
                 android:textSize="16sp"
+                android:textColor="@color/colorTextColor"
                 android:background="@android:color/white"
                 android:maxLines="1"
                 android:selectAllOnFocus="true"
@@ -46,7 +47,7 @@
                 android:id="@+id/btn_refresh"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
-                android:background="@drawable/ic_action_refresh"/>
+                android:background="@drawable/ic_refresh"/>
         </LinearLayout>
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"

@@ -27,7 +27,6 @@
     <string name="string_course_info">코스 정보</string>
     <string name="string_folder_info">폴더 정보</string>
     <string name="string_save">저장</string>
-    <string name="string_save_and_run">저장 후 앱실행</string>
     <string name="string_home">HOME</string>
 
     <string name="msg_insert_new_course">새로운 코스를 등록해보세요!</string>
@@ -52,11 +51,13 @@
     <string name="up_arrow_enable">up arrow enable</string>
     <string name="up_arrow_disable">up arrow disable</string>
 
-    <!-- Toast -->
+    <!-- Snackbar -->
     <string name="msg_favorite_y">즐겨찾기에 추가되었습니다.</string>
     <string name="msg_favorite_n">즐겨찾기에서 해제되었습니다.</string>
     <string name="msg_save">저장되었습니다.</string>
-    <string name="msg_invalid_url">적합한 주소가 아니므로 홈페이지로 연결합니다.</string>
+    <string name="msg_move_to_app">앱으로 이동</string>
+    <string name="msg_invalid_url_home">적합한 주소가 아니므로 홈페이지로 연결합니다.</string>
+    <string name="msg_invalid_url_not_save">적합한 주소가 아니므로 저장되지 않습니다.</string>
     <string name="msg_delete_all_complete">모든 항목이 삭제되었습니다.</string>
 
     <!-- Settings -->

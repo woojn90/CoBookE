@@ -8,7 +8,7 @@ import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_U
 import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibility;
 import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.DialogInterface;
@@ -48,6 +48,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 
 /**
  * Created by wjn on 2017-02-06.
@@ -67,9 +68,9 @@ public class CourseActivity extends AppCompatActivity
     @BindView(R.id.iv_favorite_n_course)
     protected ImageView mImageViewFavoriteN;
     @BindView(R.id.tv_section_empty)
-    protected TextView mTextViewCourseSectionEmpty;
+    protected TextView mTextViewSectionEmpty;
     @BindView(R.id.rv_section_list)
-    protected RecyclerView mRecyclerViewCourseSection;
+    protected RecyclerView mRecyclerViewSection;
 
     private Realm mRealm;
     private Course mCourse;
@@ -96,10 +97,11 @@ public class CourseActivity extends AppCompatActivity
 
         setAllTextView();
         toggleFavoriteImageView(mCourse.isFavorite());
-        mRecyclerViewCourseSection.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerViewCourseSection.setAdapter(new CourseSectionAdapter(this, mCourse.getSections()
-                .sort(FIELD_NAME_ID), this));
-        setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
+
+        RealmResults<Section> sections = mCourse.getSections().sort(FIELD_NAME_ID);
+        mRecyclerViewSection.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerViewSection.setAdapter(new CourseSectionAdapter(this, sections, this));
+        updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
     }
 
     @Override
@@ -285,7 +287,7 @@ public class CourseActivity extends AppCompatActivity
                             sectionItems.get(i).deleteFromRealm();
                         }
                         section.deleteFromRealm();
-                        setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
+                        updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
                     }
                 });
             }
@@ -420,9 +422,9 @@ public class CourseActivity extends AppCompatActivity
                     section.setTitle(title);
                     section.setSearchWord(searchWord);
                     mCourse.getSections().add(section);
+                    updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
                 }
                 mRealm.commitTransaction();
-                setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
             }
         });
 
@@ -473,7 +475,6 @@ public class CourseActivity extends AppCompatActivity
     }
 
     private void retrieveSectionItemById(int itemId) {
-        ParseAsyncTask parseAsyncTask = new ParseAsyncTask();
-        parseAsyncTask.execute(itemId, null, null);
+        new ParseAsyncTask().execute(itemId, null, null);
     }
 }

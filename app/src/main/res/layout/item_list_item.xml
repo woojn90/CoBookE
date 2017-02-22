@@ -36,7 +36,7 @@
                     android:id="@+id/btn_item_overflow"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:background="@drawable/ic_overflow_black"/>
+                    android:background="@drawable/ic_action_overflow"/>
             </LinearLayout>
             <TextView
                 style="@style/TextViewDesc"
@@ -46,16 +46,12 @@
                 android:textSize="14sp"
                 tools:text="Description"/>
             <TextView
+                style="@style/TextViewUrl"
                 android:id="@+id/tv_item_url"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_marginStart="5dp"
                 android:textSize="12sp"
-                android:textColor="@android:color/darker_gray"
-                android:maxLines="1"
-                android:ellipsize="end"
-                tools:text="https://www.naver.com"/>
+                tools:text="http://m.naver.com"/>
 
             <FrameLayout
                 android:layout_width="match_parent"

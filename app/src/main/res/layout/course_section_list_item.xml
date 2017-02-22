@@ -37,7 +37,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="3dp"
-            android:background="@drawable/ic_search_browser"/>
+            android:background="@drawable/ic_search_page"/>
         <Button
             android:id="@+id/btn_delete_section"
             android:layout_width="38dp"
@@ -50,7 +50,7 @@
             android:layout_height="28dp"
             android:layout_marginRight="4dp"
             android:layout_marginEnd="4dp"
-            android:background="@drawable/ic_overflow_black"/>
+            android:background="@drawable/ic_action_overflow"/>
     </LinearLayout>
 
     <FrameLayout

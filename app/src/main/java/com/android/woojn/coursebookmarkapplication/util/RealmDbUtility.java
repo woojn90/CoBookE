@@ -1,10 +1,13 @@
 package com.android.woojn.coursebookmarkapplication.util;
 
+import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_FOLDER_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.model.Course;
 import com.android.woojn.coursebookmarkapplication.model.Folder;
 import com.android.woojn.coursebookmarkapplication.model.Item;
@@ -33,7 +36,7 @@ public class RealmDbUtility {
         return newId;
     }
 
-    public static <E extends RealmModel> void setTextViewEmptyVisibility(Class<E> clazz, int parentId, TextView textViewEmpty) {
+    public static <E extends RealmModel> void updateTextViewEmptyVisibility(Class<E> clazz, int parentId, TextView textViewEmpty) {
         Realm realm = Realm.getDefaultInstance();
 
         if (clazz.equals(Section.class)) {
@@ -58,7 +61,7 @@ public class RealmDbUtility {
         realm.close();
     }
 
-    public static void setTextViewEmptyVisibilityByFolderId(int folderId, TextView textViewEmpty) {
+    public static void updateTextViewEmptyVisibilityByFolderId(int folderId, TextView textViewEmpty) {
         Realm realm = Realm.getDefaultInstance();
 
         Folder parentFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, folderId).findFirst();
@@ -66,6 +69,17 @@ public class RealmDbUtility {
             textViewEmpty.setVisibility(View.GONE);
         } else {
             textViewEmpty.setVisibility(View.VISIBLE);
+        }
+        realm.close();
+    }
+
+    public static void insertDefaultFolderIfNeeded(Context context) {
+        Realm realm = Realm.getDefaultInstance();
+        if (realm.where(Folder.class).equalTo(FIELD_NAME_ID, DEFAULT_FOLDER_ID).findFirst() == null) {
+            realm.beginTransaction();
+            Folder folder = realm.createObject(Folder.class, DEFAULT_FOLDER_ID);
+            folder.setTitle(context.getString(R.string.string_home));
+            realm.commitTransaction();
         }
         realm.close();
     }

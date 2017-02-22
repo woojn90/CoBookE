@@ -4,7 +4,8 @@ import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.setTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
+        .updateTextViewEmptyVisibility;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,7 +38,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.Sort;
+import io.realm.RealmResults;
 
 /**
  * Created by wjn on 2017-02-16.
@@ -49,8 +50,6 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
     protected TextView mTextViewCourseEmpty;
     @BindView(R.id.rv_course_list)
     protected RecyclerView mRecyclerViewCourse;
-
-    private FloatingActionButton mFabInsertCourse;
 
     private Realm mRealm;
     private Toast mToast;
@@ -66,12 +65,12 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         View rootView = inflater.inflate(R.layout.fragment_course, container, false);
         ButterKnife.bind(this, rootView);
 
+        RealmResults<Course> courses = mRealm.where(Course.class).findAllSorted(FIELD_NAME_ID);
         mRecyclerViewCourse.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerViewCourse.setAdapter(new CourseAdapter(getContext(), mRealm.where(Course.class).findAllAsync()
-                .sort(FIELD_NAME_ID, Sort.DESCENDING), this));
+        mRecyclerViewCourse.setAdapter(new CourseAdapter(getContext(), courses, this));
 
-        mFabInsertCourse = (FloatingActionButton) getActivity().findViewById(R.id.fab_insert_course);
-        mFabInsertCourse.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fabInsertCourse = (FloatingActionButton) getActivity().findViewById(R.id.fab_insert_course);
+        fabInsertCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int newCourseId = getNewIdByClass(Course.class);
@@ -83,8 +82,8 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
 
     @Override
     public void onResume() {
+        updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
         super.onResume();
-        setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
     }
 
     @Override
@@ -104,7 +103,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                 break;
             case R.id.iv_favorite_y_main:
             case R.id.iv_favorite_n_main:
-                toggleCourseFavorited(course);
+                toggleCourseFavorite(course);
                 break;
             case R.id.btn_update_course:
                 updateCourse(course);
@@ -123,7 +122,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         mToast.show();
     }
 
-    private void toggleCourseFavorited(final Course course) {
+    private void toggleCourseFavorite(final Course course) {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -162,7 +161,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                             sections.get(i).deleteFromRealm();
                         }
                         course.deleteFromRealm();
-                        setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
+                        updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
                     }
                 });
             }
@@ -210,9 +209,10 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                     Intent insertIntent = new Intent(getContext(), CourseActivity.class);
                     insertIntent.putExtra(KEY_COURSE_ID, courseId);
                     startActivity(insertIntent);
+
+                    updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
                 }
                 mRealm.commitTransaction();
-                setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
             }
         });
 

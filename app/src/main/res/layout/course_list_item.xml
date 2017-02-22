@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="@dimen/margin_basic_of_recycler_view_item"
+    android:layout_marginBottom="4dp"
     android:gravity="center_vertical"
     android:baselineAligned="false"
     android:background="@android:color/background_light">
@@ -40,7 +41,7 @@
             android:id="@+id/tv_course_title"
             android:textSize="20sp"
             android:textStyle="bold"
-            tools:text="Title" />
+            tools:text="Title"/>
         <TextView
             style="@style/TextViewDesc"
             android:id="@+id/tv_course_desc"

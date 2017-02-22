@@ -1,6 +1,6 @@
 package com.android.woojn.coursebookmarkapplication.fragment;
 
-import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_FOLDER_ID;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.insertDefaultFolderIfNeeded;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,7 +15,6 @@ import android.support.v7.preference.PreferenceScreen;
 import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
-import com.android.woojn.coursebookmarkapplication.model.Folder;
 
 import io.realm.Realm;
 
@@ -105,9 +104,9 @@ public class SettingsFragment extends PreferenceFragmentCompat
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
                     realm.deleteAll();
-                    realm.createObject(Folder.class, DEFAULT_FOLDER_ID);
                     realm.commitTransaction();
                     realm.close();
+                    insertDefaultFolderIfNeeded(getContext());
                     Toast.makeText(getContext(), R.string.msg_delete_all_complete, Toast.LENGTH_LONG).show();
                 }
             });
@@ -126,6 +125,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
             startActivity(Intent.createChooser(sendIntent, getString(R.string.settings_title_send_mail)));
 
         } else if (getString(R.string.settings_key_license).equals(preference.getKey())) {
+            // TODO: License Activity 구현
 
         }
         return false;

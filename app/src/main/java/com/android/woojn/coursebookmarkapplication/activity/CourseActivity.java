@@ -47,6 +47,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmList;
 
 /**
  * Created by wjn on 2017-02-06.
@@ -243,6 +244,15 @@ public class CourseActivity extends AppCompatActivity
                 mRealm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
+                        RealmList<Section> sections = mCourse.getSections();
+                        for (int i = sections.size() - 1; i >= 0; i--) {
+
+                            RealmList<Item> sectionItems = sections.get(i).getItems();
+                            for (int j = sectionItems.size() - 1; j >= 0; j--) {
+                                sectionItems.get(j).deleteFromRealm();
+                            }
+                            sections.get(i).deleteFromRealm();
+                        }
                         mCourse.deleteFromRealm();
                         finish();
                     }
@@ -270,6 +280,10 @@ public class CourseActivity extends AppCompatActivity
                 mRealm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
+                        RealmList<Item> sectionItems = section.getItems();
+                        for (int i = sectionItems.size() - 1; i >= 0; i--) {
+                            sectionItems.get(i).deleteFromRealm();
+                        }
                         section.deleteFromRealm();
                         setTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewCourseSectionEmpty);
                     }

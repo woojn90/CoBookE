@@ -30,10 +30,13 @@ import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.activity.CourseActivity;
 import com.android.woojn.coursebookmarkapplication.adapter.CourseAdapter;
 import com.android.woojn.coursebookmarkapplication.model.Course;
+import com.android.woojn.coursebookmarkapplication.model.Item;
+import com.android.woojn.coursebookmarkapplication.model.Section;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.Sort;
 
 /**
@@ -86,8 +89,8 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mRealm.close();
+        super.onDestroy();
     }
 
     @Override
@@ -149,6 +152,15 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                 mRealm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
+                        RealmList<Section> sections = course.getSections();
+                        for (int i = sections.size() - 1; i >= 0; i--) {
+
+                            RealmList<Item> sectionItems = sections.get(i).getItems();
+                            for (int j = sectionItems.size() - 1; j >= 0; j--) {
+                                sectionItems.get(j).deleteFromRealm();
+                            }
+                            sections.get(i).deleteFromRealm();
+                        }
                         course.deleteFromRealm();
                         setTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
                     }

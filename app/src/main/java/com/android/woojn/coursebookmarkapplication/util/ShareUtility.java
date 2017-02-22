@@ -24,39 +24,39 @@ public class ShareUtility {
     }
 
     private static String getTextByRealmObject(RealmObject realmObject) {
-        String textToShare = null;
+        StringBuffer textToShare = new StringBuffer();
         if (realmObject instanceof Item) {
             Item item = (Item) realmObject;
-            textToShare = item.getTitle();
-            textToShare += "\n" + item.getUrl();
+            textToShare.append(item.getTitle());
+            textToShare.append("\n" + item.getUrl());
         } else if (realmObject instanceof Section) {
             int itemCount = 1;
             Section section = (Section) realmObject;
-            textToShare = "[" + section.getTitle() + "]";
+            textToShare.append("[" + section.getTitle() + "]");
 
             for (Item item : section.getItems()) {
-                textToShare += "\n\n" + itemCount++ + ") " + item.getTitle();
-                textToShare += "\n" + item.getUrl();
+                textToShare.append("\n\n" + itemCount++ + ") " + item.getTitle());
+                textToShare.append("\n" + item.getUrl());
             }
         } else if (realmObject instanceof Course) {
             int sectionCount = 1;
             Course course = (Course) realmObject;
-            textToShare = course.getTitle();
+            textToShare.append(course.getTitle());
             if (!course.getDesc().isEmpty()) {
-                textToShare += "\n" + course.getDesc();
+                textToShare.append("\n" + course.getDesc());
             }
 
             for (Section section : course.getSections()) {
                 int itemCount = 1;
-                textToShare += "\n\n\n[" + sectionCount++ + ". " + section.getTitle() + "]";
+                textToShare.append("\n\n\n[" + sectionCount++ + ". " + section.getTitle() + "]");
 
                 for (Item item : section.getItems()) {
-                    textToShare += "\n\n" + itemCount++ + ") " + item.getTitle();
-                    textToShare += "\n" + item.getUrl();
+                    textToShare.append("\n\n" + itemCount++ + ") " + item.getTitle());
+                    textToShare.append("\n" + item.getUrl());
                 }
             }
         }
-        return textToShare;
+        return textToShare.toString();
     }
 
 }

@@ -26,6 +26,9 @@
     <string name="string_section_info">코스 그룹 정보</string>
     <string name="string_course_info">코스 정보</string>
     <string name="string_folder_info">폴더 정보</string>
+    <string name="string_save">저장</string>
+    <string name="string_save_and_run">저장 후 앱실행</string>
+    <string name="string_home">HOME</string>
 
     <string name="msg_insert_new_course">새로운 코스를 등록해보세요!</string>
     <string name="msg_insert_new_course_section">새로운 코스 그룹을 등록해보세요!</string>
@@ -33,6 +36,7 @@
     <string name="msg_insert_new_item">새로운 Bookmark를 등록해보세요!</string>
 
     <string name="msg_delete_confirm">삭제하시겠습니까?</string>
+    <string name="msg_delete_all_confirm">모든 항목을 삭제하시겠습니까?</string>
 
     <string name="hint_course_title">예) 강남역 데이트</string>
     <string name="hint_course_search_word">예) 강남역</string>
@@ -53,14 +57,13 @@
     <string name="msg_favorite_n">즐겨찾기에서 해제되었습니다.</string>
     <string name="msg_save">저장되었습니다.</string>
     <string name="msg_invalid_url">적합한 주소가 아니므로 홈페이지로 연결합니다.</string>
+    <string name="msg_delete_all_complete">모든 항목이 삭제되었습니다.</string>
 
     <!-- Settings -->
-    <string name="settings_category_ui">화면(추가 예정)</string>
-    <string name="settings_category_search">검색(추가 예정)</string>
-    <string name="settings_category_app_info">어플 정보(개발 예정)</string>
-
-    <string name="pref_label_tab_index">최초 실행시 선택 Tab</string>
-    <string name="pref_key_tab_index" translatable="false">tab</string>
+    <string name="settings_category_search">검색</string>
+    <string name="settings_category_data">데이터</string>
+    <string name="settings_category_etc">기타</string>
+    <string name="settings_category_app_info">어플 정보</string>
 
     <string name="pref_label_home_page">홈 페이지</string>
     <string name="pref_key_home_page" translatable="false">home_page</string>
@@ -82,16 +85,29 @@
     <string name="pref_value_target_of_auto_search_google">https://www.google.com/search?q=</string>
     <string name="pref_value_target_of_auto_search_instagram">https://www.instagram.com/explore/tags/</string>
 
-    <string name="settings_developer_info">개발자 정보</string>
-    <string name="settings_developer_info_summary">개발자 정보를 확인합니다.</string>
-    <string name="settings_developer_mail">메일 보내기</string>
-    <string name="settings_developer_mail_summary">개발자에게 메일을 보냅니다.</string>
-    <string name="settings_license">오픈소스 라이센스</string>
-    <string name="settings_license_summary">오픈소스 라이센스 세부정보입니다.</string>
+    <string name="settings_key_delete_all" translatable="false">delete_all</string>
+    <string name="settings_title_delete_all">모든 항목 삭제</string>
+    <string name="settings_summary_delete_all">저장된 모든 항목을 삭제합니다.</string>
+    <string name="settings_key_upload_backup_file" translatable="false">upload_backup_file</string>
+    <string name="settings_title_upload_backup_file">백업 내보내기(업데이트 예정)</string>
+    <string name="settings_summary_upload_backup_file">저장된 모든 항목을 파일로 저장합니다.</string>
+    <string name="settings_key_download_backup_file" translatable="false">download_backup_file</string>
+    <string name="settings_title_download_backup_file">백업 가져오기(업데이트 예정)</string>
+    <string name="settings_summary_download_backup_file">저장해둔 파일을 앱으로 불러옵니다.</string>
+
+    <string name="pref_label_tab_index">초기 선택 Tab</string>
+    <string name="pref_key_tab_index" translatable="false">tab</string>
+
+    <string name="settings_key_send_mail" translatable="false">send_mail</string>
+    <string name="settings_title_send_mail">메일 보내기</string>
+    <string name="settings_summary_send_mail">개발자에게 메일을 보냅니다.</string>
+    <string name="settings_key_license" translatable="false">license</string>
+    <string name="settings_title_license">오픈소스 라이센스</string>
+    <string name="settings_summary_license">오픈소스 라이센스 세부정보입니다.</string>
 
     <string name="pref_key_item_number_of_grid_column" translatable="false">number_of_column</string>
 
-    <!-- etc -->
-    <string name="msg_development_scheduled">개발 예정</string>
+    <string name="settings_developer_mail_address">woojn90@gmail.com</string>
+    <string name="settings_developer_mail_subject">[요청] </string>
 
 </resources>

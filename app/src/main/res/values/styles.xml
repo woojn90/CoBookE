@@ -5,6 +5,9 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
+    <style name="ShareActivityTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+    </style>
 
     <style name="MainTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabSelectedTextColor">@android:color/white</item>

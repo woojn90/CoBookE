@@ -76,11 +76,6 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.getTabAt(PAGE_COURSE).setText(R.string.string_course);
         mTabLayout.getTabAt(PAGE_ITEM).setText(R.string.string_item);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int tabIndex = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_tab_index), PAGE_COURSE + ""));
-        mTabLayout.getTabAt(tabIndex).select();
-        selectFabByTabPosition(tabIndex);
-
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -97,6 +92,19 @@ public class MainActivity extends AppCompatActivity {
                 // Do nothing
             }
         });
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int tabIndex = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_tab_index), PAGE_COURSE + ""));
+        mTabLayout.getTabAt(tabIndex).select();
+        initializeFabByTabPosition(tabIndex);
+    }
+
+    @Override
+    protected void onPause() {
+        if (isFabOpen) {
+            animateFabItemsClose();
+        }
+        super.onPause();
     }
 
     @Override
@@ -116,34 +124,44 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void initializeFabByTabPosition(int tabPosition) {
+        switch (tabPosition) {
+            case PAGE_COURSE:
+                mFabExpandItems.hide();
+                mFabExpandItems.setClickable(false);
+                break;
+            case PAGE_ITEM:
+                mFabInsertCourse.hide();
+                mFabInsertCourse.setClickable(false);
+                break;
+        }
+    }
+
     private void selectFabByTabPosition(int tabPosition) {
         switch (tabPosition) {
             case PAGE_COURSE:
                 if (isFabOpen) {
                     animateFabItemsClose();
                 }
-                mFabInsertCourse.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open));
+                mFabInsertCourse.show();
                 mFabInsertCourse.setClickable(true);
-                mFabExpandItems.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close));
+                mFabExpandItems.hide();
                 mFabExpandItems.setClickable(false);
                 break;
             case PAGE_ITEM:
-                mFabInsertCourse.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close));
-                mFabInsertCourse.setClickable(false);
-                mFabExpandItems.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open));
+                mFabExpandItems.show();
                 mFabExpandItems.setClickable(true);
+                mFabInsertCourse.hide();
+                mFabInsertCourse.setClickable(false);
                 break;
         }
     }
 
     private void animateFabItemsClose() {
         mFabExpandItems.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_backward));
-        mFabToggleGrid.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_close));
-        mFabInsertFolder.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_close));
-        mFabBrowser.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_close));
-        mFabToggleGrid.setClickable(false);
-        mFabInsertFolder.setClickable(false);
-        mFabBrowser.setClickable(false);
+        mFabToggleGrid.hide();
+        mFabInsertFolder.hide();
+        mFabBrowser.hide();
         isFabOpen = false;
     }
 }

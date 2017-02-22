@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/settings_category_ui">
-        <ListPreference
-            android:key="@string/pref_key_tab_index"
-            android:title="@string/pref_label_tab_index"
-            android:defaultValue="0"
-            android:entries="@array/pref_labels_tab_index"
-            android:entryValues="@array/pref_values_tab_index"
-            android:negativeButtonText="@null"
-            android:positiveButtonText="@null"/>
-    </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_search">
         <ListPreference
             android:key="@string/pref_key_home_page"
@@ -28,18 +18,43 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"/>
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_data">
+        <Preference
+            android:key="@string/settings_key_delete_all"
+            android:title="@string/settings_title_delete_all"
+            android:summary="@string/settings_summary_delete_all">
+        </Preference>
+        <Preference
+            android:key="@string/settings_key_upload_backup_file"
+            android:title="@string/settings_title_upload_backup_file"
+            android:summary="@string/settings_summary_upload_backup_file">
+        </Preference>
+        <Preference
+            android:key="@string/settings_key_download_backup_file"
+            android:title="@string/settings_title_download_backup_file"
+            android:summary="@string/settings_summary_download_backup_file">
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_etc">
+        <ListPreference
+            android:key="@string/pref_key_tab_index"
+            android:title="@string/pref_label_tab_index"
+            android:defaultValue="0"
+            android:entries="@array/pref_labels_tab_index"
+            android:entryValues="@array/pref_values_tab_index"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_app_info">
         <Preference
-            android:summary="@string/settings_developer_info_summary"
-            android:title="@string/settings_developer_info">
+            android:key="@string/settings_key_send_mail"
+            android:title="@string/settings_title_send_mail"
+            android:summary="@string/settings_summary_send_mail">
         </Preference>
         <Preference
-            android:summary="@string/settings_developer_mail_summary"
-            android:title="@string/settings_developer_mail">
-        </Preference>
-        <Preference
-            android:summary="@string/settings_license_summary"
-            android:title="@string/settings_license">
+            android:key="@string/settings_key_license"
+            android:title="@string/settings_title_license"
+            android:summary="@string/settings_summary_license">
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

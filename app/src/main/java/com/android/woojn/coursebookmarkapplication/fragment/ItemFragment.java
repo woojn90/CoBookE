@@ -55,6 +55,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 /**
@@ -101,7 +102,8 @@ public class ItemFragment extends Fragment
 
         if (mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, DEFAULT_FOLDER_ID).findAll().size() == 0) {
             mRealm.beginTransaction();
-            mRealm.createObject(Folder.class, DEFAULT_FOLDER_ID);
+            Folder folder = mRealm.createObject(Folder.class, DEFAULT_FOLDER_ID);
+            folder.setTitle(getString(R.string.string_home));
             mRealm.commitTransaction();
         }
     }
@@ -148,7 +150,6 @@ public class ItemFragment extends Fragment
         mFabBrowser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                animateFabInItemTab();
                 showDefaultWebPage();
             }
         });
@@ -169,8 +170,8 @@ public class ItemFragment extends Fragment
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mRealm.close();
+        super.onDestroy();
     }
 
     @Override
@@ -190,6 +191,7 @@ public class ItemFragment extends Fragment
 
     @OnClick(R.id.iv_up_arrow_enable)
     public void onClickImageViewUpArrowEnable() {
+        if (isFabOpen) animateFabInItemTab();
         int childCount = mLinearLayoutExplorerBar.getChildCount();
         mLinearLayoutExplorerBar.removeViewAt(childCount - 1);
         mLinearLayoutExplorerBar.removeViewAt(childCount - 2);
@@ -201,6 +203,7 @@ public class ItemFragment extends Fragment
 
     @OnClick(R.id.iv_home)
     public void onClickImageViewHome() {
+        if (isFabOpen) animateFabInItemTab();
         if (mFolderIds.size() > 1) {
             int childCount = mLinearLayoutExplorerBar.getChildCount();
             for (int i = childCount - 1; i > 1; i--) {
@@ -216,6 +219,7 @@ public class ItemFragment extends Fragment
 
     @Override
     public void onFolderClick(int id) {
+        if (isFabOpen) animateFabInItemTab();
         currentFolderId = id;
         mFolderIds.add(currentFolderId);
         Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, currentFolderId).findFirst();
@@ -250,6 +254,7 @@ public class ItemFragment extends Fragment
 
     @Override
     public void onItemInFolderClick(final int id, View view) {
+        if (isFabOpen) animateFabInItemTab();
         switch (view.getId()) {
             case R.id.btn_folder_overflow:
                 PopupMenu popupMenu = new PopupMenu(getContext(), view);
@@ -290,6 +295,7 @@ public class ItemFragment extends Fragment
 
     @Override
     public void onItemInItemClick(final int id, View view) {
+        if (isFabOpen) animateFabInItemTab();
         switch (view.getId()) {
             case R.id.btn_item_overflow:
                 PopupMenu popupMenu = new PopupMenu(getContext(), view);
@@ -336,21 +342,15 @@ public class ItemFragment extends Fragment
     private void animateFabInItemTab() {
         if (isFabOpen) {
             mFabExpandItems.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.rotate_backward));
-            mFabToggleGrid.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fab_close));
-            mFabInsertFolder.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fab_close));
-            mFabBrowser.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fab_close));
-            mFabToggleGrid.setClickable(false);
-            mFabInsertFolder.setClickable(false);
-            mFabBrowser.setClickable(false);
+            mFabToggleGrid.hide();
+            mFabInsertFolder.hide();
+            mFabBrowser.hide();
             isFabOpen = false;
         } else {
             mFabExpandItems.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.rotate_forward));
-            mFabToggleGrid.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fab_open));
-            mFabInsertFolder.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fab_open));
-            mFabBrowser.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fab_open));
-            mFabToggleGrid.setClickable(true);
-            mFabInsertFolder.setClickable(true);
-            mFabBrowser.setClickable(true);
+            mFabToggleGrid.show();
+            mFabInsertFolder.show();
+            mFabBrowser.show();
             isFabOpen = true;
         }
     }
@@ -395,6 +395,8 @@ public class ItemFragment extends Fragment
     }
 
     private void moveToSelectedFolder(int folderId) {
+        if (isFabOpen) animateFabInItemTab();
+
         if (folderId == currentFolderId) {
             return;
         }
@@ -421,9 +423,31 @@ public class ItemFragment extends Fragment
 
     private void deleteFolder(Folder folder) {
         mRealm.beginTransaction();
-        folder.deleteFromRealm();
+        deleteItemsAndFoldersInsideFolder(folder);
         mRealm.commitTransaction();
         setTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
+    }
+
+    /**
+     * realm.beginTransaction(); 이후에 호출됨 / 재귀 함수
+     */
+    private void deleteItemsAndFoldersInsideFolder(Folder parentFolder) {
+        deleteItemsInsideFolder(parentFolder);
+        RealmList<Folder> folders = parentFolder.getFolders();
+        for (int i = folders.size() - 1; i >= 0; i--) {
+            deleteItemsInsideFolder(folders.get(i));
+        }
+        parentFolder.deleteFromRealm();
+    }
+
+    /**
+     * realm.beginTransaction(); 이후에 호출됨
+     */
+    private void deleteItemsInsideFolder(Folder parentFolder) {
+        RealmList<Item> items = parentFolder.getItems();
+        for (int i = items.size() - 1; i >= 0; i--) {
+            items.get(i).deleteFromRealm();
+        }
     }
 
     private void showFolderDialog(final int folderId, final String beforeTitle) {
@@ -491,7 +515,8 @@ public class ItemFragment extends Fragment
     }
 
     private void retrieveItemById(int itemId) {
-        new ParseAsyncTask().execute(itemId, null, null);
+        ParseAsyncTask parseAsyncTask = new ParseAsyncTask();
+        parseAsyncTask.execute(itemId, null, null);
     }
 
     private void showDefaultWebPage() {

@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/item_update_folder"
-        android:orderInCategory="1"
-        android:title="@string/action_update"
-        android:icon="@drawable/ic_edit"
-        app:showAsAction="ifRoom"/>
-    <item
         android:id="@+id/item_delete_folder"
-        android:orderInCategory="2"
+        android:orderInCategory="1"
         android:title="@string/action_delete"
         android:icon="@drawable/ic_trash_can"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/item_change_folder"
+        android:orderInCategory="2"
+        android:title="@string/action_move"
+        android:icon="@drawable/ic_folder_open"
         app:showAsAction="ifRoom"/>
 </menu>

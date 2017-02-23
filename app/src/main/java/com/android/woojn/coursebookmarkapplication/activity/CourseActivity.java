@@ -24,15 +24,19 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +46,9 @@ import com.android.woojn.coursebookmarkapplication.async.ParseAsyncTask;
 import com.android.woojn.coursebookmarkapplication.model.Course;
 import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +64,8 @@ import io.realm.RealmResults;
 public class CourseActivity extends AppCompatActivity
         implements CourseSectionAdapter.OnRecyclerViewClickListener {
 
+    @BindView(R.id.layout_course_info)
+    protected LinearLayout mLinearLayoutCourseInfo;
     @BindView(R.id.tv_course_title)
     protected TextView mTextViewCourseTitle;
     @BindView(R.id.tv_course_search_word)
@@ -102,6 +111,22 @@ public class CourseActivity extends AppCompatActivity
         mRecyclerViewSection.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerViewSection.setAdapter(new CourseSectionAdapter(this, sections, this));
         updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
+
+        final GestureDetector gd = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                showCourseDialog(mCourse.getTitle(), mCourse.getSearchWord(), mCourse.getDesc());
+                return true;
+            }
+        });
+
+        mLinearLayoutCourseInfo.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                gd.onTouchEvent(event);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -132,9 +157,6 @@ public class CourseActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_update:
-                showCourseDialog(mCourse.getTitle(), mCourse.getSearchWord(), mCourse.getDesc());
-                break;
             case R.id.action_delete:
                 deleteCourse();
                 break;
@@ -152,21 +174,18 @@ public class CourseActivity extends AppCompatActivity
             case R.id.btn_search_section_item:
                 searchAndShowResults(section);
                 break;
-            case R.id.btn_delete_section:
-                deleteSection(section);
-                break;
             case R.id.btn_section_overflow:
                 PopupMenu popupMenu = new PopupMenu(this, view);
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
-                            case R.id.item_update_section:
-                                updateSection(section);
-                                return true;
                             case R.id.item_share_section:
                                 shareTextByRealmObject(CourseActivity.this, section);
                                 return true;
+                            case R.id.item_delete_section:
+                                deleteSection(section);
+                                break;
                         }
                         return false;
                     }
@@ -178,6 +197,12 @@ public class CourseActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onItemDoubleTap(int id) {
+        Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, id).findFirst();
+        showSectionDialog(section.getId(), true, section.getTitle(), section.getSearchWord());
+    }
+
     @OnClick({R.id.iv_favorite_y_course, R.id.iv_favorite_n_course})
     protected void onClickTextViewCourseFavorite() {
         toggleCourseFavorite();
@@ -186,7 +211,7 @@ public class CourseActivity extends AppCompatActivity
     @OnClick(R.id.fab_insert_section)
     protected void onClickFloatingActionButton() {
         int newSectionId = getNewIdByClass(Section.class);
-        insertSection(newSectionId);
+        showSectionDialog(newSectionId, false, "", "");
     }
 
     private void showToastByForce(int resId) {
@@ -264,14 +289,6 @@ public class CourseActivity extends AppCompatActivity
         builder.show();
     }
 
-    private void insertSection(int sectionId) {
-        showSectionDialog(sectionId, false, "", "");
-    }
-
-    private void updateSection(Section section) {
-        showSectionDialog(section.getId(), true, section.getTitle(), section.getSearchWord());
-    }
-
     private void deleteSection(final Section section) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.msg_delete_confirm);
@@ -304,9 +321,23 @@ public class CourseActivity extends AppCompatActivity
             query = query.replace(" ", "");
         }
 
+        String queryEncoded;
+        try {
+            // TODO: 폰으로 test하고 Log 지울 것
+            queryEncoded = URLEncoder.encode(query, "UTF-8");
+            Log.d("Check", "try / query : " + query);
+            Log.d("Check", "try / queryEncode : " + queryEncoded);
+        } catch (UnsupportedEncodingException e) {
+            queryEncoded = query;
+            e.printStackTrace();
+            Log.d("Check", e.getMessage());
+            Log.d("Check", "try / query : " + query);
+            Log.d("Check", "catch / queryEncode : " + queryEncoded);
+        }
+
         Intent webIntent = new Intent(this, WebActivity.class);
         webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
-        webIntent.putExtra(KEY_STRING_URL, searchEngine + query);
+        webIntent.putExtra(KEY_STRING_URL, searchEngine + queryEncoded);
         webIntent.putExtra(KEY_SECTION_ID, section.getId());
         startActivity(webIntent);
     }

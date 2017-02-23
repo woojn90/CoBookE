@@ -35,14 +35,18 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.activity.MainActivity;
 import com.android.woojn.coursebookmarkapplication.activity.WebActivity;
+import com.android.woojn.coursebookmarkapplication.adapter.DropdownAdapter;
 import com.android.woojn.coursebookmarkapplication.adapter.FolderAdapter;
 import com.android.woojn.coursebookmarkapplication.adapter.ItemAdapter;
 import com.android.woojn.coursebookmarkapplication.async.ParseAsyncTask;
@@ -57,6 +61,7 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmList;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 /**
@@ -88,10 +93,10 @@ public class ItemFragment extends Fragment
     private Realm mRealm;
     private SharedPreferences mSharedPreferences;
     private RealmResults<Folder> mFolders;
-
     private RealmResults<Item> mItems;
-    private ArrayList<Integer> mFolderIds;
 
+    private int mFolderIdWantToChange;
+    public static ArrayList<Integer> folderIds;
     public static boolean isFabOpen;
     public static int currentFolderId;
 
@@ -108,8 +113,8 @@ public class ItemFragment extends Fragment
         ButterKnife.bind(this, rootView);
 
         setRecyclerViewLayoutManager();
-        mFolderIds = new ArrayList<>();
-        mFolderIds.add(DEFAULT_FOLDER_ID);
+        folderIds = new ArrayList<>();
+        folderIds.add(DEFAULT_FOLDER_ID);
         currentFolderId = DEFAULT_FOLDER_ID;
         setRecyclerViewAdapter();
 
@@ -202,22 +207,22 @@ public class ItemFragment extends Fragment
         mLinearLayoutExplorerBar.removeViewAt(childCount - 1);
         mLinearLayoutExplorerBar.removeViewAt(childCount - 2);
 
-        mFolderIds.remove(mFolderIds.indexOf(currentFolderId));
-        currentFolderId = mFolderIds.get(mFolderIds.size() - 1);
+        folderIds.remove(folderIds.indexOf(currentFolderId));
+        currentFolderId = folderIds.get(folderIds.size() - 1);
         setRecyclerViewAdapter();
     }
 
     @OnClick(R.id.iv_home)
     public void onClickImageViewHome() {
         if (isFabOpen) animateFabInItemTab();
-        if (mFolderIds.size() > 1) {
+        if (folderIds.size() > 1) {
             int childCount = mLinearLayoutExplorerBar.getChildCount();
             for (int i = childCount - 1; i > 1; i--) {
                 mLinearLayoutExplorerBar.removeViewAt(i);
             }
 
-            mFolderIds.clear();
-            mFolderIds.add(DEFAULT_FOLDER_ID);
+            folderIds.clear();
+            folderIds.add(DEFAULT_FOLDER_ID);
             currentFolderId = DEFAULT_FOLDER_ID;
             setRecyclerViewAdapter();
         }
@@ -227,12 +232,12 @@ public class ItemFragment extends Fragment
     public void onFolderClick(int id) {
         if (isFabOpen) animateFabInItemTab();
         currentFolderId = id;
-        mFolderIds.add(currentFolderId);
+        folderIds.add(currentFolderId);
         Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, currentFolderId).findFirst();
 
         TextView textViewInside = new TextView(getContext());
         textViewInside.setText(">");
-        textViewInside.setTextSize(16);
+        textViewInside.setTextSize(17);
         textViewInside.setPadding(4, 4, 4, 4);
         textViewInside.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -241,7 +246,7 @@ public class ItemFragment extends Fragment
 
         TextView textViewFolder = new TextView(getContext());
         textViewFolder.setText(folder.getTitle());
-        textViewFolder.setTextSize(16);
+        textViewFolder.setTextSize(17);
         textViewFolder.setPadding(4, 4, 4, 4);
         textViewFolder.setTag(id);
         textViewFolder.setLayoutParams(new LinearLayout.LayoutParams(
@@ -259,6 +264,12 @@ public class ItemFragment extends Fragment
     }
 
     @Override
+    public void onFolderDoubleTap(int id) {
+        Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, id).findFirst();
+        showFolderDialog(id, folder.getTitle());
+    }
+
+    @Override
     public void onItemInFolderClick(final int id, View view) {
         if (isFabOpen) animateFabInItemTab();
         switch (view.getId()) {
@@ -269,11 +280,11 @@ public class ItemFragment extends Fragment
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, id).findFirst();
                         switch (menuItem.getItemId()) {
-                            case R.id.item_update_folder:
-                                showFolderDialog(id, folder.getTitle());
-                                return true;
                             case R.id.item_delete_folder:
                                 deleteFolder(folder);
+                                return true;
+                            case R.id.item_change_folder:
+                                showChangeFolderDialog(folder);
                                 return true;
                         }
                         return false;
@@ -310,11 +321,14 @@ public class ItemFragment extends Fragment
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         Item item = mRealm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
                         switch (menuItem.getItemId()) {
+                            case R.id.item_delete_item:
+                                deleteItem(item);
+                                return true;
                             case R.id.item_share_item:
                                 shareTextByRealmObject(getContext(), item);
                                 return true;
-                            case R.id.item_delete_item:
-                                deleteItem(item);
+                            case R.id.item_change_item:
+                                showChangeFolderDialog(item);
                                 return true;
                         }
                         return false;
@@ -379,18 +393,8 @@ public class ItemFragment extends Fragment
         mRecyclerViewItem.setAdapter(new ItemAdapter(getContext(), mItems, ItemFragment.this));
     }
 
-    private void insertFolder() {
-        Folder parentFolder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, currentFolderId).findFirst();
-        int newFolderId = getNewIdByClass(Folder.class);
-        mRealm.beginTransaction();
-        Folder folder = mRealm.createObject(Folder.class, newFolderId);
-        folder.setTitle("New Folder");
-        parentFolder.getFolders().add(folder);
-        mRealm.commitTransaction();
-    }
-
     private void toggleUpArrowImageView() {
-        if (mFolderIds.size() > 1) {
+        if (folderIds.size() > 1) {
             mImageViewUpArrowDisable.setVisibility(View.GONE);
             mImageViewUpArrowEnable.setVisibility(View.VISIBLE);
         } else {
@@ -406,14 +410,14 @@ public class ItemFragment extends Fragment
             return;
         }
 
-        int index = mFolderIds.indexOf(folderId);
+        int index = folderIds.indexOf(folderId);
         int childCount = mLinearLayoutExplorerBar.getChildCount();
         for (int i = childCount - 1; i > index * 2 + 1; i--) {
             mLinearLayoutExplorerBar.removeViewAt(i);
         }
 
-        for (int i = mFolderIds.size() - 1; i > index; i--) {
-            mFolderIds.remove(i);
+        for (int i = folderIds.size() - 1; i > index; i--) {
+            folderIds.remove(i);
         }
         currentFolderId = folderId;
         setRecyclerViewAdapter();
@@ -422,6 +426,16 @@ public class ItemFragment extends Fragment
     private void deleteItem(Item item) {
         mRealm.beginTransaction();
         item.deleteFromRealm();
+        mRealm.commitTransaction();
+    }
+
+    private void insertFolder() {
+        Folder parentFolder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, currentFolderId).findFirst();
+        int newFolderId = getNewIdByClass(Folder.class);
+        mRealm.beginTransaction();
+        Folder folder = mRealm.createObject(Folder.class, newFolderId);
+        folder.setTitle("New Folder");
+        parentFolder.getFolders().add(folder);
         mRealm.commitTransaction();
     }
 
@@ -515,6 +529,74 @@ public class ItemFragment extends Fragment
             }
         };
         editTextTitle.addTextChangedListener(textWatcher);
+    }
+
+    private void showChangeFolderDialog(final RealmObject realmObject) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_folder_change, null);
+        builder.setView(dialogView);
+        final Spinner spinnerFolder = (Spinner) dialogView.findViewById(R.id.sp_folder_change_dropdown);
+        setSpinnerData(spinnerFolder);
+
+        builder.setTitle(R.string.string_folder_change);
+        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setPositiveButton(R.string.string_change, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Folder currentFolder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, currentFolderId).findFirst();
+                Folder changeFolder = (Folder) spinnerFolder.getSelectedItem();
+
+                if (realmObject instanceof Item) {
+                    Item item = (Item) realmObject;
+                    mRealm.beginTransaction();
+                    currentFolder.getItems().remove(item);
+                    changeFolder.getItems().add(item);
+                    mRealm.commitTransaction();
+                } else {
+                    Folder folder = (Folder) realmObject;
+                    mRealm.beginTransaction();
+                    currentFolder.getItems().remove(folder);
+                    changeFolder.getFolders().add(folder);
+                    mRealm.commitTransaction();
+                }
+                Toast.makeText(getContext(), changeFolder.getTitle() +
+                        getString(R.string.msg_postfix_folder_move), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        spinnerFolder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Folder folder = (Folder) parent.getSelectedItem();
+                if (folder.getId() != currentFolderId) {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                } else {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
+    }
+
+    private void setSpinnerData(Spinner spinner) {
+        ArrayList<Folder> foldersToDisplay = new ArrayList<>();
+        RealmResults<Folder> folders = mRealm.where(Folder.class).findAll().sort(FIELD_NAME_ID);
+
+        for (Folder folder : folders) {
+            foldersToDisplay.add(folder);
+        }
+
+        DropdownAdapter adapter = new DropdownAdapter(getContext(), R.layout.dropdown_folder, R.id.tv_dropdown_folder,
+                foldersToDisplay, getActivity().getLayoutInflater());
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0);
     }
 
     private void retrieveItemById(int itemId) {

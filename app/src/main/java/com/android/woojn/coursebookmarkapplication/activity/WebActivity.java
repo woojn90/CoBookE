@@ -14,6 +14,7 @@ import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.ge
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -56,10 +57,10 @@ public class WebActivity extends AppCompatActivity {
     protected ProgressBar mProgressBarWebLoading;
     @BindView(R.id.web_view)
     protected WebView mWebView;
-    @BindView(R.id.btn_page_back)
-    protected Button mButtonPageBack;
-    @BindView(R.id.btn_page_forward)
-    protected Button mButtonPageForward;
+    @BindView(R.id.btn_web_back)
+    protected Button mButtonWebBack;
+    @BindView(R.id.btn_web_forward)
+    protected Button mButtonWebForward;
     @BindView(R.id.et_web_address)
     protected EditText mEditTextWebAddress;
 
@@ -100,6 +101,7 @@ public class WebActivity extends AppCompatActivity {
         mSectionId = getIntent().getIntExtra(KEY_SECTION_ID, DEFAULT_SECTION_ID);
         mFolderId = getIntent().getIntExtra(KEY_FOLDER_ID, DEFAULT_FOLDER_ID);
         String stringUrl = getIntent().getStringExtra(KEY_STRING_URL);
+
         if (stringUrl == null || stringUrl.length() == 0) {
             Toast.makeText(this, R.string.msg_invalid_url_home, Toast.LENGTH_LONG).show();
             stringUrl = mSharedPreferences.getString(getString(R.string.pref_key_home_page)
@@ -108,13 +110,19 @@ public class WebActivity extends AppCompatActivity {
 
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadUrl(stringUrl);
+
         mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                mEditTextWebAddress.setText(url);
+                setButtonsEnable();
+                super.onPageStarted(view, url, favicon);
+            }
+
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
-                mEditTextWebAddress.setText(mWebView.getUrl());
-                setButtonsEnable();
                 return true;
             }
 
@@ -128,8 +136,9 @@ public class WebActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
+                mEditTextWebAddress.setText(url);
                 setButtonsEnable();
+                super.onPageFinished(view, url);
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -177,47 +186,47 @@ public class WebActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    @OnClick(R.id.btn_page_back)
-    public void onClickButtonPageBack() {
+    @OnClick(R.id.btn_web_back)
+    public void onClickButtonWebBack() {
         if (mWebView.canGoBack()) {
             mWebView.goBack();
         }
     }
 
-    @OnClick(R.id.btn_page_forward)
-    public void onClickButtonPageFront() {
+    @OnClick(R.id.btn_web_forward)
+    public void onClickButtonWebFront() {
         if (mWebView.canGoForward()) {
             mWebView.goForward();
         }
     }
 
-    @OnClick(R.id.btn_page_home)
-    public void onClickButtonPageHome() {
+    @OnClick(R.id.btn_web_home)
+    public void onClickButtonWebHome() {
         String homePageUrl = mSharedPreferences.getString(getString(R.string.pref_key_home_page)
                 , getString(R.string.pref_value_home_page_naver));
         mWebView.loadUrl(homePageUrl);
     }
 
-    @OnClick(R.id.btn_refresh)
-    public void onClickButtonRefresh() {
+    @OnClick(R.id.btn_web_refresh)
+    public void onClickButtonWebRefresh() {
         mWebView.reload();
     }
 
     private void setButtonsEnable() {
         if (mWebView.canGoBack()) {
-            mButtonPageBack.setEnabled(true);
-            mButtonPageBack.setAlpha(1);
+            mButtonWebBack.setEnabled(true);
+            mButtonWebBack.setAlpha(1);
         } else {
-            mButtonPageBack.setEnabled(false);
-            mButtonPageBack.setAlpha(0.3f);
+            mButtonWebBack.setEnabled(false);
+            mButtonWebBack.setAlpha(0.3f);
         }
 
         if (mWebView.canGoForward()) {
-            mButtonPageForward.setEnabled(true);
-            mButtonPageForward.setAlpha(1);
+            mButtonWebForward.setEnabled(true);
+            mButtonWebForward.setAlpha(1);
         } else {
-            mButtonPageForward.setEnabled(false);
-            mButtonPageForward.setAlpha(0.3f);
+            mButtonWebForward.setEnabled(false);
+            mButtonWebForward.setAlpha(0.3f);
         }
     }
 

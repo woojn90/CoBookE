@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    app:cardBackgroundColor="@color/colorBackgroundSecond"
     app:cardCornerRadius="5dp"
     app:cardUseCompatPadding="true">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_basic_of_item_inside_recycler_view_item">
+        android:layout_margin="@dimen/padding_basic_of_recycler_view_item">
         <LinearLayout
             android:id="@+id/layout_item"
             android:layout_width="match_parent"
@@ -36,7 +36,7 @@
                     android:id="@+id/btn_item_overflow"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:background="@drawable/ic_action_overflow"/>
+                    android:background="@drawable/ic_overflow_in_item"/>
             </LinearLayout>
             <TextView
                 style="@style/TextViewDesc"

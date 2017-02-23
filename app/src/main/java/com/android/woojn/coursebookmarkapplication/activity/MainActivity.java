@@ -1,6 +1,7 @@
 package com.android.woojn.coursebookmarkapplication.activity;
 
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_FOLDER_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_FOLDER_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.PAGE_COURSE;
 import static com.android.woojn.coursebookmarkapplication.Constants.PAGE_ITEM;
 import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.currentFolderId;
@@ -96,9 +97,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int tabIndex = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_tab_index), PAGE_COURSE + ""));
-        mTabLayout.getTabAt(tabIndex).select();
-        initializeFabByTabPosition(tabIndex);
+
+        if (getIntent() != null && getIntent().hasExtra(KEY_FOLDER_ID)) {
+            mTabLayout.getTabAt(PAGE_ITEM).select();
+            // TODO: 해당 폴더로 이동하게 (ArrayList<Integer> foldedIds 처리가 복잡하여 보류)
+        } else {
+            int tabIndex = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_tab_index), PAGE_COURSE + ""));
+            mTabLayout.getTabAt(tabIndex).select();
+            initializeFabByTabPosition(tabIndex);
+        }
     }
 
     @Override

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,15 +30,17 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_gravity="bottom|end"
-        android:src="@drawable/ic_fab_add"/>
+        android:src="@drawable/ic_fab_add"
+        android:scaleType="center"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_expand_items"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_fab_expand"/>
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_fab_expand"
+        android:scaleType="center"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_toggle_grid"
         android:layout_width="wrap_content"
@@ -47,6 +50,7 @@
         android:layout_marginEnd="16dp"
         android:layout_gravity="bottom|end"
         android:src="@drawable/ic_fab_grid_3x3"
+        android:scaleType="center"
         android:visibility="invisible"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_insert_folder"
@@ -57,6 +61,7 @@
         android:layout_marginEnd="16dp"
         android:layout_gravity="bottom|end"
         android:src="@drawable/ic_fab_insert_folder"
+        android:scaleType="center"
         android:visibility="invisible"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_browser"
@@ -67,6 +72,7 @@
         android:layout_marginEnd="16dp"
         android:layout_gravity="bottom|end"
         android:src="@drawable/ic_fab_browser"
+        android:scaleType="center"
         android:visibility="invisible"/>
 
 </FrameLayout>

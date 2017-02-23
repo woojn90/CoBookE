@@ -1,6 +1,7 @@
 package com.android.woojn.coursebookmarkapplication.fragment;
 
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_FAVORITE;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
@@ -39,6 +40,7 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 /**
  * Created by wjn on 2017-02-16.
@@ -65,7 +67,8 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         View rootView = inflater.inflate(R.layout.fragment_course, container, false);
         ButterKnife.bind(this, rootView);
 
-        RealmResults<Course> courses = mRealm.where(Course.class).findAllSorted(FIELD_NAME_ID);
+        RealmResults<Course> courses = mRealm.where(Course.class).findAllSorted(FIELD_NAME_ID)
+                .sort(FIELD_NAME_FAVORITE, Sort.DESCENDING);
         mRecyclerViewCourse.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerViewCourse.setAdapter(new CourseAdapter(getContext(), courses, this));
 
@@ -105,13 +108,16 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
             case R.id.iv_favorite_n_main:
                 toggleCourseFavorite(course);
                 break;
-            case R.id.btn_update_course:
-                updateCourse(course);
-                break;
             case R.id.btn_delete_course:
                 deleteCourse(course);
                 break;
         }
+    }
+
+    @Override
+    public void onItemDoubleTap(int id) {
+        Course course = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, id).findFirst();
+        showCourseDialog(course.getId(), true, course.getTitle(), course.getSearchWord(), course.getDesc());
     }
 
     private void showToastByForce(int resId) {
@@ -135,10 +141,6 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                 }
             }
         });
-    }
-
-    private void updateCourse(Course course) {
-        showCourseDialog(course.getId(), true, course.getTitle(), course.getSearchWord(), course.getDesc());
     }
 
     private void deleteCourse(final Course course) {

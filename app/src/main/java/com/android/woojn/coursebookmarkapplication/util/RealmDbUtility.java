@@ -2,6 +2,8 @@ package com.android.woojn.coursebookmarkapplication.util;
 
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_FOLDER_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.currentFolderId;
+import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.folderIds;
 
 import android.content.Context;
 import android.view.View;
@@ -12,6 +14,8 @@ import com.android.woojn.coursebookmarkapplication.model.Course;
 import com.android.woojn.coursebookmarkapplication.model.Folder;
 import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
+
+import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmModel;
@@ -77,7 +81,10 @@ public class RealmDbUtility {
         Realm realm = Realm.getDefaultInstance();
         if (realm.where(Folder.class).equalTo(FIELD_NAME_ID, DEFAULT_FOLDER_ID).findFirst() == null) {
             realm.beginTransaction();
-            Folder folder = realm.createObject(Folder.class, DEFAULT_FOLDER_ID);
+            folderIds = new ArrayList<>();
+            folderIds.add(DEFAULT_FOLDER_ID);
+            currentFolderId = DEFAULT_FOLDER_ID;
+            Folder folder = realm.createObject(Folder.class, currentFolderId);
             folder.setTitle(context.getString(R.string.string_home));
             realm.commitTransaction();
         }

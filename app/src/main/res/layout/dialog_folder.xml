@@ -2,15 +2,15 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="280dp"
     android:layout_height="wrap_content"
-    android:padding="@dimen/margin_basic_of_activity"
+    android:padding="@dimen/padding_basic_of_activity"
     android:stretchColumns="1">
     <TableRow>
         <TextView
-            style="@style/TextViewDialog"
+            style="@style/TextViewInDialog"
             android:id="@+id/tv_folder_title"
             android:text="@string/string_title"/>
         <EditText
-            style="@style/EditTextDialog"
+            style="@style/EditTextInDialog"
             android:id="@+id/et_folder_title"
             android:layout_marginLeft="@dimen/margin_left_of_edit_text"
             android:layout_marginStart="@dimen/margin_left_of_edit_text" />

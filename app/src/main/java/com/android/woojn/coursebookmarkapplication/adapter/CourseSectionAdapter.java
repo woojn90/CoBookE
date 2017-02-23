@@ -12,7 +12,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -47,6 +49,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, View view);
+        void onItemDoubleTap(int id);
     }
 
     @Override
@@ -83,12 +86,28 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
         @BindView(R.id.rv_section_item_list)
         RecyclerView recyclerViewCourseSectionDetail;
 
-        public CourseSectionViewHolder(View itemView) {
+        public CourseSectionViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            final GestureDetector gd = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    mListener.onItemDoubleTap((int) itemView.getTag());
+                    return true;
+                }
+            });
+
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    gd.onTouchEvent(event);
+                    return true;
+                }
+            });
         }
 
-        @OnClick({R.id.btn_search_section_item, R.id.btn_delete_section, R.id.btn_section_overflow})
+        @OnClick({R.id.btn_search_section_item, R.id.btn_section_overflow})
         public void onClick(View view) {
             mListener.onItemClick((int) itemView.getTag(), view);
         }

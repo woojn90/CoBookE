@@ -2,7 +2,9 @@ package com.android.woojn.coursebookmarkapplication.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -31,6 +33,7 @@ public class FolderAdapter extends RealmRecyclerViewAdapter <Folder, FolderAdapt
 
     public interface OnRecyclerViewClickListener {
         void onFolderClick(int id);
+        void onFolderDoubleTap(int id);
         void onItemInFolderClick(int id, View view);
     }
 
@@ -51,21 +54,36 @@ public class FolderAdapter extends RealmRecyclerViewAdapter <Folder, FolderAdapt
         }
     }
 
-    class FolderViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+    class FolderViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tv_folder_title)
         TextView textViewFolderTitle;
 
-        public FolderViewHolder(View itemView) {
+        public FolderViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
-        }
 
-        @Override
-        public void onClick(View view) {
-            mListener.onFolderClick((int) itemView.getTag());
+            final GestureDetector gd = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    mListener.onFolderClick((int) itemView.getTag());
+                    return true;
+                }
+
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    mListener.onFolderDoubleTap((int) itemView.getTag());
+                    return true;
+                }
+            });
+
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    gd.onTouchEvent(event);
+                    return true;
+                }
+            });
         }
 
         @OnClick(R.id.btn_folder_overflow)
@@ -73,5 +91,4 @@ public class FolderAdapter extends RealmRecyclerViewAdapter <Folder, FolderAdapt
             mListener.onItemInFolderClick((int) itemView.getTag(), view);
         }
     }
-
 }

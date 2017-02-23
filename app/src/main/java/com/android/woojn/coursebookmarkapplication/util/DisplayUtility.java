@@ -2,8 +2,6 @@ package com.android.woojn.coursebookmarkapplication.util;
 
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.PopupMenu;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 
 import java.lang.reflect.Field;
 
@@ -22,15 +20,6 @@ public class DisplayUtility {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static SpannableString getUnderlineText(String text) {
-        if (text != null && text.length() != 0) {
-            SpannableString content = new SpannableString(text);
-            content.setSpan(new UnderlineSpan(), 0, text.length(), 0);
-            return content;
-        }
-        return null;
     }
 
 }

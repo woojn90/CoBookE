@@ -6,6 +6,7 @@ package com.android.woojn.coursebookmarkapplication;
 
 public class Constants {
     public static final String FIELD_NAME_ID = "id";
+    public static final String FIELD_NAME_FAVORITE = "favorite";
     public static final String KEY_COURSE_ID = "courseId";
     public static final String KEY_SECTION_ID = "sectionId";
     public static final String KEY_FOLDER_ID = "folderId";

@@ -1,7 +1,6 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
-import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.getUnderlineText;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -60,7 +59,7 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
                 holder.itemView.setTag(item.getId());
                 holder.textViewSectionItemTitle.setText(item.getTitle());
                 holder.textViewSectionItemDesc.setText(item.getDesc());
-                holder.textViewSectionItemUrl.setText(getUnderlineText(item.getUrl()));
+                holder.textViewSectionItemUrl.setText(item.getUrl());
 
                 Glide.with(this.context)
                         .load(item.getImageUrl())

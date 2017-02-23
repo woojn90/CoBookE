@@ -32,8 +32,14 @@ public class ParseAsyncTask extends AsyncTask<Integer, Void, Void> {
 
             Elements ogTags = doc.select("meta[property^=og:]");
             if (ogTags.size() <= 0) {
-                // TODO: og: 태그 없으면 title 등 다른 tag로 찾기
+                // TODO: og: 태그 없을 때 다른 tag로 찾기 enhance
+                Elements imgSrc = doc.select("img[src^=http]");
+
                 realm.beginTransaction();
+                item.setTitle(doc.title());
+                if (imgSrc.size() > 0) {
+                    item.setImageUrl(imgSrc.get(0).attr("src"));
+                }
                 item.setVisited(true);
                 realm.commitTransaction();
                 return null;

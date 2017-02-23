@@ -25,14 +25,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@drawable/ic_up_enable"
-                        android:contentDescription="@string/up_arrow_enable"
+                        android:contentDescription="@string/content_desc_up_arrow_enable"
                         android:visibility="gone"/>
                     <ImageView
                         android:id="@+id/iv_up_arrow_disable"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@drawable/ic_up_disable"
-                        android:contentDescription="@string/up_arrow_disable"/>
+                        android:contentDescription="@string/content_desc_up_arrow_disable"/>
                 </FrameLayout>
                 <ImageView
                     android:id="@+id/iv_home"

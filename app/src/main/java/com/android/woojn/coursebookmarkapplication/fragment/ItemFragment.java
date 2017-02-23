@@ -8,6 +8,8 @@ import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
 import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
+import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showFolderDialog;
+import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showItemDialog;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibilityByFolderId;
@@ -25,18 +27,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -92,10 +87,10 @@ public class ItemFragment extends Fragment
 
     private Realm mRealm;
     private SharedPreferences mSharedPreferences;
+    private Toast mToast;
     private RealmResults<Folder> mFolders;
     private RealmResults<Item> mItems;
 
-    private int mFolderIdWantToChange;
     public static ArrayList<Integer> folderIds;
     public static boolean isFabOpen;
     public static int currentFolderId;
@@ -181,8 +176,8 @@ public class ItemFragment extends Fragment
 
     @Override
     public void onDestroy() {
-        mRealm.close();
         super.onDestroy();
+        mRealm.close();
     }
 
     @Override
@@ -266,7 +261,7 @@ public class ItemFragment extends Fragment
     @Override
     public void onFolderDoubleTap(int id) {
         Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, id).findFirst();
-        showFolderDialog(id, folder.getTitle());
+        showFolderDialog(getContext(), id, folder.getTitle());
     }
 
     @Override
@@ -284,7 +279,7 @@ public class ItemFragment extends Fragment
                                 deleteFolder(folder);
                                 return true;
                             case R.id.item_change_folder:
-                                showChangeFolderDialog(folder);
+                                showFolderChangeDialog(folder);
                                 return true;
                         }
                         return false;
@@ -311,6 +306,12 @@ public class ItemFragment extends Fragment
     }
 
     @Override
+    public void onItemDoubleTap(int id) {
+        Item item = mRealm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
+        showItemDialog(getContext(), id, item.getTitle(), item.getDesc());
+    }
+
+    @Override
     public void onItemInItemClick(final int id, View view) {
         if (isFabOpen) animateFabInItemTab();
         switch (view.getId()) {
@@ -324,12 +325,12 @@ public class ItemFragment extends Fragment
                             case R.id.item_delete_item:
                                 deleteItem(item);
                                 return true;
-                            case R.id.item_share_item:
-                                shareTextByRealmObject(getContext(), item);
-                                return true;
                             case R.id.item_change_item:
-                                showChangeFolderDialog(item);
+                                showFolderChangeDialog(item);
                                 return true;
+                            case R.id.item_share_item:
+                            shareTextByRealmObject(getContext(), item);
+                            return true;
                         }
                         return false;
                     }
@@ -339,6 +340,22 @@ public class ItemFragment extends Fragment
                 showPopupMenuIcon(popupMenu);
                 break;
         }
+    }
+
+    private void showToastByForce(int resId) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(getContext(), resId, Toast.LENGTH_LONG);
+        mToast.show();
+    }
+
+    private void showToastByForce(String text) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(getContext(), text, Toast.LENGTH_LONG);
+        mToast.show();
     }
 
     private void setRecyclerViewLayoutManager() {
@@ -427,6 +444,7 @@ public class ItemFragment extends Fragment
         mRealm.beginTransaction();
         item.deleteFromRealm();
         mRealm.commitTransaction();
+        showToastByForce(R.string.msg_delete);
     }
 
     private void insertFolder() {
@@ -434,7 +452,7 @@ public class ItemFragment extends Fragment
         int newFolderId = getNewIdByClass(Folder.class);
         mRealm.beginTransaction();
         Folder folder = mRealm.createObject(Folder.class, newFolderId);
-        folder.setTitle("New Folder");
+        folder.setTitle(getString(R.string.string_new_folder));
         parentFolder.getFolders().add(folder);
         mRealm.commitTransaction();
     }
@@ -443,6 +461,7 @@ public class ItemFragment extends Fragment
         mRealm.beginTransaction();
         deleteItemsAndFoldersInsideFolder(folder);
         mRealm.commitTransaction();
+        showToastByForce(R.string.msg_delete);
     }
 
     /**
@@ -467,76 +486,17 @@ public class ItemFragment extends Fragment
         }
     }
 
-    private void showFolderDialog(final int folderId, final String beforeTitle) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        final View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_folder, null);
-        builder.setView(dialogView);
-        final EditText editTextTitle = (EditText) dialogView.findViewById(R.id.et_folder_title);
-
-        editTextTitle.setText(beforeTitle);
-
-        builder.setTitle(R.string.string_folder_info);
-        builder.setNegativeButton(R.string.string_cancel, null);
-        builder.setPositiveButton(R.string.string_update, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String title = editTextTitle.getText().toString();
-
-                Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, folderId).findFirst();
-                mRealm.beginTransaction();
-                folder.setTitle(title);
-                mRealm.commitTransaction();
-            }
-        });
-
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-        alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-        editTextTitle.requestFocus();
-        editTextTitle.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        editTextTitle.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE){
-                    if (alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled()) {
-                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
-
-        TextWatcher textWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Do nothing
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String afterTitle = editTextTitle.getText().toString();
-
-                if (!afterTitle.trim().isEmpty() && !beforeTitle.equals(afterTitle)) {
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                } else {
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                }
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-                // Do nothing
-            }
-        };
-        editTextTitle.addTextChangedListener(textWatcher);
-    }
-
-    private void showChangeFolderDialog(final RealmObject realmObject) {
+    private void showFolderChangeDialog(final RealmObject realmObject) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_folder_change, null);
         builder.setView(dialogView);
         final Spinner spinnerFolder = (Spinner) dialogView.findViewById(R.id.sp_folder_change_dropdown);
-        setSpinnerData(spinnerFolder);
+
+        int folderId = -1;
+        if (realmObject instanceof Folder) {
+            folderId = ((Folder) realmObject).getId();
+        }
+        boolean hasData = setSpinnerData(spinnerFolder, folderId);
 
         builder.setTitle(R.string.string_folder_change);
         builder.setNegativeButton(R.string.string_cancel, null);
@@ -554,49 +514,61 @@ public class ItemFragment extends Fragment
                     mRealm.commitTransaction();
                 } else {
                     Folder folder = (Folder) realmObject;
-                    mRealm.beginTransaction();
-                    currentFolder.getItems().remove(folder);
-                    changeFolder.getFolders().add(folder);
-                    mRealm.commitTransaction();
+
+                    if (checkMoveFolderPossible(folder, changeFolder.getId())) {
+                        mRealm.beginTransaction();
+                        currentFolder.getFolders().remove(folder);
+                        changeFolder.getFolders().add(folder);
+                        mRealm.commitTransaction();
+                    } else {
+                        showToastByForce(R.string.msg_impossible_to_move_to_child);
+                        return;
+                    }
+
                 }
-                Toast.makeText(getContext(), changeFolder.getTitle() +
-                        getString(R.string.msg_postfix_folder_move), Toast.LENGTH_SHORT).show();
+                showToastByForce(changeFolder.getTitle() + getString(R.string.msg_postfix_folder_move));
             }
         });
 
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-        spinnerFolder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Folder folder = (Folder) parent.getSelectedItem();
-                if (folder.getId() != currentFolderId) {
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                } else {
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
-            }
-        });
+        if (!hasData) {
+            alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setEnabled(false);
+        }
     }
 
-    private void setSpinnerData(Spinner spinner) {
+    private boolean setSpinnerData(Spinner spinner, int selectedFolderId) {
         ArrayList<Folder> foldersToDisplay = new ArrayList<>();
         RealmResults<Folder> folders = mRealm.where(Folder.class).findAll().sort(FIELD_NAME_ID);
 
         for (Folder folder : folders) {
-            foldersToDisplay.add(folder);
+            int folderId = folder.getId();
+            if (folderId != currentFolderId) {
+                if (selectedFolderId == -1 || selectedFolderId != folderId) {
+                    foldersToDisplay.add(folder);
+                }
+            }
         }
 
         DropdownAdapter adapter = new DropdownAdapter(getContext(), R.layout.dropdown_folder, R.id.tv_dropdown_folder,
                 foldersToDisplay, getActivity().getLayoutInflater());
         spinner.setAdapter(adapter);
         spinner.setSelection(0);
+
+        if (foldersToDisplay.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkMoveFolderPossible(Folder parentFolder, int changeFolderId) {
+        for (Folder folder : parentFolder.getFolders()) {
+            if (folder.getId() == changeFolderId || !checkMoveFolderPossible(folder, changeFolderId)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void retrieveItemById(int itemId) {

@@ -12,7 +12,6 @@
     <style name="PopupMenu" parent="@style/Widget.AppCompat.Light.PopupMenu">
         <item name="android:popupBackground">@color/colorBackgroundSecond</item>
     </style>
-
     <style name="MainTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabSelectedTextColor">@color/colorAccent</item>
         <item name="tabTextAppearance">@style/MainTabTextAppearance</item>
@@ -21,7 +20,6 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/colorTextColorActionBar</item>
     </style>
-
     <style name="ShareActivityTheme" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="windowNoTitle">true</item>
@@ -54,6 +52,12 @@
         <item name="android:textColor">@color/colorTextColorThird</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
+    </style>
+    <style name="TextViewPreview">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/colorTextColorThird</item>
+        <item name="android:text">@string/msg_no_preview_image</item>
     </style>
 
     <style name="TextViewInDialog">

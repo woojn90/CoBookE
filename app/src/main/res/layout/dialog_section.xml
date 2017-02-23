@@ -7,7 +7,6 @@
     <TableRow>
         <TextView
             style="@style/TextViewInDialog"
-            android:id="@+id/tv_section_title"
             android:text="@string/string_title"/>
         <EditText
             style="@style/EditTextInDialog"
@@ -19,7 +18,6 @@
     <TableRow>
         <TextView
             style="@style/TextViewInDialog"
-            android:id="@+id/tv_section_search_word"
             android:text="@string/string_search_word"/>
         <EditText
             style="@style/EditTextInDialog"

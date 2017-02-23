@@ -85,14 +85,14 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
 
     @Override
     public void onResume() {
-        updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
         super.onResume();
+        updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
     }
 
     @Override
     public void onDestroy() {
-        mRealm.close();
         super.onDestroy();
+        mRealm.close();
     }
 
     @Override
@@ -163,6 +163,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                             sections.get(i).deleteFromRealm();
                         }
                         course.deleteFromRealm();
+                        showToastByForce(R.string.msg_delete);
                         updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
                     }
                 });

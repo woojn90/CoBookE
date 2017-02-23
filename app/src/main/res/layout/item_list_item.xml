@@ -11,7 +11,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding_basic_of_recycler_view_item">
+        android:padding="@dimen/padding_basic_of_recycler_view_item">
         <LinearLayout
             android:id="@+id/layout_item"
             android:layout_width="match_parent"
@@ -22,8 +22,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="@dimen/margin_left_of_text_in_item"
+                android:layout_marginStart="@dimen/margin_left_of_text_in_item"
                 android:gravity="center_vertical">
                 <TextView
                     style="@style/TextViewTitle"
@@ -41,15 +41,15 @@
             <TextView
                 style="@style/TextViewDesc"
                 android:id="@+id/tv_item_desc"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="@dimen/margin_left_of_text_in_item"
+                android:layout_marginStart="@dimen/margin_left_of_text_in_item"
                 android:textSize="14sp"
                 tools:text="Description"/>
             <TextView
                 style="@style/TextViewUrl"
                 android:id="@+id/tv_item_url"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="@dimen/margin_left_of_text_in_item"
+                android:layout_marginStart="@dimen/margin_left_of_text_in_item"
                 android:textSize="12sp"
                 tools:text="http://m.naver.com"/>
 
@@ -57,12 +57,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_marginTop="5dp">
+                <TextView
+                    style="@style/TextViewPreview"
+                    android:id="@+id/tv_item_preview"
+                    android:layout_gravity="center"
+                    android:visibility="invisible"/>
                 <ImageView
                     android:id="@+id/iv_item_preview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:contentDescription="@string/content_desc_url_preview"
-                    tools:background="@color/cardview_dark_background"/>
+                    android:contentDescription="@string/content_desc_url_preview"/>
                 <ProgressBar
                     style="@android:style/Widget.ProgressBar.Small"
                     android:id="@+id/pg_item_preview"

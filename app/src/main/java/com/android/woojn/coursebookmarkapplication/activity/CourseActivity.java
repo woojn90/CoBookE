@@ -24,7 +24,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -281,6 +280,7 @@ public class CourseActivity extends AppCompatActivity
                             sections.get(i).deleteFromRealm();
                         }
                         mCourse.deleteFromRealm();
+                        showToastByForce(R.string.msg_delete);
                         finish();
                     }
                 });
@@ -304,6 +304,7 @@ public class CourseActivity extends AppCompatActivity
                             sectionItems.get(i).deleteFromRealm();
                         }
                         section.deleteFromRealm();
+                        showToastByForce(R.string.msg_delete);
                         updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
                     }
                 });
@@ -323,19 +324,10 @@ public class CourseActivity extends AppCompatActivity
 
         String queryEncoded;
         try {
-            // TODO: 폰으로 test하고 Log 지울 것
             queryEncoded = URLEncoder.encode(query, "UTF-8");
-            Log.d("Check", "try / query : " + query);
-            Log.d("Check", "try / queryEncode : " + queryEncoded);
-            // 칸쿤 카페
-            // %EC%B9%B8%EC%BF%A4+%EC%B9%B4%ED%8E%98
-            // %EC%B9%B8%EC%BF%A4+%EC%B9%B4%ED%8E%98
         } catch (UnsupportedEncodingException e) {
             queryEncoded = query;
             e.printStackTrace();
-            Log.d("Check", e.getMessage());
-            Log.d("Check", "try / query : " + query);
-            Log.d("Check", "catch / queryEncode : " + queryEncoded);
         }
 
         Intent webIntent = new Intent(this, WebActivity.class);

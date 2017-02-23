@@ -66,6 +66,8 @@ public class WebActivity extends AppCompatActivity {
     protected EditText mEditTextWebAddress;
 
     private SharedPreferences mSharedPreferences;
+    private Toast mToast;
+
     private int mSectionId;
     private int mFolderId;
 
@@ -104,7 +106,7 @@ public class WebActivity extends AppCompatActivity {
         String stringUrl = getIntent().getStringExtra(KEY_STRING_URL);
 
         if (stringUrl == null || stringUrl.length() == 0) {
-            Toast.makeText(this, R.string.msg_invalid_url_home, Toast.LENGTH_LONG).show();
+            showToastByForce(R.string.msg_invalid_url_home);
             stringUrl = mSharedPreferences.getString(getString(R.string.pref_key_home_page)
                     , getString(R.string.pref_value_home_page_naver));
         }
@@ -119,14 +121,12 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 mEditTextWebAddress.setText(url);
-                Log.d("Check", "onPageStarted " + url);
                 super.onPageStarted(view, url, favicon);
             }
 
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Log.d("Check", "shouldOverrideUrlLoading1 " + url);
                 view.loadUrl(url);
                 return true;
             }
@@ -134,7 +134,6 @@ public class WebActivity extends AppCompatActivity {
             @TargetApi(Build.VERSION_CODES.N)
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                Log.d("Check", "shouldOverrideUrlLoading2 " + request.getUrl());
                 view.loadUrl(request.getUrl().toString());
                 mEditTextWebAddress.setText(mWebView.getUrl());
                 return true;
@@ -143,7 +142,6 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 mEditTextWebAddress.setText(url);
-                Log.d("Check", "onPageFinished " + url);
                 setButtonsEnable();
                 super.onPageFinished(view, url);
             }
@@ -153,7 +151,6 @@ public class WebActivity extends AppCompatActivity {
             public void onProgressChanged(WebView view, int newProgress) {
                 mProgressBarWebLoading.setProgress(newProgress);
                 if (newProgress >= 100) {
-                    Log.d("Check", "onProgressChanged >= 100 " + mWebView.getUrl());
                     mProgressBarWebLoading.setVisibility(View.GONE);
                 } else {
                     mProgressBarWebLoading.setVisibility(View.VISIBLE);
@@ -220,6 +217,14 @@ public class WebActivity extends AppCompatActivity {
         mWebView.reload();
     }
 
+    private void showToastByForce(int resId) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this, resId, Toast.LENGTH_LONG);
+        mToast.show();
+    }
+
     private void setButtonsEnable() {
         if (mWebView.canGoBack()) {
             mButtonWebBack.setEnabled(true);
@@ -245,6 +250,9 @@ public class WebActivity extends AppCompatActivity {
         realm.beginTransaction();
         Item item = realm.createObject(Item.class, newItemId);
         item.setUrl(mWebView.getUrl());
+        mWebView.getTitle();
+        item.setTitle(getString(R.string.string_default_title));
+        item.setDesc(getString(R.string.string_default_desc));
         item.setVisited(false);
         realm.commitTransaction();
 
@@ -260,6 +268,6 @@ public class WebActivity extends AppCompatActivity {
             realm.commitTransaction();
         }
         realm.close();
-        Toast.makeText(this, R.string.msg_save, Toast.LENGTH_LONG).show();
+        showToastByForce(R.string.msg_save);
     }
 }

@@ -44,13 +44,18 @@ public class DropdownAdapter extends ArrayAdapter<Folder> {
         return getCustomView(position, parent);
     }
 
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        return getCustomView(position, parent);
+    }
+
     private View getCustomView(int position, ViewGroup parent) {
         View view = mLayoutInflater.inflate(R.layout.dropdown_folder, parent, false);
         ButterKnife.bind(this, view);
 
         mTextViewDropdownFolder.setText((mFolders.get(position)).toString());
-        if (mFolders.get(position).getId() != DEFAULT_FOLDER_ID) {
-            mImageViewDropdownFolder.setBackgroundResource(R.drawable.ic_folder);
+        if (mFolders.get(position).getId() == DEFAULT_FOLDER_ID) {
+            mImageViewDropdownFolder.setBackgroundResource(R.drawable.ic_home);
         }
         return view;
     }

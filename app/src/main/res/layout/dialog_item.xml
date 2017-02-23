@@ -10,8 +10,19 @@
             android:text="@string/string_title"/>
         <EditText
             style="@style/EditTextInDialog"
-            android:id="@+id/et_folder_title"
+            android:id="@+id/et_item_title"
             android:layout_marginLeft="@dimen/margin_left_of_edit_text"
-            android:layout_marginStart="@dimen/margin_left_of_edit_text" />
+            android:layout_marginStart="@dimen/margin_left_of_edit_text"/>
+    </TableRow>
+    <TableRow>
+        <TextView
+            style="@style/TextViewInDialog"
+            android:text="@string/string_desc"/>
+        <EditText
+            style="@style/EditTextInDialog"
+            android:id="@+id/et_item_desc"
+            android:layout_marginLeft="@dimen/margin_left_of_edit_text"
+            android:layout_marginStart="@dimen/margin_left_of_edit_text">
+        </EditText>
     </TableRow>
 </TableLayout>

@@ -9,7 +9,6 @@ import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.in
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -57,6 +56,8 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
     protected TextView mTextViewShareTitle;
     @BindView(R.id.tv_share_desc)
     protected TextView mTextViewShareDesc;
+    @BindView(R.id.tv_share_preview)
+    protected TextView mTextViewSharePreview;
     @BindView(R.id.iv_share_preview)
     protected ImageView mImageViewSharePreview;
     @BindView(R.id.pg_share_preview)
@@ -65,6 +66,7 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
     protected Spinner mSpinnerShareDropdown;
 
     private Realm mRealm;
+    private Toast mToast;
 
     private int mItemId = getNewIdByClass(Item.class);
     private int mFolderId = DEFAULT_FOLDER_ID;
@@ -90,12 +92,9 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
         if (shareIntent != null && Intent.ACTION_SEND.equals(shareIntent.getAction())
                 && "text/plain".equals(shareIntent.getType())) {
             String sharedText = shareIntent.getStringExtra(Intent.EXTRA_TEXT);
-            Log.d("Check", "onCreate sharedText : " + sharedText);
             if (sharedText != null) {
                 String stringUrl = sharedText.substring(sharedText.indexOf("http"));
                 if (stringUrl.length() > 0) {
-                    Log.d("Check", "onCreate stringUrl : " + stringUrl);
-
                     mTextViewShareUrl.setText(stringUrl);
 
                     mRealm.beginTransaction();
@@ -109,7 +108,7 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
                     return;
                 }
             }
-            Toast.makeText(this, R.string.msg_invalid_url_not_save, Toast.LENGTH_LONG).show();
+            showToastByForce(R.string.msg_invalid_url_not_save);
             finishAndRemoveTask();
         }
     }
@@ -139,6 +138,7 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
                         public boolean onException(Exception e, String model,
                                 Target<GlideDrawable> target, boolean isFirstResource) {
                             mProgressBarSharePreview.setVisibility(View.INVISIBLE);
+                            mTextViewSharePreview.setVisibility(View.VISIBLE);
                             return false;
                         }
 
@@ -146,6 +146,7 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
                         public boolean onResourceReady(GlideDrawable resource, String model,
                                 Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                             mProgressBarSharePreview.setVisibility(View.INVISIBLE);
+                            mTextViewSharePreview.setVisibility(View.VISIBLE);
                             return false;
                         }
                     })
@@ -168,6 +169,14 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(KEY_FOLDER_ID, mFolderId);
         startActivity(intent);
+    }
+
+    private void showToastByForce(int resId) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this, resId, Toast.LENGTH_LONG);
+        mToast.show();
     }
 
     private void setSpinnerData() {
@@ -202,7 +211,7 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
         folder.getItems().add(mItem);
         mRealm.commitTransaction();
 
-        Toast.makeText(this, R.string.msg_save, Toast.LENGTH_LONG).show();
+        showToastByForce(R.string.msg_save);
         mIsSaved = true;
         finishAndRemoveTask();
     }

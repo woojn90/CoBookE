@@ -1,23 +1,27 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
-import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
 import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
+import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showItemDialog;
+import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibility;
 import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.activity.WebActivity;
@@ -40,6 +44,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
     private final Context mContext;
     private final OnRecyclerViewClickListener mListener;
+    private Toast mToast;
 
     public CourseSectionAdapter(Context context, OrderedRealmCollection<Section> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
@@ -113,26 +118,55 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
         }
 
         @Override
-        public void onItemClick(int id, int viewId) {
+        public void onItemClick(int id) {
             Realm realm = Realm.getDefaultInstance();
             Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
+            String stringUrl = item.getUrl();
+            realm.close();
 
-            switch (viewId) {
-                case DEFAULT_VIEW_ID:
-                    String stringUrl = item.getUrl();
-                    Intent webIntent = new Intent(mContext, WebActivity.class);
-                    webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITHOUT_SAVE);
-                    webIntent.putExtra(KEY_STRING_URL, stringUrl);
-                    mContext.startActivity(webIntent);
-                    break;
-                case R.id.btn_share_section_item:
-                    shareTextByRealmObject(mContext, item);
-                    break;
-                case R.id.btn_delete_section_item:
-                    deleteSectionItem(item);
+            Intent webIntent = new Intent(mContext, WebActivity.class);
+            webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITHOUT_SAVE);
+            webIntent.putExtra(KEY_STRING_URL, stringUrl);
+            mContext.startActivity(webIntent);
+        }
+
+        @Override
+        public void onItemDoubleTap(int id) {
+            Realm realm = Realm.getDefaultInstance();
+            Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
+            showItemDialog(mContext, id, item.getTitle(), item.getDesc());
+            realm.close();
+        }
+
+        @Override
+        public void onItemInItemClick(final int id, View view) {
+            switch (view.getId()) {
+                case R.id.btn_section_item_overflow:
+                    PopupMenu popupMenu = new PopupMenu(mContext, view);
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            Realm realm = Realm.getDefaultInstance();
+                            Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
+                            switch (menuItem.getItemId()) {
+                                case R.id.item_delete_section_item:
+                                    deleteSectionItem(item);
+                                    realm.close();
+                                    return true;
+                                case R.id.item_share_section_item:
+                                    shareTextByRealmObject(mContext, item);
+                                    realm.close();
+                                    return true;
+                            }
+                            realm.close();
+                            return false;
+                        }
+                    });
+                    popupMenu.inflate(R.menu.menu_in_section_item_view);
+                    popupMenu.show();
+                    showPopupMenuIcon(popupMenu);
                     break;
             }
-            realm.close();
         }
 
         private void deleteSectionItem(Item item) {
@@ -141,7 +175,14 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             item.deleteFromRealm();
             realm.commitTransaction();
             realm.close();
+            if (mToast != null) {
+                mToast.cancel();
+            }
+            mToast = Toast.makeText(mContext, R.string.msg_delete, Toast.LENGTH_LONG);
+            mToast.show();
             updateTextViewEmptyVisibility(Item.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
         }
+
+
     }
 }

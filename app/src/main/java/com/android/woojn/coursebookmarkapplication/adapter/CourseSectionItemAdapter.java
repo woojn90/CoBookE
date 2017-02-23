@@ -1,10 +1,10 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
-import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,7 +40,9 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
     }
 
     public interface OnRecyclerViewClickListener {
-        void onItemClick(int id, int viewId);
+        void onItemClick(int id);
+        void onItemDoubleTap(int id);
+        void onItemInItemClick(int id, View view);
     }
 
     @Override
@@ -68,6 +70,7 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
                             public boolean onException(Exception e, String model,
                                     Target<GlideDrawable> target, boolean isFirstResource) {
                                 holder.progressBarSectionItemPreview.setVisibility(View.INVISIBLE);
+                                holder.textViewSectionItemPreview.setVisibility(View.VISIBLE);
                                 return false;
                             }
 
@@ -75,6 +78,7 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
                             public boolean onResourceReady(GlideDrawable resource, String model,
                                     Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                                 holder.progressBarSectionItemPreview.setVisibility(View.INVISIBLE);
+                                holder.textViewSectionItemPreview.setVisibility(View.VISIBLE);
                                 return false;
                             }
                         })
@@ -91,8 +95,7 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
         }
     }
 
-    class CourseSectionItemViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+    class CourseSectionItemViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.layout_section_item)
         LinearLayout linearLayoutSectionItem;
@@ -104,30 +107,43 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
         TextView textViewSectionItemDesc;
         @BindView(R.id.tv_section_item_url)
         TextView textViewSectionItemUrl;
+        @BindView(R.id.tv_section_item_preview)
+        TextView textViewSectionItemPreview;
         @BindView(R.id.iv_section_item_preview)
         ImageView imageViewSectionItemPreview;
         @BindView(R.id.pg_section_item_preview)
         ProgressBar progressBarSectionItemPreview;
 
-        public CourseSectionItemViewHolder(View itemView) {
+        public CourseSectionItemViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
+
+            final GestureDetector gd = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    mListener.onItemClick((int) itemView.getTag());
+                    return true;
+                }
+
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    mListener.onItemDoubleTap((int) itemView.getTag());
+                    return true;
+                }
+            });
+
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    gd.onTouchEvent(event);
+                    return true;
+                }
+            });
         }
 
-        @Override
-        public void onClick(View view) {
-            mListener.onItemClick((int) itemView.getTag(), DEFAULT_VIEW_ID);
-        }
-
-        @OnClick(R.id.btn_share_section_item)
-        public void onClickButtonShareSectionDetail(View view) {
-            mListener.onItemClick((int) itemView.getTag(), view.getId());
-        }
-
-        @OnClick(R.id.btn_delete_section_item)
-        public void onClickButtonDeleteSectionDetail(View view) {
-            mListener.onItemClick((int) itemView.getTag(), view.getId());
+        @OnClick(R.id.btn_section_item_overflow)
+        public void onClickButtonSectionItemOverflow(View view) {
+            mListener.onItemInItemClick((int) itemView.getTag(), view);
         }
     }
 }

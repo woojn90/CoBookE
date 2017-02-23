@@ -10,7 +10,7 @@
         android:id="@+id/iv_dropdown_folder"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:background="@drawable/ic_home"
+        android:background="@drawable/ic_folder"
         android:contentDescription="@string/content_desc_folder"/>
     <TextView
         style="@style/TextViewTitle"

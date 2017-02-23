@@ -327,6 +327,9 @@ public class CourseActivity extends AppCompatActivity
             queryEncoded = URLEncoder.encode(query, "UTF-8");
             Log.d("Check", "try / query : " + query);
             Log.d("Check", "try / queryEncode : " + queryEncoded);
+            // 칸쿤 카페
+            // %EC%B9%B8%EC%BF%A4+%EC%B9%B4%ED%8E%98
+            // %EC%B9%B8%EC%BF%A4+%EC%B9%B4%ED%8E%98
         } catch (UnsupportedEncodingException e) {
             queryEncoded = query;
             e.printStackTrace();

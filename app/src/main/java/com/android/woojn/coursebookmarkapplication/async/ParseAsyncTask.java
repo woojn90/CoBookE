@@ -3,6 +3,8 @@ package com.android.woojn.coursebookmarkapplication.async;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 
 import android.os.AsyncTask;
+import android.os.Build;
+import android.text.Html;
 
 import com.android.woojn.coursebookmarkapplication.model.Item;
 
@@ -43,11 +45,11 @@ public class ParseAsyncTask extends AsyncTask<Integer, Void, Void> {
                 String content = tag.attr("content");
 
                 if ("og:title".equals(property)) {
-                    item.setTitle(content);
+                    item.setTitle(convertTextFromHtml(content));
                 } else if ("og:description".equals(property)) {
-                    item.setDesc(content);
+                    item.setDesc(convertTextFromHtml(content));
                 } else if ("og:image".equals(property)) {
-                    item.setImageUrl(content);
+                    item.setImageUrl(convertTextFromHtml(content));
                 }
             }
             // TODO: 저장된 값이 없어도 방문한 것으로 처리할 지 확인
@@ -59,5 +61,15 @@ public class ParseAsyncTask extends AsyncTask<Integer, Void, Void> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private String convertTextFromHtml(String html) {
+        String convertText;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            convertText = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY).toString();
+        } else {
+            convertText = Html.fromHtml(html).toString();
+        }
+        return convertText;
     }
 }

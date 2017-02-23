@@ -1,10 +1,12 @@
 package com.android.woojn.coursebookmarkapplication.fragment;
 
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.insertDefaultFolderIfNeeded;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
+        .insertDefaultFolderIfNeeded;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.ListPreference;
@@ -119,7 +121,9 @@ public class SettingsFragment extends PreferenceFragmentCompat
             // TODO: 백업 가져오기 구현
 
         } else if (getString(R.string.settings_key_send_mail).equals(preference.getKey())) {
-            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+            Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
+            sendIntent.setType("text/plain");
+            sendIntent.setData(Uri.parse("mailto:"));
             sendIntent.putExtra(Intent.EXTRA_EMAIL, getString(R.string.settings_developer_mail_address));
             sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.settings_developer_mail_subject));
             startActivity(Intent.createChooser(sendIntent, getString(R.string.settings_title_send_mail)));

@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -109,19 +110,23 @@ public class WebActivity extends AppCompatActivity {
         }
 
         mWebView.getSettings().setJavaScriptEnabled(true);
+        Log.d("Check", "loadUrl before");
         mWebView.loadUrl(stringUrl);
+        setButtonsEnable();
+        Log.d("Check", "loadUrl after");
 
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 mEditTextWebAddress.setText(url);
-                setButtonsEnable();
+                Log.d("Check", "onPageStarted " + url);
                 super.onPageStarted(view, url, favicon);
             }
 
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                Log.d("Check", "shouldOverrideUrlLoading1 " + url);
                 view.loadUrl(url);
                 return true;
             }
@@ -129,6 +134,7 @@ public class WebActivity extends AppCompatActivity {
             @TargetApi(Build.VERSION_CODES.N)
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                Log.d("Check", "shouldOverrideUrlLoading2 " + request.getUrl());
                 view.loadUrl(request.getUrl().toString());
                 mEditTextWebAddress.setText(mWebView.getUrl());
                 return true;
@@ -137,6 +143,7 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 mEditTextWebAddress.setText(url);
+                Log.d("Check", "onPageFinished " + url);
                 setButtonsEnable();
                 super.onPageFinished(view, url);
             }
@@ -146,6 +153,7 @@ public class WebActivity extends AppCompatActivity {
             public void onProgressChanged(WebView view, int newProgress) {
                 mProgressBarWebLoading.setProgress(newProgress);
                 if (newProgress >= 100) {
+                    Log.d("Check", "onProgressChanged >= 100 " + mWebView.getUrl());
                     mProgressBarWebLoading.setVisibility(View.GONE);
                 } else {
                     mProgressBarWebLoading.setVisibility(View.VISIBLE);

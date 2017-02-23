@@ -76,7 +76,7 @@
     <string name="pref_label_home_page_naver">네이버</string>
     <string name="pref_label_home_page_google">구글</string>
     <string name="pref_label_home_page_daum">다음</string>
-    <string name="pref_value_home_page_naver">http://www.naver.com</string>
+    <string name="pref_value_home_page_naver">http://m.naver.com</string>
     <string name="pref_value_home_page_google">http://www.google.com</string>
     <string name="pref_value_home_page_daum">http://www.daum.net</string>
 
@@ -86,8 +86,8 @@
     <string name="pref_label_target_of_auto_search_naver_blog">네이버(블로그)</string>
     <string name="pref_label_target_of_auto_search_google">구글</string>
     <string name="pref_label_target_of_auto_search_instagram">인스타그램</string>
-    <string name="pref_value_target_of_auto_search_naver_total">https://search.naver.com/search.naver?query=</string>
-    <string name="pref_value_target_of_auto_search_naver_blog">https://search.naver.com/search.naver?where=post&amp;query=</string>
+    <string name="pref_value_target_of_auto_search_naver_total">https://m.search.naver.com/search.naver?ie=utf8&amp;query=</string>
+    <string name="pref_value_target_of_auto_search_naver_blog">https://m.search.naver.com/search.naver?where=m_blog&amp;ie=utf8&amp;query=</string>
     <string name="pref_value_target_of_auto_search_google">https://www.google.com/search?q=</string>
     <string name="pref_value_target_of_auto_search_instagram">https://www.instagram.com/explore/tags/</string>
 

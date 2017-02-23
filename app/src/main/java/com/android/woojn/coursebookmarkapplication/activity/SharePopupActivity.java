@@ -110,7 +110,7 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
                 }
             }
             Toast.makeText(this, R.string.msg_invalid_url_not_save, Toast.LENGTH_LONG).show();
-            finish();
+            finishAndRemoveTask();
         }
     }
 
@@ -204,6 +204,6 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
 
         Toast.makeText(this, R.string.msg_save, Toast.LENGTH_LONG).show();
         mIsSaved = true;
-        finish();
+        finishAndRemoveTask();
     }
 }

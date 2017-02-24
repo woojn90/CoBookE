@@ -10,10 +10,12 @@ import io.realm.RealmConfiguration;
  */
 
 public class MyApplication extends Application {
+
     @Override
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
+        // TODO: Migration 하도록 변경 + schemaVersion 지정
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .deleteRealmIfMigrationNeeded()
                 .build();

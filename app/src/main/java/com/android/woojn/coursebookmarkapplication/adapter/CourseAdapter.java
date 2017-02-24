@@ -4,7 +4,9 @@ import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,6 +36,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, int viewId);
+        void onItemDoubleTap(int id);
     }
 
     @Override
@@ -66,8 +69,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
         }
     }
 
-    class CourseViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+    class CourseViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tv_course_title)
         TextView textViewCourseTitle;
@@ -78,16 +80,31 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
         @BindView(R.id.iv_favorite_n_main)
         ImageView imageViewFavoriteN;
 
-        public CourseViewHolder(View itemView) {
+        public CourseViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            itemView.setOnClickListener(this);
-        }
+            final GestureDetector gd = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    mListener.onItemClick((int) itemView.getTag(), DEFAULT_VIEW_ID);
+                    return true;
+                }
 
-        @Override
-        public void onClick(View view) {
-            mListener.onItemClick((int) itemView.getTag(), DEFAULT_VIEW_ID);
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    mListener.onItemDoubleTap((int) itemView.getTag());
+                    return true;
+                }
+            });
+
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    gd.onTouchEvent(event);
+                    return true;
+                }
+            });
         }
 
         @OnClick(R.id.iv_favorite_y_main)
@@ -101,11 +118,6 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
         public void onClickImageViewFavoriteN(View view) {
             imageViewFavoriteN.setVisibility(View.GONE);
             imageViewFavoriteY.setVisibility(View.VISIBLE);
-            mListener.onItemClick((int) itemView.getTag(), view.getId());
-        }
-
-        @OnClick(R.id.btn_update_course)
-        public void onClickButtonUpdateCourse(View view) {
             mListener.onItemClick((int) itemView.getTag(), view.getId());
         }
 

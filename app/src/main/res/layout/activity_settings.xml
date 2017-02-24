@@ -4,4 +4,4 @@
     android:name="com.android.woojn.coursebookmarkapplication.fragment.SettingsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/margin_basic_of_activity"/>
+    android:padding="@dimen/padding_basic_of_activity"/>

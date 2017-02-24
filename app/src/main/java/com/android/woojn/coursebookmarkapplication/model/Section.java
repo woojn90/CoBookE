@@ -14,7 +14,7 @@ public class Section extends RealmObject {
     private int id;
     private String title;
     private String searchWord;
-    private RealmList<SectionDetail> sectionDetails;
+    private RealmList<Item> items;
 
     public int getId() {
         return id;
@@ -36,7 +36,7 @@ public class Section extends RealmObject {
         this.searchWord = searchWord;
     }
 
-    public RealmList<SectionDetail> getSectionDetails() {
-        return sectionDetails;
+    public RealmList<Item> getItems() {
+        return items;
     }
 }

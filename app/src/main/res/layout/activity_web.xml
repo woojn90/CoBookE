@@ -3,12 +3,59 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:id="@+id/pb_web_loading"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:progressTint="@color/colorPrimary"/>
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="6dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+            <Button
+                android:id="@+id/btn_web_back"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="@drawable/ic_web_back"/>
+            <Button
+                android:id="@+id/btn_web_forward"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="@drawable/ic_web_forward"/>
+            <Button
+                android:id="@+id/btn_web_home"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="@drawable/ic_web_home"/>
+            <EditText
+                android:id="@+id/et_web_address"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:padding="4dp"
+                android:textSize="16sp"
+                android:textColor="@color/colorTextColor"
+                android:background="@android:color/white"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:inputType="textUri"/>
+            <Button
+                android:id="@+id/btn_web_refresh"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="@drawable/ic_web_refresh"/>
+        </LinearLayout>
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@+id/pb_web_loading"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:progressTint="@color/colorAccent"/>
+    </android.support.design.widget.AppBarLayout>
     <WebView
         android:id="@+id/web_view"
         android:layout_width="match_parent"

@@ -3,19 +3,39 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:textColorPrimary">@color/colorTextColor</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="PopupMenu" parent="@style/Widget.AppCompat.Light.PopupMenu">
+        <item name="android:popupBackground">@color/colorBackgroundSecond</item>
+    </style>
+    <style name="MainTabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabSelectedTextColor">@color/colorAccent</item>
+        <item name="tabTextAppearance">@style/MainTabTextAppearance</item>
+    </style>
+    <style name="MainTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorTextColorActionBar</item>
+    </style>
+    <style name="ShareActivityTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="TextViewTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/colorTextColorAccent</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
     <style name="TextViewSearchWord">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/colorTextColorSecond</item>
         <item name="android:textStyle">italic</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
@@ -26,17 +46,32 @@
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
+    <style name="TextViewUrl">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/colorTextColorThird</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+    <style name="TextViewPreview">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/colorTextColorThird</item>
+        <item name="android:text">@string/msg_no_preview_image</item>
+    </style>
 
-    <style name="TextViewDialog">
+    <style name="TextViewInDialog">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textSize">18sp</item>
     </style>
-    <style name="EditTextDialog">
+    <style name="EditTextInDialog">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:maxLines">1</item>
         <item name="android:selectAllOnFocus">true</item>
+        <item name="android:inputType">text</item>
     </style>
+
 </resources>

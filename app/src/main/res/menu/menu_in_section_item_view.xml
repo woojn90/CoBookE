@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/item_delete_section_item"
+        android:orderInCategory="1"
+        android:title="@string/action_delete"
+        android:icon="@drawable/ic_trash_can"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/item_share_section_item"
+        android:orderInCategory="2"
+        android:title="@string/action_share"
+        android:icon="@drawable/ic_share"
+        app:showAsAction="ifRoom"/>
+</menu>

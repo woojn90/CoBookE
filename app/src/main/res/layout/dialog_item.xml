@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="280dp"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_basic_of_activity"
+    android:stretchColumns="1">
+    <TableRow>
+        <TextView
+            style="@style/TextViewInDialog"
+            android:text="@string/string_title"/>
+        <EditText
+            style="@style/EditTextInDialog"
+            android:id="@+id/et_item_title"
+            android:layout_marginLeft="@dimen/margin_left_of_edit_text"
+            android:layout_marginStart="@dimen/margin_left_of_edit_text"/>
+    </TableRow>
+    <TableRow>
+        <TextView
+            style="@style/TextViewInDialog"
+            android:text="@string/string_desc"/>
+        <EditText
+            style="@style/EditTextInDialog"
+            android:id="@+id/et_item_desc"
+            android:layout_marginLeft="@dimen/margin_left_of_edit_text"
+            android:layout_marginStart="@dimen/margin_left_of_edit_text">
+        </EditText>
+    </TableRow>
+</TableLayout>

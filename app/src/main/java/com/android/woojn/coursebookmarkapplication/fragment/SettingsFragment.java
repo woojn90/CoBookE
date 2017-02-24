@@ -1,21 +1,32 @@
 package com.android.woojn.coursebookmarkapplication.fragment;
 
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
+        .insertDefaultFolderIfNeeded;
+
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
+import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
+
+import io.realm.Realm;
 
 /**
  * Created by wjn on 2017-02-07.
  */
 
 public class SettingsFragment extends PreferenceFragmentCompat
-        implements SharedPreferences.OnSharedPreferenceChangeListener {
+        implements SharedPreferences.OnSharedPreferenceChangeListener,
+        Preference.OnPreferenceClickListener {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -63,14 +74,64 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+        Preference prefDeleteAll = findPreference(getString(R.string.settings_key_delete_all));
+        Preference prefDownloadBackup= findPreference(getString(R.string.settings_key_download_backup_file));
+        Preference prefUploadBackup= findPreference(getString(R.string.settings_key_upload_backup_file));
+        Preference prefSendMail = findPreference(getString(R.string.settings_key_send_mail));
+        Preference prefLicense = findPreference(getString(R.string.settings_key_license));
+        prefDeleteAll.setOnPreferenceClickListener(this);
+        prefDownloadBackup.setOnPreferenceClickListener(this);
+        prefUploadBackup.setOnPreferenceClickListener(this);
+        prefSendMail.setOnPreferenceClickListener(this);
+        prefLicense.setOnPreferenceClickListener(this);
     }
 
     @Override
     public void onDestroy() {
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
-        getPreferenceScreen().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        if (getString(R.string.settings_key_delete_all).equals(preference.getKey())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage(R.string.msg_delete_all_confirm);
+            builder.setNegativeButton(R.string.string_cancel, null);
+            builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    realm.deleteAll();
+                    realm.commitTransaction();
+                    realm.close();
+                    insertDefaultFolderIfNeeded(getContext());
+                    Toast.makeText(getContext(), R.string.msg_delete_all_complete, Toast.LENGTH_LONG).show();
+                }
+            });
+            builder.show();
+
+        } else if (getString(R.string.settings_key_download_backup_file).equals(preference.getKey())) {
+            // TODO: 백업 내보내기 구현
+
+        } else if (getString(R.string.settings_key_upload_backup_file).equals(preference.getKey())) {
+            // TODO: 백업 가져오기 구현
+
+        } else if (getString(R.string.settings_key_send_mail).equals(preference.getKey())) {
+            Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
+            sendIntent.setType("text/plain");
+            sendIntent.setData(Uri.parse("mailto:"));
+            sendIntent.putExtra(Intent.EXTRA_EMAIL, getString(R.string.settings_developer_mail_address));
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.settings_developer_mail_subject));
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.settings_title_send_mail)));
+
+        } else if (getString(R.string.settings_key_license).equals(preference.getKey())) {
+            // TODO: License Activity 구현
+
+        }
+        return false;
     }
 }

@@ -19,4 +19,5 @@ CoBookE는 북마크를 개인 디바이스에 저장하고 관리하는 어플�
 - [x] #8 Design UI roughly (with fake data)
 - [x] #11 DB Linkage
 - [x] #14 Interact with search web page (WebView)
-- [ ] #21 Develop item tab & Enhance share function
+- [x] #21 Develop item tab & Enhance share function
+- [ ] #25 Complete developing app & Prepare showcase

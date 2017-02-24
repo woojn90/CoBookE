@@ -36,6 +36,7 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, int viewId);
+        void onItemLongClick(int id);
         void onItemDoubleTap(int id);
     }
 
@@ -92,6 +93,12 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
                 }
 
                 @Override
+                public void onLongPress(MotionEvent e) {
+                    mListener.onItemLongClick((int) itemView.getTag());
+                    return;
+                }
+
+                @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     mListener.onItemDoubleTap((int) itemView.getTag());
                     return true;
@@ -118,11 +125,6 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
         public void onClickImageViewFavoriteN(View view) {
             imageViewFavoriteN.setVisibility(View.GONE);
             imageViewFavoriteY.setVisibility(View.VISIBLE);
-            mListener.onItemClick((int) itemView.getTag(), view.getId());
-        }
-
-        @OnClick(R.id.btn_delete_course)
-        public void onClickButtonDeleteCourse(View view) {
             mListener.onItemClick((int) itemView.getTag(), view.getId());
         }
     }

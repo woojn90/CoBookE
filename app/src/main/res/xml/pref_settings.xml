@@ -44,6 +44,11 @@
             android:entryValues="@array/pref_values_tab_index"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"/>
+        <CheckBoxPreference
+            android:key="@string/settings_key_delete_with_confirm"
+            android:title="@string/settings_title_delete_with_confirm"
+            android:summary="@string/settings_summary_delete_with_confirm"
+            android:defaultValue="true"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_app_info">
         <Preference

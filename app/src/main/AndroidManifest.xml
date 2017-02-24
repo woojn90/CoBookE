@@ -11,13 +11,22 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <activity android:name=".activity.SplashActivity"
+            android:theme="@style/SplashTheme"
+            android:noHistory="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.GuideActivity"
+            android:noHistory="true">
+        </activity>
         <activity android:name=".activity.MainActivity"
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity android:name=".activity.CourseActivity"
             android:label="@string/action_course"
@@ -36,7 +45,7 @@
         </activity>
         <activity android:name=".activity.SettingsActivity"
             android:label="@string/action_setting"
-            android:parentActivityName=".activity.MainActivity">
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity"/>
@@ -44,12 +53,26 @@
         <activity android:name=".activity.SharePopupActivity"
             android:launchMode="singleInstance"
             android:noHistory="true"
-            android:theme="@style/ShareActivityTheme">
+            android:theme="@style/ShareActivityTheme"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="text/plain"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".activity.LicenseActivity"
+            android:label="@string/action_license"
+            android:configChanges="orientation|screenSize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.SettingsActivity"/>
+        </activity>
+        <activity android:name=".activity.LicenseDetailActivity"
+            android:configChanges="orientation|screenSize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.LicenseActivity"/>
         </activity>
     </application>
 </manifest>

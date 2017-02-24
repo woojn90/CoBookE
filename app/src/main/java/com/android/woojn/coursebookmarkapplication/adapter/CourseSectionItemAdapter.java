@@ -41,6 +41,7 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id);
+        void onItemLongClick(int id);
         void onItemDoubleTap(int id);
         void onItemInItemClick(int id, View view);
     }
@@ -123,6 +124,12 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
                 public boolean onSingleTapConfirmed(MotionEvent e) {
                     mListener.onItemClick((int) itemView.getTag());
                     return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    mListener.onItemLongClick((int) itemView.getTag());
+                    return;
                 }
 
                 @Override

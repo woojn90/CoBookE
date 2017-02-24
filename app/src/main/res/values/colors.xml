@@ -7,7 +7,7 @@
     <color name="colorTextColorSecond">#b0b0b0</color>
     <color name="colorTextColorThird">#b9b9b9</color>
     <color name="colorTextColorAccent">#373737</color>
-    <color name="colorBackground">#fffcf7</color>
-    <color name="colorBackgroundSecond">#fffefa</color>
+    <color name="colorBackground">#fffcf6</color>
+    <color name="colorBackgroundSecond">#fffdf9</color>
     <color name="colorTextColorActionBar">#f9f9f9</color>
 </resources>

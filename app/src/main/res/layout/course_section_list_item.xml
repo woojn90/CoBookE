@@ -37,23 +37,21 @@
                     tools:text="(Search Word)"/>
             </LinearLayout>
             <Button
-                android:id="@+id/btn_search_section_item"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="3dp"
-                android:background="@drawable/ic_search_page"/>
+                android:id="@+id/btn_section_search_page"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/ic_menu_search_page"/>
             <Button
-                android:id="@+id/btn_section_overflow"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/ic_overflow_in_item"/>
+                android:id="@+id/btn_section_share"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="2dp"
+                android:background="@drawable/ic_menu_share"/>
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="192dp">
+            android:layout_height="182dp">
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_section_item_list"
                 android:layout_width="wrap_content"

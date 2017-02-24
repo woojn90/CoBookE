@@ -20,7 +20,7 @@ public class ShareUtility {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, getTextByRealmObject(realmObject));
-        context.startActivity(intent.createChooser(intent, context.getString(R.string.action_share)));
+        context.startActivity(intent.createChooser(intent, context.getString(R.string.menu_share)));
     }
 
     private static String getTextByRealmObject(RealmObject realmObject) {

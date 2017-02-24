@@ -1,16 +1,19 @@
 package com.android.woojn.coursebookmarkapplication.adapter;
 
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
-import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
+import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showItemDialog;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
+        .updateTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.isDeleteWithConfirm;
 import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -54,6 +57,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, View view);
+        void onItemLongClick(int id);
         void onItemDoubleTap(int id);
     }
 
@@ -97,6 +101,12 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
 
             final GestureDetector gd = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
+                public void onLongPress(MotionEvent e) {
+                    mListener.onItemLongClick((int) itemView.getTag());
+                    return;
+                }
+
+                @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     mListener.onItemDoubleTap((int) itemView.getTag());
                     return true;
@@ -112,7 +122,7 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             });
         }
 
-        @OnClick({R.id.btn_search_section_item, R.id.btn_section_overflow})
+        @OnClick({R.id.btn_section_search_page, R.id.btn_section_share})
         public void onClick(View view) {
             mListener.onItemClick((int) itemView.getTag(), view);
         }
@@ -120,14 +130,24 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
         @Override
         public void onItemClick(int id) {
             Realm realm = Realm.getDefaultInstance();
+            Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, (int) itemView.getTag()).findFirst();
             Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
+            int sectionId = section.getId();
             String stringUrl = item.getUrl();
             realm.close();
 
             Intent webIntent = new Intent(mContext, WebActivity.class);
-            webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITHOUT_SAVE);
             webIntent.putExtra(KEY_STRING_URL, stringUrl);
+            webIntent.putExtra(KEY_SECTION_ID, sectionId);
             mContext.startActivity(webIntent);
+        }
+
+        @Override
+        public void onItemLongClick(int id) {
+            Realm realm = Realm.getDefaultInstance();
+            Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
+            deleteSectionItem(item);
+            realm.close();
         }
 
         @Override
@@ -149,10 +169,6 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
                             Realm realm = Realm.getDefaultInstance();
                             Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
                             switch (menuItem.getItemId()) {
-                                case R.id.item_delete_section_item:
-                                    deleteSectionItem(item);
-                                    realm.close();
-                                    return true;
                                 case R.id.item_share_section_item:
                                     shareTextByRealmObject(mContext, item);
                                     realm.close();
@@ -169,7 +185,24 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             }
         }
 
-        private void deleteSectionItem(Item item) {
+        private void deleteSectionItem(final Item item) {
+            if (isDeleteWithConfirm(mContext)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setMessage(R.string.msg_delete_confirm);
+                builder.setNegativeButton(R.string.string_cancel, null);
+                builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteSectionItemConfirm(item);
+                    }
+                });
+                builder.show();
+            } else {
+                deleteSectionItemConfirm(item);
+            }
+        }
+
+        private void deleteSectionItemConfirm(Item item) {
             Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
             item.deleteFromRealm();
@@ -182,7 +215,5 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             mToast.show();
             updateTextViewEmptyVisibility(Item.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
         }
-
-
     }
 }

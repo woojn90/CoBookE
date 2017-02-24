@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_item_tab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/padding_basic_of_layout_inside_tab">
@@ -24,21 +25,21 @@
                         android:id="@+id/iv_up_arrow_enable"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/ic_up_enable"
+                        android:background="@drawable/ic_ui_arrow_up_enable"
                         android:contentDescription="@string/content_desc_up_arrow_enable"
                         android:visibility="gone"/>
                     <ImageView
                         android:id="@+id/iv_up_arrow_disable"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/ic_up_disable"
+                        android:background="@drawable/ic_ui_arrow_up_disable"
                         android:contentDescription="@string/content_desc_up_arrow_disable"/>
                 </FrameLayout>
                 <ImageView
                     android:id="@+id/iv_home"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:background="@drawable/ic_home"
+                    android:background="@drawable/ic_ui_home"
                     android:contentDescription="@string/content_desc_home"/>
             </LinearLayout>
         </HorizontalScrollView>

@@ -2,13 +2,12 @@ package com.android.woojn.coursebookmarkapplication.activity;
 
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
-import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
-import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibility;
+
+import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.isDeleteWithConfirm;
 import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.DialogInterface;
@@ -20,7 +19,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -156,12 +154,9 @@ public class CourseActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_delete:
-                deleteCourse();
-                break;
             case R.id.action_share:
                 shareTextByRealmObject(this, mCourse);
-                break;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -170,30 +165,19 @@ public class CourseActivity extends AppCompatActivity
     public void onItemClick(int id, View view) {
         final Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, id).findFirst();
         switch (view.getId()) {
-            case R.id.btn_search_section_item:
+            case R.id.btn_section_search_page:
                 searchAndShowResults(section);
                 break;
-            case R.id.btn_section_overflow:
-                PopupMenu popupMenu = new PopupMenu(this, view);
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.item_share_section:
-                                shareTextByRealmObject(CourseActivity.this, section);
-                                return true;
-                            case R.id.item_delete_section:
-                                deleteSection(section);
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                popupMenu.inflate(R.menu.menu_in_section_view);
-                popupMenu.show();
-                showPopupMenuIcon(popupMenu);
+            case R.id.btn_section_share:
+                shareTextByRealmObject(CourseActivity.this, section);
                 break;
         }
+    }
+
+    @Override
+    public void onItemLongClick(int id) {
+        Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, id).findFirst();
+        deleteSection(section);
     }
 
     @Override
@@ -260,57 +244,33 @@ public class CourseActivity extends AppCompatActivity
         });
     }
 
-    private void deleteCourse() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.msg_delete_confirm);
-        builder.setNegativeButton(R.string.string_cancel, null);
-        builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mRealm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        RealmList<Section> sections = mCourse.getSections();
-                        for (int i = sections.size() - 1; i >= 0; i--) {
-
-                            RealmList<Item> sectionItems = sections.get(i).getItems();
-                            for (int j = sectionItems.size() - 1; j >= 0; j--) {
-                                sectionItems.get(j).deleteFromRealm();
-                            }
-                            sections.get(i).deleteFromRealm();
-                        }
-                        mCourse.deleteFromRealm();
-                        showToastByForce(R.string.msg_delete);
-                        finish();
-                    }
-                });
-            }
-        });
-        builder.show();
+    private void deleteSection(final Section section) {
+        if (isDeleteWithConfirm(this)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.msg_delete_confirm);
+            builder.setNegativeButton(R.string.string_cancel, null);
+            builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    deleteSectionConfirm(section);
+                }
+            });
+            builder.show();
+        } else {
+            deleteSectionConfirm(section);
+        }
     }
 
-    private void deleteSection(final Section section) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.msg_delete_confirm);
-        builder.setNegativeButton(R.string.string_cancel, null);
-        builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mRealm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        RealmList<Item> sectionItems = section.getItems();
-                        for (int i = sectionItems.size() - 1; i >= 0; i--) {
-                            sectionItems.get(i).deleteFromRealm();
-                        }
-                        section.deleteFromRealm();
-                        showToastByForce(R.string.msg_delete);
-                        updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
-                    }
-                });
-            }
-        });
-        builder.show();
+    private void deleteSectionConfirm(Section section) {
+        RealmList<Item> sectionItems = section.getItems();
+        mRealm.beginTransaction();
+        for (int i = sectionItems.size() - 1; i >= 0; i--) {
+            sectionItems.get(i).deleteFromRealm();
+        }
+        section.deleteFromRealm();
+        mRealm.commitTransaction();
+        showToastByForce(R.string.msg_delete);
+        updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
     }
 
     private void searchAndShowResults(Section section) {
@@ -331,7 +291,6 @@ public class CourseActivity extends AppCompatActivity
         }
 
         Intent webIntent = new Intent(this, WebActivity.class);
-        webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
         webIntent.putExtra(KEY_STRING_URL, searchEngine + queryEncoded);
         webIntent.putExtra(KEY_SECTION_ID, section.getId());
         startActivity(webIntent);

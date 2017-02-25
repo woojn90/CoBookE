@@ -17,6 +17,7 @@ import android.support.v7.preference.PreferenceScreen;
 import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
+import com.android.woojn.coursebookmarkapplication.activity.LicenseActivity;
 
 import io.realm.Realm;
 
@@ -113,7 +114,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 }
             });
             builder.show();
-
+            return true;
         } else if (getString(R.string.settings_key_download_backup_file).equals(preference.getKey())) {
             // TODO: 백업 내보내기 구현
 
@@ -127,10 +128,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
             sendIntent.putExtra(Intent.EXTRA_EMAIL, getString(R.string.settings_developer_mail_address));
             sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.settings_developer_mail_subject));
             startActivity(Intent.createChooser(sendIntent, getString(R.string.settings_title_send_mail)));
-
+            return true;
         } else if (getString(R.string.settings_key_license).equals(preference.getKey())) {
-            // TODO: License Activity 구현
-
+            Intent licenseIntent = new Intent(getContext(), LicenseActivity.class);
+            startActivity(licenseIntent);
+            return true;
         }
         return false;
     }

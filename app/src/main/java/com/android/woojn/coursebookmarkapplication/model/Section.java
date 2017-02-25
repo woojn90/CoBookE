@@ -39,4 +39,12 @@ public class Section extends RealmObject {
     public RealmList<Item> getItems() {
         return items;
     }
+
+    /**
+     * spinner에서 사용하기 위해 title만 return합니다.
+     */
+    @Override
+    public String toString() {
+        return title;
+    }
 }

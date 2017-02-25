@@ -55,7 +55,7 @@ public class DropdownAdapter extends ArrayAdapter<Folder> {
 
         mTextViewDropdownFolder.setText((mFolders.get(position)).toString());
         if (mFolders.get(position).getId() == DEFAULT_FOLDER_ID) {
-            mImageViewDropdownFolder.setBackgroundResource(R.drawable.ic_home);
+            mImageViewDropdownFolder.setBackgroundResource(R.drawable.ic_ui_home);
         }
         return view;
     }

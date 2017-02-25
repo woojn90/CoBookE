@@ -2,9 +2,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_setting"
+        android:id="@+id/action_change_grid"
         android:orderInCategory="1"
-        android:title="@string/action_setting"
-        android:icon="@drawable/ic_action_setting"
+        android:title="@string/menu_change_grid"
+        android:icon="@drawable/ic_fab_grid_3x3"
         app:showAsAction="always"/>
+    <item
+        android:orderInCategory="2"
+        android:title="@string/menu_overflow"
+        android:icon="@drawable/ic_action_overflow"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/action_help"
+                android:orderInCategory="1"
+                android:title="@string/menu_help"
+                android:icon="@drawable/ic_action_help"
+                app:showAsAction="ifRoom"/>
+            <item
+                android:id="@+id/action_setting"
+                android:orderInCategory="2"
+                android:title="@string/menu_setting"
+                android:icon="@drawable/ic_action_setting"
+                app:showAsAction="ifRoom"/>
+        </menu>
+    </item>
 </menu>

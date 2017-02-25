@@ -33,12 +33,17 @@ public class ParseAsyncTask extends AsyncTask<Integer, Void, Void> {
             Elements ogTags = doc.select("meta[property^=og:]");
             if (ogTags.size() <= 0) {
                 // TODO: og: 태그 없을 때 다른 tag로 찾기 enhance
-                Elements imgSrc = doc.select("img[src^=http]");
+                Elements imgSrcPrefixHttp = doc.select("img[src^=http]");
 
                 realm.beginTransaction();
                 item.setTitle(doc.title());
-                if (imgSrc.size() > 0) {
-                    item.setImageUrl(imgSrc.get(0).attr("src"));
+                if (imgSrcPrefixHttp.size() > 0) {
+                    item.setImageUrl(imgSrcPrefixHttp.get(0).attr("src"));
+                } else {
+                    Elements imgSrc = doc.select("img[src]");
+                    if (imgSrc.size() > 0) {
+                        item.setImageUrl(item.getUrl() + imgSrc.get(0).attr("src"));
+                    }
                 }
                 item.setVisited(true);
                 realm.commitTransaction();
@@ -58,7 +63,6 @@ public class ParseAsyncTask extends AsyncTask<Integer, Void, Void> {
                     item.setImageUrl(convertTextFromHtml(content));
                 }
             }
-            // TODO: 저장된 값이 없어도 방문한 것으로 처리할 지 확인
             item.setVisited(true);
             realm.commitTransaction();
             realm.close();

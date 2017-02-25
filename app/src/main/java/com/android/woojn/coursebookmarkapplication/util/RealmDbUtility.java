@@ -90,4 +90,77 @@ public class RealmDbUtility {
         }
         realm.close();
     }
+
+    // TODO: Resourse 분리 등의 관리가 필요
+    public static void insertInitialData(Context context) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        Course courseEx1 = realm.createObject(Course.class, getNewIdByClass(Course.class));
+        courseEx1.setTitle("강남역 근처 데이트");
+        courseEx1.setSearchWord("강남역");
+        courseEx1.setDesc("강남역 근처 코스 예시");
+        courseEx1.setFavorite(true);
+        Course courseEx2 = realm.createObject(Course.class, getNewIdByClass(Course.class));
+        courseEx2.setTitle("동아리 모임 장소");
+        courseEx2.setSearchWord("종로3가역");
+        courseEx2.setDesc("종로3가역 근처 코스 예시");
+        courseEx2.setFavorite(false);
+        Section sectionEx11 = realm.createObject(Section.class, getNewIdByClass(Section.class));
+        sectionEx11.setTitle("식당");
+        sectionEx11.setSearchWord("맛집");
+        Item sectionItemEx111 = realm.createObject(Item.class, getNewIdByClass(Item.class));
+        sectionItemEx111.setUrl("http://m.blog.naver.com/kunby/220926402527");
+        Item sectionItemEx112 = realm.createObject(Item.class, getNewIdByClass(Item.class));
+        sectionItemEx112.setUrl("http://m.blog.naver.com/jollynii1/220926663281");
+        Item sectionItemEx113 = realm.createObject(Item.class, getNewIdByClass(Item.class));
+        sectionItemEx113.setUrl("http://m.blog.naver.com/dahaeyoo/220941988349");
+        Section sectionEx12 = realm.createObject(Section.class, getNewIdByClass(Section.class));
+        sectionEx12.setTitle("카페");
+        sectionEx12.setSearchWord("분위기 카페");
+        Item sectionItemEx121 = realm.createObject(Item.class, getNewIdByClass(Item.class));
+        sectionItemEx121.setUrl("http://m.blog.naver.com/jvely0426/220941984868");
+        Section sectionEx13 = realm.createObject(Section.class, getNewIdByClass(Section.class));
+        sectionEx13.setTitle("술집");
+        sectionEx13.setSearchWord("조용한 술집");
+        Item sectionItemEx131 = realm.createObject(Item.class, getNewIdByClass(Item.class));
+        sectionItemEx131.setUrl("http://m.blog.naver.com/party_tasty/220759306435");
+        Item sectionItemEx132 = realm.createObject(Item.class, getNewIdByClass(Item.class));
+        sectionItemEx132.setUrl("http://m.blog.naver.com/darong_1231/220864983989");
+
+        sectionEx11.getItems().add(sectionItemEx111);
+        sectionEx11.getItems().add(sectionItemEx112);
+        sectionEx11.getItems().add(sectionItemEx113);
+        sectionEx12.getItems().add(sectionItemEx121);
+        sectionEx13.getItems().add(sectionItemEx131);
+        sectionEx13.getItems().add(sectionItemEx132);
+        courseEx1.getSections().add(sectionEx11);
+        courseEx1.getSections().add(sectionEx12);
+        courseEx1.getSections().add(sectionEx13);
+
+        Folder folderEx1 = realm.createObject(Folder.class, getNewIdByClass(Folder.class));
+        folderEx1.setTitle("공부");
+        Folder folderEx2 = realm.createObject(Folder.class, getNewIdByClass(Folder.class));
+        folderEx2.setTitle("패션");
+        Folder folderEx3 = realm.createObject(Folder.class, getNewIdByClass(Folder.class));
+        folderEx3.setTitle("일상");
+        Folder folderEx4 = realm.createObject(Folder.class, getNewIdByClass(Folder.class));
+        folderEx4.setTitle("기타");
+
+        Item itemEx1 = realm.createObject(Item.class, getNewIdByClass(Item.class));
+        itemEx1.setUrl(context.getString(R.string.pref_value_home_page_naver));
+        Item itemEx2 = realm.createObject(Item.class, getNewIdByClass(Item.class));
+        itemEx2.setUrl(context.getString(R.string.pref_value_home_page_daum));
+
+        Folder homeFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, DEFAULT_FOLDER_ID).findFirst();
+        homeFolder.getFolders().add(folderEx1);
+        homeFolder.getFolders().add(folderEx2);
+        homeFolder.getFolders().add(folderEx3);
+        homeFolder.getFolders().add(folderEx4);
+        homeFolder.getItems().add(itemEx1);
+        homeFolder.getItems().add(itemEx2);
+
+        realm.commitTransaction();
+        realm.close();
+    }
+
 }

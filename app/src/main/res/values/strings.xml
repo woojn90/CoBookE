@@ -1,19 +1,25 @@
 <resources>
     <string name="app_name">CoBookE</string>
 
-    <!-- Action Bar -->
+    <!-- Action Bar Label -->
     <string name="action_course">코스</string>
     <string name="action_search">검색</string>
     <string name="action_setting">설정</string>
-    <string name="action_overflow">Over Flow</string>
-    <string name="action_update">수정하기</string>
-    <string name="action_delete">삭제하기</string>
-    <string name="action_move">이동하기</string>
-    <string name="action_share">공유하기</string>
-    <string name="action_save">저장</string>
-    <string name="action_refresh">새로고침</string>
+    <string name="action_license">오픈소스 라이센스</string>
+
+    <!-- Menu -->
+    <string name="menu_overflow">Over Flow</string>
+    <string name="menu_help">사용방법</string>
+    <string name="menu_setting">설정하기</string>
+    <string name="menu_change_grid">그리드 변경</string>
+    <string name="menu_share">공유하기</string>
+    <string name="menu_search">검색하기</string>
+    <string name="menu_delete">삭제하기</string>
+    <string name="menu_move">이동하기</string>
+    <string name="menu_save">저장하기</string>
 
     <!-- UI -->
+    <string name="string_start">시작하기</string>
     <string name="string_course">코스</string>
     <string name="string_item">항목</string>
     <string name="string_title">제목</string>
@@ -24,8 +30,9 @@
     <string name="string_cancel">취소</string>
     <string name="string_change">변경</string>
     <string name="string_search_word">검색어</string>
-    <string name="string_section_info">코스 그룹 정보</string>
     <string name="string_course_info">코스 정보</string>
+    <string name="string_section_info">코스 그룹 정보</string>
+    <string name="string_section_change">코스 그룹 변경</string>
     <string name="string_item_info">항목 정보</string>
     <string name="string_folder_info">폴더 정보</string>
     <string name="string_folder_change">폴더 변경</string>
@@ -34,7 +41,7 @@
     <string name="string_home">Home</string>
     <string name="string_new_folder">새 폴더</string>
     <string name="string_default_title">기본 제목</string>
-    <string name="string_default_desc">기본 설명</string>
+    <string name="string_default_desc">기본 설명입니다.</string>
 
     <string name="hint_course_title">예) 강남역 데이트</string>
     <string name="hint_course_search_word">예) 강남역</string>
@@ -58,7 +65,7 @@
 
     <string name="msg_favorite_y">즐겨찾기에 추가되었습니다.</string>
     <string name="msg_favorite_n">즐겨찾기에서 해제되었습니다.</string>
-    <string name="msg_save">저장되었습니다.</string>
+    <string name="msg_save_bookmark">북마크로 저장되었습니다.</string>
     <string name="msg_delete">삭제되었습니다.</string>
     <string name="msg_delete_confirm">삭제하시겠습니까?</string>
     <string name="msg_delete_all_confirm">모든 항목을 삭제하시겠습니까?</string>
@@ -66,9 +73,12 @@
 
     <string name="msg_invalid_url_home">적합한 주소가 아니므로 홈페이지로 연결합니다.</string>
     <string name="msg_invalid_url_not_save">저장할 수 없습니다. 해당 웹 주소를 개발자 메일로 보내주세요.</string>
-    <string name="msg_postfix_folder_move"> 폴더로 위치가 변경되었습니다.</string>
+    <string name="msg_prefix_move">[</string>
+    <string name="msg_postfix_move_folder">] 폴더로 위치가 변경되었습니다.</string>
+    <string name="msg_postfix_move_section">] 그룹으로 위치가 변경되었습니다.</string>
     <string name="msg_impossible_to_move_to_child">자신보다 하위 폴더로 이동할 수 없습니다.</string>
     <string name="msg_no_preview_image">대표 이미지가 없습니다.</string>
+    <string name="msg_exit_twice">뒤로 버튼을 다시 누르면 종료됩니다.</string>
 
     <!-- Settings -->
     <string name="settings_category_search">검색</string>
@@ -83,7 +93,7 @@
     <string name="pref_label_home_page_daum">다음</string>
     <string name="pref_value_home_page_naver">http://m.naver.com</string>
     <string name="pref_value_home_page_google">http://www.google.com</string>
-    <string name="pref_value_home_page_daum">http://www.daum.net</string>
+    <string name="pref_value_home_page_daum">http://m.daum.net</string>
 
     <string name="pref_label_target_of_auto_search">자동 검색 대상</string>
     <string name="pref_key_target_of_auto_search" translatable="false">target_of_auto_search</string>
@@ -109,16 +119,20 @@
     <string name="pref_label_tab_index">초기 선택 Tab</string>
     <string name="pref_key_tab_index" translatable="false">tab</string>
 
+    <string name="settings_key_delete_with_confirm" translatable="false">delete_with_confirm</string>
+    <string name="settings_title_delete_with_confirm">삭제 확인</string>
+    <string name="settings_summary_delete_with_confirm">삭제 전에 알림창을 띄웁니다.</string>
+
     <string name="settings_key_send_mail" translatable="false">send_mail</string>
     <string name="settings_title_send_mail">메일 보내기</string>
     <string name="settings_summary_send_mail">개발자에게 메일을 보냅니다.</string>
     <string name="settings_key_license" translatable="false">license</string>
     <string name="settings_title_license">오픈소스 라이센스</string>
     <string name="settings_summary_license">오픈소스 라이센스 세부정보입니다.</string>
-
-    <string name="pref_key_item_number_of_grid_column" translatable="false">number_of_column</string>
-
     <string name="settings_developer_mail_address">woojn90@gmail.com</string>
     <string name="settings_developer_mail_subject">[요청] </string>
+
+    <string name="pref_key_item_number_of_grid_column" translatable="false">number_of_column</string>
+    <string name="pref_key_zero_means_first_run" translatable="false">first_run</string>
 
 </resources>

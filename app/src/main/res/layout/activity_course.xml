@@ -31,14 +31,14 @@
                     android:id="@+id/iv_favorite_y_course"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/ic_favorite_y"
+                    android:background="@drawable/ic_ui_favorite_y"
                     android:contentDescription="@string/content_desc_favorite_y"
                     android:visibility="gone"/>
                 <ImageView
                     android:id="@+id/iv_favorite_n_course"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/ic_favorite_n"
+                    android:background="@drawable/ic_ui_favorite_n"
                     android:contentDescription="@string/content_desc_favorite_n"/>
             </FrameLayout>
             <LinearLayout

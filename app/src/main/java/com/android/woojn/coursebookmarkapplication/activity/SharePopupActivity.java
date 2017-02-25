@@ -100,6 +100,8 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
                     mRealm.beginTransaction();
                     mItem = mRealm.createObject(Item.class, mItemId);
                     mItem.setUrl(stringUrl);
+                    mItem.setTitle(getString(R.string.string_default_title));
+                    mItem.setDesc(getString(R.string.string_default_desc));
                     mRealm.commitTransaction();
 
                     mItem.addChangeListener(this);
@@ -211,7 +213,7 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
         folder.getItems().add(mItem);
         mRealm.commitTransaction();
 
-        showToastByForce(R.string.msg_save);
+        showToastByForce(R.string.msg_save_bookmark);
         mIsSaved = true;
         finishAndRemoveTask();
     }

@@ -7,6 +7,7 @@ import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_I
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
         .updateTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.isDeleteWithConfirm;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -97,7 +98,6 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
 
     @Override
     public void onItemClick(int id, int viewId) {
-        Course course = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, id).findFirst();
         switch (viewId) {
             case DEFAULT_VIEW_ID:
                 Intent updateIntent = new Intent(getContext(), CourseActivity.class);
@@ -106,12 +106,16 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                 break;
             case R.id.iv_favorite_y_main:
             case R.id.iv_favorite_n_main:
+                Course course = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, id).findFirst();
                 toggleCourseFavorite(course);
                 break;
-            case R.id.btn_delete_course:
-                deleteCourse(course);
-                break;
         }
+    }
+
+    @Override
+    public void onItemLongClick(int id) {
+        Course course = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, id).findFirst();
+        deleteCourse(course);
     }
 
     @Override
@@ -144,32 +148,37 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
     }
 
     private void deleteCourse(final Course course) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage(R.string.msg_delete_confirm);
-        builder.setNegativeButton(R.string.string_cancel, null);
-        builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mRealm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        RealmList<Section> sections = course.getSections();
-                        for (int i = sections.size() - 1; i >= 0; i--) {
+        if (isDeleteWithConfirm(getContext())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage(R.string.msg_delete_confirm);
+            builder.setNegativeButton(R.string.string_cancel, null);
+            builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    deleteCourseConfirm(course);
+                }
+            });
+            builder.show();
+        } else {
+            deleteCourseConfirm(course);
+        }
+    }
 
-                            RealmList<Item> sectionItems = sections.get(i).getItems();
-                            for (int j = sectionItems.size() - 1; j >= 0; j--) {
-                                sectionItems.get(j).deleteFromRealm();
-                            }
-                            sections.get(i).deleteFromRealm();
-                        }
-                        course.deleteFromRealm();
-                        showToastByForce(R.string.msg_delete);
-                        updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
-                    }
-                });
+    private void deleteCourseConfirm(Course course) {
+        mRealm.beginTransaction();
+        RealmList<Section> sections = course.getSections();
+        for (int i = sections.size() - 1; i >= 0; i--) {
+
+            RealmList<Item> sectionItems = sections.get(i).getItems();
+            for (int j = sectionItems.size() - 1; j >= 0; j--) {
+                sectionItems.get(j).deleteFromRealm();
             }
-        });
-        builder.show();
+            sections.get(i).deleteFromRealm();
+        }
+        course.deleteFromRealm();
+        mRealm.commitTransaction();
+        showToastByForce(R.string.msg_delete);
+        updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
     }
 
     private void showCourseDialog(final int courseId, final boolean isCreated, final String beforeTitle, final String beforeSearchWord, final String beforeDesc) {

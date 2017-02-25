@@ -36,7 +36,7 @@
                     android:id="@+id/btn_item_overflow"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:background="@drawable/ic_overflow_in_item"/>
+                    android:background="@drawable/ic_menu_overflow"/>
             </LinearLayout>
             <TextView
                 style="@style/TextViewDesc"

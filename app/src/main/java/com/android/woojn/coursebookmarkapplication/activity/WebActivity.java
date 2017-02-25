@@ -4,11 +4,8 @@ import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_FOLD
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_FOLDER_ID;
-import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITHOUT_SAVE;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 
 import android.annotation.TargetApi;
@@ -20,7 +17,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -112,10 +108,8 @@ public class WebActivity extends AppCompatActivity {
         }
 
         mWebView.getSettings().setJavaScriptEnabled(true);
-        Log.d("Check", "loadUrl before");
         mWebView.loadUrl(stringUrl);
         setButtonsEnable();
-        Log.d("Check", "loadUrl after");
 
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -163,12 +157,6 @@ public class WebActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_web, menu);
-
-        int requestCode = getIntent().getIntExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
-        if (requestCode == REQUEST_WEB_ACTIVITY_WITHOUT_SAVE) {
-            menu.findItem(R.id.action_save).setVisible(false);
-            // TODO: 목록 띄워서 저장 가능하게
-        }
         return true;
     }
 
@@ -177,7 +165,7 @@ public class WebActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_save:
                 saveThisPage();
-                break;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -250,7 +238,6 @@ public class WebActivity extends AppCompatActivity {
         realm.beginTransaction();
         Item item = realm.createObject(Item.class, newItemId);
         item.setUrl(mWebView.getUrl());
-        mWebView.getTitle();
         item.setTitle(getString(R.string.string_default_title));
         item.setDesc(getString(R.string.string_default_desc));
         item.setVisited(false);
@@ -268,6 +255,6 @@ public class WebActivity extends AppCompatActivity {
             realm.commitTransaction();
         }
         realm.close();
-        showToastByForce(R.string.msg_save);
+        showToastByForce(R.string.msg_save_bookmark);
     }
 }

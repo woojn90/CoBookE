@@ -33,6 +33,7 @@ public class FolderAdapter extends RealmRecyclerViewAdapter <Folder, FolderAdapt
 
     public interface OnRecyclerViewClickListener {
         void onFolderClick(int id);
+        void onFolderLongClick(int id);
         void onFolderDoubleTap(int id);
         void onItemInFolderClick(int id, View view);
     }
@@ -68,6 +69,12 @@ public class FolderAdapter extends RealmRecyclerViewAdapter <Folder, FolderAdapt
                 public boolean onSingleTapConfirmed(MotionEvent e) {
                     mListener.onFolderClick((int) itemView.getTag());
                     return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    mListener.onFolderLongClick((int) itemView.getTag());
+                    return;
                 }
 
                 @Override

@@ -4,15 +4,14 @@ import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_FOLD
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_FOLDER_ID;
-import static com.android.woojn.coursebookmarkapplication.Constants.KEY_REQUEST_WEB_ACTIVITY;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
-import static com.android.woojn.coursebookmarkapplication.Constants.REQUEST_WEB_ACTIVITY_WITH_SAVE;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showFolderDialog;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showItemDialog;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibilityByFolderId;
+import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.isDeleteWithConfirm;
 import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
 import android.content.Context;
@@ -64,8 +63,8 @@ import io.realm.RealmResults;
  */
 
 public class ItemFragment extends Fragment
-        implements ItemAdapter.OnRecyclerViewClickListener, FolderAdapter.OnRecyclerViewClickListener
-        , MainActivity.onKeyBackPressedListener {
+        implements ItemAdapter.OnRecyclerViewClickListener, FolderAdapter.OnRecyclerViewClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener, MainActivity.onKeyBackPressedListener {
 
     @BindView(R.id.layout_explorer_bar)
     protected LinearLayout mLinearLayoutExplorerBar;
@@ -81,7 +80,6 @@ public class ItemFragment extends Fragment
     protected RecyclerView mRecyclerViewItem;
 
     private FloatingActionButton mFabExpandItems;
-    private FloatingActionButton mFabToggleGrid;
     private FloatingActionButton mFabInsertFolder;
     private FloatingActionButton mFabBrowser;
 
@@ -100,6 +98,7 @@ public class ItemFragment extends Fragment
         super.onCreate(savedInstanceState);
         mRealm = Realm.getDefaultInstance();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -131,15 +130,6 @@ public class ItemFragment extends Fragment
             @Override
             public void onClick(View v) {
                 animateFabInItemTab();
-            }
-        });
-
-        mFabToggleGrid = (FloatingActionButton) getActivity().findViewById(R.id.fab_toggle_grid);
-        mFabToggleGrid.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                animateFabInItemTab();
-                toggleGridColumn();
             }
         });
 
@@ -178,6 +168,7 @@ public class ItemFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
         mRealm.close();
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -185,6 +176,7 @@ public class ItemFragment extends Fragment
         if (currentFolderId != DEFAULT_FOLDER_ID) {
             onClickImageViewUpArrowEnable();
         } else {
+            if (isFabOpen) animateFabInItemTab();
             getActivity().onBackPressed();
         }
     }
@@ -259,7 +251,15 @@ public class ItemFragment extends Fragment
     }
 
     @Override
+    public void onFolderLongClick(int id) {
+        if (isFabOpen) animateFabInItemTab();
+        Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, id).findFirst();
+        deleteFolder(folder);
+    }
+
+    @Override
     public void onFolderDoubleTap(int id) {
+        if (isFabOpen) animateFabInItemTab();
         Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, id).findFirst();
         showFolderDialog(getContext(), id, folder.getTitle());
     }
@@ -273,12 +273,9 @@ public class ItemFragment extends Fragment
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, id).findFirst();
                         switch (menuItem.getItemId()) {
-                            case R.id.item_delete_folder:
-                                deleteFolder(folder);
-                                return true;
                             case R.id.item_change_folder:
+                                Folder folder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, id).findFirst();
                                 showFolderChangeDialog(folder);
                                 return true;
                         }
@@ -294,11 +291,11 @@ public class ItemFragment extends Fragment
 
     @Override
     public void onItemClick(int id) {
+        if (isFabOpen) animateFabInItemTab();
         Item item = mRealm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
         String stringUrl = item.getUrl();
 
         Intent webIntent = new Intent(getContext(), WebActivity.class);
-        webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
         webIntent.putExtra(KEY_STRING_URL, stringUrl);
         webIntent.putExtra(KEY_FOLDER_ID, currentFolderId);
         webIntent.putExtra(KEY_SECTION_ID, DEFAULT_SECTION_ID);
@@ -306,7 +303,15 @@ public class ItemFragment extends Fragment
     }
 
     @Override
+    public void onItemLongClick(int id) {
+        if (isFabOpen) animateFabInItemTab();
+        Item item = mRealm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
+        deleteItem(item);
+    }
+
+    @Override
     public void onItemDoubleTap(int id) {
+        if (isFabOpen) animateFabInItemTab();
         Item item = mRealm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
         showItemDialog(getContext(), id, item.getTitle(), item.getDesc());
     }
@@ -322,15 +327,12 @@ public class ItemFragment extends Fragment
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         Item item = mRealm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
                         switch (menuItem.getItemId()) {
-                            case R.id.item_delete_item:
-                                deleteItem(item);
-                                return true;
                             case R.id.item_change_item:
                                 showFolderChangeDialog(item);
                                 return true;
                             case R.id.item_share_item:
-                            shareTextByRealmObject(getContext(), item);
-                            return true;
+                                shareTextByRealmObject(getContext(), item);
+                                return true;
                         }
                         return false;
                     }
@@ -339,6 +341,20 @@ public class ItemFragment extends Fragment
                 popupMenu.show();
                 showPopupMenuIcon(popupMenu);
                 break;
+        }
+    }
+
+    @OnClick(R.id.layout_item_tab)
+    public void onClickLayoutItemTab() {
+        if (isFabOpen) animateFabInItemTab();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (getContext().getString(R.string.pref_key_item_number_of_grid_column).equals(key)) {
+            setRecyclerViewLayoutManager();
+            mRecyclerViewFolder.setAdapter(new FolderAdapter(getContext(), mFolders, ItemFragment.this));
+            mRecyclerViewItem.setAdapter(new ItemAdapter(getContext(), mItems, ItemFragment.this));
         }
     }
 
@@ -379,35 +395,15 @@ public class ItemFragment extends Fragment
     private void animateFabInItemTab() {
         if (isFabOpen) {
             mFabExpandItems.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.rotate_backward));
-            mFabToggleGrid.hide();
             mFabInsertFolder.hide();
             mFabBrowser.hide();
             isFabOpen = false;
         } else {
             mFabExpandItems.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.rotate_forward));
-            mFabToggleGrid.show();
             mFabInsertFolder.show();
             mFabBrowser.show();
             isFabOpen = true;
         }
-    }
-
-    private void toggleGridColumn() {
-        int beforeNumberOfColumn = mSharedPreferences.getInt(getString(R.string.pref_key_item_number_of_grid_column), 2);
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-
-        if (beforeNumberOfColumn == 2) {
-            editor.putInt(getString(R.string.pref_key_item_number_of_grid_column), 3);
-            editor.apply();
-            mFabToggleGrid.setImageResource(R.drawable.ic_fab_grid_2x2);
-        } else {
-            editor.putInt(getString(R.string.pref_key_item_number_of_grid_column), 2);
-            editor.apply();
-            mFabToggleGrid.setImageResource(R.drawable.ic_fab_grid_3x3);
-        }
-        setRecyclerViewLayoutManager();
-        mRecyclerViewFolder.setAdapter(new FolderAdapter(getContext(), mFolders, ItemFragment.this));
-        mRecyclerViewItem.setAdapter(new ItemAdapter(getContext(), mItems, ItemFragment.this));
     }
 
     private void toggleUpArrowImageView() {
@@ -440,11 +436,29 @@ public class ItemFragment extends Fragment
         setRecyclerViewAdapter();
     }
 
-    private void deleteItem(Item item) {
+    private void deleteItem(final Item item) {
+        if (isDeleteWithConfirm(getContext())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage(R.string.msg_delete_confirm);
+            builder.setNegativeButton(R.string.string_cancel, null);
+            builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    deleteItemConfirm(item);
+                }
+            });
+            builder.show();
+        } else {
+            deleteItemConfirm(item);
+        }
+    }
+
+    private void deleteItemConfirm(Item item) {
         mRealm.beginTransaction();
         item.deleteFromRealm();
         mRealm.commitTransaction();
         showToastByForce(R.string.msg_delete);
+        updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
     private void insertFolder() {
@@ -455,13 +469,32 @@ public class ItemFragment extends Fragment
         folder.setTitle(getString(R.string.string_new_folder));
         parentFolder.getFolders().add(folder);
         mRealm.commitTransaction();
+        updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
-    private void deleteFolder(Folder folder) {
+    private void deleteFolder(final Folder folder) {
+        if (isDeleteWithConfirm(getContext())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage(R.string.msg_delete_confirm);
+            builder.setNegativeButton(R.string.string_cancel, null);
+            builder.setPositiveButton(R.string.string_delete, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    deleteFolderConfirm(folder);
+                }
+            });
+            builder.show();
+        } else {
+            deleteFolderConfirm(folder);
+        }
+    }
+
+    private void deleteFolderConfirm(Folder folder) {
         mRealm.beginTransaction();
         deleteItemsAndFoldersInsideFolder(folder);
         mRealm.commitTransaction();
         showToastByForce(R.string.msg_delete);
+        updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
     /**
@@ -526,7 +559,9 @@ public class ItemFragment extends Fragment
                     }
 
                 }
-                showToastByForce(changeFolder.getTitle() + getString(R.string.msg_postfix_folder_move));
+                showToastByForce(getString(R.string.msg_prefix_move) + changeFolder.getTitle() +
+                        getString(R.string.msg_postfix_move_folder));
+                updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
             }
         });
 
@@ -577,7 +612,6 @@ public class ItemFragment extends Fragment
 
     private void showDefaultWebPage() {
         Intent webIntent = new Intent(getContext(), WebActivity.class);
-        webIntent.putExtra(KEY_REQUEST_WEB_ACTIVITY, REQUEST_WEB_ACTIVITY_WITH_SAVE);
         String stringUrl = mSharedPreferences.getString(getString(R.string.pref_key_home_page)
                 , getString(R.string.pref_value_home_page_naver));
         webIntent.putExtra(KEY_STRING_URL, stringUrl);

@@ -7,6 +7,8 @@ import static com.android.woojn.coursebookmarkapplication.Constants.PAGE_ITEM;
 import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.currentFolderId;
 import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.isFabOpen;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.insertDefaultFolderIfNeeded;
+
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.insertInitialData;
 import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.toggleGridColumn;
 
 import android.content.Intent;
@@ -136,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = mSharedPreferences.edit();
             editor.putInt(getString(R.string.pref_key_zero_means_first_run), 1);
             editor.apply();
+            insertInitialData(this);
         }
     }
 
@@ -186,14 +189,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void showOnboarderActivity() {
         List<OnboardingPage> pages = new LinkedList<>();
-        OnboardingPage page1 = new OnboardingPage(null, "desc", R.drawable.splash);
-        OnboardingPage page2 = new OnboardingPage(null, "desc2", R.drawable.splash);
-        OnboardingPage page3 = new OnboardingPage(null, "desc3", R.drawable.ic_ui_home, "시작하기");
+        OnboardingPage page1 = new OnboardingPage("<기능 소개>\n검색어 지정", "코스 별, 그룹 별로\n검색어를 지정할 수 있습니다.", R.drawable.onboarder1);
+        OnboardingPage page2 = new OnboardingPage("<기능 소개>\n자동 검색 및 저장", "지정해둔 검색어로 자동 검색합니다.\n어플 안에서 원하는 페이지를 찾아 저장합니다.", R.drawable.onboarder2);
+        OnboardingPage page3 = new OnboardingPage("<기능 소개>\n공유 받기", "다른 어플에서 보던 내용도\n공유 기능을 사용하여 손쉽게 저장합니다.", R.drawable.onboarder3);
+        OnboardingPage page4 = new OnboardingPage("<기능 소개>\n공유 하기", "저장해둔 항목들은\n깔끔하게 정리하여 공유할 수 있습니다.", R.drawable.onboarder4);
+        OnboardingPage page5 = new OnboardingPage("[사용법]\n항목 수정", "연달아 터치하여\n항목을 수정합니다.", R.drawable.onboarder5);
+        OnboardingPage page6 = new OnboardingPage("[사용법]\n항목 삭제", "길게 터치하여\n항목을 삭제합니다.", R.drawable.onboarder6);
+        OnboardingPage page7 = new OnboardingPage(null, "Course Bookmark with Efficiency\n효율적인 북마크 관리", R.drawable.icon, getString(R.string.string_start));
+
         pages.add(page1);
         pages.add(page2);
         pages.add(page3);
+        pages.add(page4);
+        pages.add(page5);
+        pages.add(page6);
+        pages.add(page7);
 
-        Bundle bundle = OnboardingActivity.newBundleColorBackground(R.color.colorAccent, pages);
+        for (OnboardingPage page : pages) {
+            page.setTitleTextColor(android.R.color.black);
+            page.setBodyTextColor(android.R.color.black);
+        }
+
+        Bundle bundle = OnboardingActivity.newBundleColorBackground(R.color.colorBackgroundOnboarder, pages);
         Intent intent = new Intent(this, GuideActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);

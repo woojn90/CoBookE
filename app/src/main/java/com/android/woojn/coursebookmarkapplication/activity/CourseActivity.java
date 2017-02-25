@@ -79,9 +79,10 @@ public class CourseActivity extends AppCompatActivity
     protected RecyclerView mRecyclerViewSection;
 
     private Realm mRealm;
-    private Course mCourse;
     private SharedPreferences mSharedPreferences;
     private Toast mToast;
+
+    public static Course currentCourse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,22 +98,22 @@ public class CourseActivity extends AppCompatActivity
         int courseId = getIntent().getIntExtra(KEY_COURSE_ID, 0);
 
         mRealm = Realm.getDefaultInstance();
-        mCourse = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, courseId).findFirst();
+        currentCourse = mRealm.where(Course.class).equalTo(FIELD_NAME_ID, courseId).findFirst();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         setAllTextView();
-        toggleFavoriteImageView(mCourse.isFavorite());
+        toggleFavoriteImageView(currentCourse.isFavorite());
 
-        RealmResults<Section> sections = mCourse.getSections().sort(FIELD_NAME_ID);
+        RealmResults<Section> sections = currentCourse.getSections().sort(FIELD_NAME_ID);
         mRecyclerViewSection.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerViewSection.setAdapter(new CourseSectionAdapter(this, sections, this));
-        updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
+        updateTextViewEmptyVisibility(Section.class, currentCourse.getId(), mTextViewSectionEmpty);
 
         final GestureDetector gd = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                showCourseDialog(mCourse.getTitle(), mCourse.getSearchWord(), mCourse.getDesc());
+                showCourseDialog(currentCourse.getTitle(), currentCourse.getSearchWord(), currentCourse.getDesc());
                 return true;
             }
         });
@@ -129,7 +130,7 @@ public class CourseActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        for (Section section : mCourse.getSections()) {
+        for (Section section : currentCourse.getSections()) {
             for (Item item : section.getItems()) {
                 if (!item.isVisited()) {
                     retrieveSectionItemById(item.getId());
@@ -155,7 +156,7 @@ public class CourseActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                shareTextByRealmObject(this, mCourse);
+                shareTextByRealmObject(this, currentCourse);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -217,12 +218,12 @@ public class CourseActivity extends AppCompatActivity
     }
 
     private void setAllTextView() {
-        mTextViewCourseTitle.setText(mCourse.getTitle());
-        mTextViewCourseSearchWord.setText("(" + mCourse.getSearchWord() + ")");
-        String desc = mCourse.getDesc();
+        mTextViewCourseTitle.setText(currentCourse.getTitle());
+        mTextViewCourseSearchWord.setText("(" + currentCourse.getSearchWord() + ")");
+        String desc = currentCourse.getDesc();
         if (desc != null && !desc.isEmpty()) {
             mTextViewCourseDesc.setVisibility(View.VISIBLE);
-            mTextViewCourseDesc.setText(mCourse.getDesc());
+            mTextViewCourseDesc.setText(currentCourse.getDesc());
         } else {
             mTextViewCourseDesc.setVisibility(View.GONE);
         }
@@ -232,14 +233,14 @@ public class CourseActivity extends AppCompatActivity
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                if (mCourse.isFavorite()) {
-                    mCourse.setFavorite(false);
+                if (currentCourse.isFavorite()) {
+                    currentCourse.setFavorite(false);
                     showToastByForce(R.string.msg_favorite_n);
                 } else {
-                    mCourse.setFavorite(true);
+                    currentCourse.setFavorite(true);
                     showToastByForce(R.string.msg_favorite_y);
                 }
-                toggleFavoriteImageView(mCourse.isFavorite());
+                toggleFavoriteImageView(currentCourse.isFavorite());
             }
         });
     }
@@ -270,13 +271,13 @@ public class CourseActivity extends AppCompatActivity
         section.deleteFromRealm();
         mRealm.commitTransaction();
         showToastByForce(R.string.msg_delete);
-        updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
+        updateTextViewEmptyVisibility(Section.class, currentCourse.getId(), mTextViewSectionEmpty);
     }
 
     private void searchAndShowResults(Section section) {
         String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_target_of_auto_search),
                 getString(R.string.pref_value_target_of_auto_search_naver_total));
-        String query = mCourse.getSearchWord() + " " + section.getSearchWord();
+        String query = currentCourse.getSearchWord() + " " + section.getSearchWord();
 
         if (getString(R.string.pref_value_target_of_auto_search_instagram).equals(searchEngine)) {
             query = query.replace(" ", "");
@@ -318,9 +319,9 @@ public class CourseActivity extends AppCompatActivity
                 String Desc = editTextDesc.getText().toString();
 
                 mRealm.beginTransaction();
-                mCourse.setTitle(title);
-                mCourse.setSearchWord(searchWord);
-                mCourse.setDesc(Desc);
+                currentCourse.setTitle(title);
+                currentCourse.setSearchWord(searchWord);
+                currentCourse.setDesc(Desc);
                 mRealm.commitTransaction();
                 setAllTextView();
             }
@@ -406,8 +407,8 @@ public class CourseActivity extends AppCompatActivity
                     section = mRealm.createObject(Section.class, sectionId);
                     section.setTitle(title);
                     section.setSearchWord(searchWord);
-                    mCourse.getSections().add(section);
-                    updateTextViewEmptyVisibility(Section.class, mCourse.getId(), mTextViewSectionEmpty);
+                    currentCourse.getSections().add(section);
+                    updateTextViewEmptyVisibility(Section.class, currentCourse.getId(), mTextViewSectionEmpty);
                 }
                 mRealm.commitTransaction();
             }

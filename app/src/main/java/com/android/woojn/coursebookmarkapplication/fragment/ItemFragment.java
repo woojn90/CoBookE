@@ -331,8 +331,8 @@ public class ItemFragment extends Fragment
                                 showFolderChangeDialog(item);
                                 return true;
                             case R.id.item_share_item:
-                            shareTextByRealmObject(getContext(), item);
-                            return true;
+                                shareTextByRealmObject(getContext(), item);
+                                return true;
                         }
                         return false;
                     }
@@ -458,6 +458,7 @@ public class ItemFragment extends Fragment
         item.deleteFromRealm();
         mRealm.commitTransaction();
         showToastByForce(R.string.msg_delete);
+        updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
     private void insertFolder() {
@@ -493,6 +494,7 @@ public class ItemFragment extends Fragment
         deleteItemsAndFoldersInsideFolder(folder);
         mRealm.commitTransaction();
         showToastByForce(R.string.msg_delete);
+        updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
     }
 
     /**
@@ -557,8 +559,9 @@ public class ItemFragment extends Fragment
                     }
 
                 }
-                showToastByForce(getString(R.string.msg_prefix_folder_move) + changeFolder.getTitle() +
-                        getString(R.string.msg_postfix_folder_move));
+                showToastByForce(getString(R.string.msg_prefix_move) + changeFolder.getTitle() +
+                        getString(R.string.msg_postfix_move_folder));
+                updateTextViewEmptyVisibilityByFolderId(currentFolderId, mTextViewItemEmpty);
             }
         });
 

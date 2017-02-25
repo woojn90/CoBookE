@@ -10,4 +10,5 @@
     <color name="colorBackground">#fffcf6</color>
     <color name="colorBackgroundSecond">#fffdf9</color>
     <color name="colorTextColorActionBar">#f9f9f9</color>
+    <color name="colorBackgroundOnboarder">#ffdaa6</color>
 </resources>

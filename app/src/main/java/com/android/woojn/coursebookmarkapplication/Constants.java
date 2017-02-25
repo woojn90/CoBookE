@@ -18,5 +18,5 @@ public class Constants {
     public static final int DEFAULT_SECTION_ID = 0;
     public static final int DEFAULT_FOLDER_ID = 0;
     public static final int PAGE_COURSE = 0;
-    public static final int PAGE_ITEM = 1;
+    public static final int PAGE_ITEM = PAGE_COURSE + 1;
 }

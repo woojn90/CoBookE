@@ -3,6 +3,7 @@ package com.android.woojn.coursebookmarkapplication.adapter;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
+import static com.android.woojn.coursebookmarkapplication.activity.CourseActivity.currentCourse;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showItemDialog;
 import static com.android.woojn.coursebookmarkapplication.util.DisplayUtility.showPopupMenuIcon;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
@@ -23,6 +24,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,11 +34,14 @@ import com.android.woojn.coursebookmarkapplication.activity.WebActivity;
 import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmRecyclerViewAdapter;
 import io.realm.RealmResults;
 
@@ -169,7 +175,11 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
                             Realm realm = Realm.getDefaultInstance();
                             Item item = realm.where(Item.class).equalTo(FIELD_NAME_ID, id).findFirst();
                             switch (menuItem.getItemId()) {
-                                case R.id.item_share_section_item:
+                                case R.id.item_change_item:
+                                    showSectionChangeDialog(item);
+                                    realm.close();
+                                    return true;
+                                case R.id.item_share_item:
                                     shareTextByRealmObject(mContext, item);
                                     realm.close();
                                     return true;
@@ -178,11 +188,70 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
                             return false;
                         }
                     });
-                    popupMenu.inflate(R.menu.menu_in_section_item_view);
+                    popupMenu.inflate(R.menu.menu_in_item_view);
                     popupMenu.show();
                     showPopupMenuIcon(popupMenu);
                     break;
             }
+        }
+
+        private void showSectionChangeDialog(final Item item) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            final View dialogView = ((LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.dialog_folder_change, null);
+            builder.setView(dialogView);
+            final Spinner spinnerSection = (Spinner) dialogView.findViewById(R.id.sp_folder_change_dropdown);
+
+            final int sectionId = (int) itemView.getTag();
+            boolean hasData = setSpinnerData(spinnerSection, sectionId);
+
+            builder.setTitle(R.string.string_section_change);
+            builder.setNegativeButton(R.string.string_cancel, null);
+            builder.setPositiveButton(R.string.string_change, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Realm realm = Realm.getDefaultInstance();
+                    Section currentSection = realm.where(Section.class).equalTo(FIELD_NAME_ID, sectionId).findFirst();
+                    Section changeSection = (Section) spinnerSection.getSelectedItem();
+
+                    realm.beginTransaction();
+                    currentSection.getItems().remove(item);
+                    changeSection.getItems().add(item);
+                    realm.commitTransaction();
+                    realm.close();
+                    showToastByForce(mContext.getString(R.string.msg_prefix_move) + changeSection.getTitle() +
+                            mContext.getString(R.string.msg_postfix_move_section));
+                }
+            });
+
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            if (!hasData) {
+                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setEnabled(false);
+            }
+        }
+
+        private boolean setSpinnerData(Spinner spinner, int selectedSectionId) {
+            ArrayList<Section> sectionsToDisplay = new ArrayList<>();
+            Realm realm = Realm.getDefaultInstance();
+            RealmList<Section> sections = currentCourse.getSections();
+            realm.close();
+
+            for (Section section : sections) {
+                int sectionId = section.getId();
+                if (sectionId != selectedSectionId) {
+                    sectionsToDisplay.add(section);
+                }
+            }
+
+            ArrayAdapter<Section> adapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_dropdown_item, sectionsToDisplay);
+            spinner.setAdapter(adapter);
+            spinner.setSelection(0);
+
+            if (sectionsToDisplay.size() > 0) {
+                return true;
+            }
+            return false;
         }
 
         private void deleteSectionItem(final Item item) {
@@ -208,12 +277,24 @@ public class CourseSectionAdapter extends RealmRecyclerViewAdapter<Section, Cour
             item.deleteFromRealm();
             realm.commitTransaction();
             realm.close();
+            showToastByForce(R.string.msg_delete);
+            updateTextViewEmptyVisibility(Item.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
+        }
+
+        private void showToastByForce(int resId) {
             if (mToast != null) {
                 mToast.cancel();
             }
-            mToast = Toast.makeText(mContext, R.string.msg_delete, Toast.LENGTH_LONG);
+            mToast = Toast.makeText(mContext, resId, Toast.LENGTH_LONG);
             mToast.show();
-            updateTextViewEmptyVisibility(Item.class, (int) itemView.getTag(), textViewCourseSectionDetailEmpty);
+        }
+
+        private void showToastByForce(String text) {
+            if (mToast != null) {
+                mToast.cancel();
+            }
+            mToast = Toast.makeText(mContext, text, Toast.LENGTH_LONG);
+            mToast.show();
         }
     }
 }

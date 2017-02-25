@@ -19,6 +19,7 @@
     <string name="menu_save">저장하기</string>
 
     <!-- UI -->
+    <string name="string_start">시작하기</string>
     <string name="string_course">코스</string>
     <string name="string_item">항목</string>
     <string name="string_title">제목</string>
@@ -29,8 +30,9 @@
     <string name="string_cancel">취소</string>
     <string name="string_change">변경</string>
     <string name="string_search_word">검색어</string>
-    <string name="string_section_info">코스 그룹 정보</string>
     <string name="string_course_info">코스 정보</string>
+    <string name="string_section_info">코스 그룹 정보</string>
+    <string name="string_section_change">코스 그룹 변경</string>
     <string name="string_item_info">항목 정보</string>
     <string name="string_folder_info">폴더 정보</string>
     <string name="string_folder_change">폴더 변경</string>
@@ -71,8 +73,9 @@
 
     <string name="msg_invalid_url_home">적합한 주소가 아니므로 홈페이지로 연결합니다.</string>
     <string name="msg_invalid_url_not_save">저장할 수 없습니다. 해당 웹 주소를 개발자 메일로 보내주세요.</string>
-    <string name="msg_prefix_folder_move">[</string>
-    <string name="msg_postfix_folder_move">] 폴더로 위치가 변경되었습니다.</string>
+    <string name="msg_prefix_move">[</string>
+    <string name="msg_postfix_move_folder">] 폴더로 위치가 변경되었습니다.</string>
+    <string name="msg_postfix_move_section">] 그룹으로 위치가 변경되었습니다.</string>
     <string name="msg_impossible_to_move_to_child">자신보다 하위 폴더로 이동할 수 없습니다.</string>
     <string name="msg_no_preview_image">대표 이미지가 없습니다.</string>
     <string name="msg_exit_twice">뒤로 버튼을 다시 누르면 종료됩니다.</string>
@@ -90,7 +93,7 @@
     <string name="pref_label_home_page_daum">다음</string>
     <string name="pref_value_home_page_naver">http://m.naver.com</string>
     <string name="pref_value_home_page_google">http://www.google.com</string>
-    <string name="pref_value_home_page_daum">http://www.daum.net</string>
+    <string name="pref_value_home_page_daum">http://m.daum.net</string>
 
     <string name="pref_label_target_of_auto_search">자동 검색 대상</string>
     <string name="pref_key_target_of_auto_search" translatable="false">target_of_auto_search</string>

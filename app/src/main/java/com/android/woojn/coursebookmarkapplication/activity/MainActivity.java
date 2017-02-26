@@ -7,7 +7,6 @@ import static com.android.woojn.coursebookmarkapplication.Constants.PAGE_ITEM;
 import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.currentFolderId;
 import static com.android.woojn.coursebookmarkapplication.fragment.ItemFragment.isFabOpen;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.insertDefaultFolderIfNeeded;
-
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.insertInitialData;
 import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.toggleGridColumn;
 
@@ -123,13 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (getIntent() != null && getIntent().hasExtra(KEY_FOLDER_ID)) {
-            mTabLayout.getTabAt(PAGE_ITEM).select();
-            // TODO: 해당 폴더로 이동하게 (ArrayList<Integer> foldedIds 처리가 복잡하여 보류)
-        } else {
-            int tabIndex = Integer.parseInt(mSharedPreferences.getString(getString(R.string.pref_key_tab_index), PAGE_COURSE + ""));
-            mTabLayout.getTabAt(tabIndex).select();
-        }
+        int tabIndex = Integer.parseInt(mSharedPreferences.getString(getString(R.string.pref_key_tab_index), PAGE_COURSE + ""));
+        mTabLayout.getTabAt(tabIndex).select();
         initializeFabByTabPosition(mTabLayout.getSelectedTabPosition());
 
         int firstRun = mSharedPreferences.getInt(getString(R.string.pref_key_zero_means_first_run), 0);
@@ -143,10 +137,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        if (isFabOpen) {
-            animateFabItemsClose();
+    protected void onResume() {
+        super.onResume();
+        if (getIntent() != null && getIntent().hasExtra(KEY_FOLDER_ID)) {
+            mTabLayout.getTabAt(PAGE_ITEM).select();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        if (isFabOpen) animateFabItemsClose();
         super.onPause();
     }
 

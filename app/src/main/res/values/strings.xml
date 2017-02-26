@@ -73,6 +73,8 @@
 
     <string name="msg_invalid_url_home">적합한 주소가 아니므로 홈페이지로 연결합니다.</string>
     <string name="msg_invalid_url_not_save">저장할 수 없습니다. 해당 웹 주소를 개발자 메일로 보내주세요.</string>
+    <string name="msg_prefix_save">[</string>
+    <string name="msg_postfix_save">] 폴더로 저장되었습니다.</string>
     <string name="msg_prefix_move">[</string>
     <string name="msg_postfix_move_folder">] 폴더로 위치가 변경되었습니다.</string>
     <string name="msg_postfix_move_section">] 그룹으로 위치가 변경되었습니다.</string>

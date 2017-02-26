@@ -181,6 +181,14 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
         mToast.show();
     }
 
+    private void showToastByForce(String text) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this, text, Toast.LENGTH_LONG);
+        mToast.show();
+    }
+
     private void setSpinnerData() {
         ArrayList<Folder> foldersToDisplay = new ArrayList<>();
         RealmResults<Folder> folders = mRealm.where(Folder.class).findAll().sort(FIELD_NAME_ID);
@@ -213,7 +221,8 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
         folder.getItems().add(mItem);
         mRealm.commitTransaction();
 
-        showToastByForce(R.string.msg_save_bookmark);
+        showToastByForce(getString(R.string.msg_prefix_save) + folder.getTitle() +
+                getString(R.string.msg_postfix_save));
         mIsSaved = true;
         finishAndRemoveTask();
     }

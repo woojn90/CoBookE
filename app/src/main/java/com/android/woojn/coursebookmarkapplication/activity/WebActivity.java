@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -235,26 +237,30 @@ public class WebActivity extends AppCompatActivity {
         Realm realm = Realm.getDefaultInstance();
         int newItemId = getNewIdByClass(Item.class);
 
-        realm.beginTransaction();
-        Item item = realm.createObject(Item.class, newItemId);
-        item.setUrl(mWebView.getUrl());
-        item.setTitle(getString(R.string.string_default_title));
-        item.setDesc(getString(R.string.string_default_desc));
-        item.setVisited(false);
-        realm.commitTransaction();
+        if (URLUtil.isValidUrl(mWebView.getUrl()) && Patterns.WEB_URL.matcher(mWebView.getUrl()).matches()) {
+            realm.beginTransaction();
+            Item item = realm.createObject(Item.class, newItemId);
+            item.setUrl(mWebView.getUrl());
+            item.setTitle(getString(R.string.string_default_title));
+            item.setDesc(getString(R.string.string_default_desc));
+            item.setVisited(false);
+            realm.commitTransaction();
 
-        if (mSectionId != DEFAULT_SECTION_ID) {
-            Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, mSectionId).findFirst();
-            realm.beginTransaction();
-            section.getItems().add(item);
-            realm.commitTransaction();
+            if (mSectionId != DEFAULT_SECTION_ID) {
+                Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, mSectionId).findFirst();
+                realm.beginTransaction();
+                section.getItems().add(item);
+                realm.commitTransaction();
+            } else {
+                Folder parentFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, mFolderId).findFirst();
+                realm.beginTransaction();
+                parentFolder.getItems().add(item);
+                realm.commitTransaction();
+            }
+            realm.close();
+            showToastByForce(R.string.msg_save_bookmark);
         } else {
-            Folder parentFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, mFolderId).findFirst();
-            realm.beginTransaction();
-            parentFolder.getItems().add(item);
-            realm.commitTransaction();
+            showToastByForce(R.string.msg_invalid_url_not_valid);
         }
-        realm.close();
-        showToastByForce(R.string.msg_save_bookmark);
     }
 }

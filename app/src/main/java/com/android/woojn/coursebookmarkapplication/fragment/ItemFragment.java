@@ -26,6 +26,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -224,7 +225,7 @@ public class ItemFragment extends Fragment
 
         TextView textViewInside = new TextView(getContext());
         textViewInside.setText(">");
-        textViewInside.setTextSize(19);
+        textViewInside.setTextSize(18);
         textViewInside.setPadding(8, 0, 8, 0);
         textViewInside.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -233,7 +234,7 @@ public class ItemFragment extends Fragment
 
         TextView textViewFolder = new TextView(getContext());
         textViewFolder.setText(folder.getTitle());
-        textViewFolder.setTextSize(19);
+        textViewFolder.setTextSize(18);
         textViewFolder.setPadding(8, 0, 8, 0);
         textViewFolder.setTag(id);
         textViewFolder.setLayoutParams(new LinearLayout.LayoutParams(
@@ -508,7 +509,7 @@ public class ItemFragment extends Fragment
         deleteItemsInsideFolder(parentFolder);
         RealmList<Folder> folders = parentFolder.getFolders();
         for (int i = folders.size() - 1; i >= 0; i--) {
-            deleteItemsInsideFolder(folders.get(i));
+            deleteItemsAndFoldersInsideFolder(folders.get(i));
         }
         parentFolder.deleteFromRealm();
     }

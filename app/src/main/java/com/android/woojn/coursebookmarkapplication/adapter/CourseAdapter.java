@@ -36,14 +36,13 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
 
     public interface OnRecyclerViewClickListener {
         void onItemClick(int id, int viewId);
-        void onItemLongClick(int id);
         void onItemDoubleTap(int id);
     }
 
     @Override
     public CourseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.course_list_item, parent, false);
+        View view = inflater.inflate(R.layout.list_item_of_course, parent, false);
         return new CourseViewHolder(view);
     }
 
@@ -93,12 +92,6 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
                 }
 
                 @Override
-                public void onLongPress(MotionEvent e) {
-                    mListener.onItemLongClick((int) itemView.getTag());
-                    return;
-                }
-
-                @Override
                 public boolean onDoubleTap(MotionEvent e) {
                     mListener.onItemDoubleTap((int) itemView.getTag());
                     return true;
@@ -125,6 +118,11 @@ public class CourseAdapter extends RealmRecyclerViewAdapter<Course, CourseAdapte
         public void onClickImageViewFavoriteN(View view) {
             imageViewFavoriteN.setVisibility(View.GONE);
             imageViewFavoriteY.setVisibility(View.VISIBLE);
+            mListener.onItemClick((int) itemView.getTag(), view.getId());
+        }
+
+        @OnClick(R.id.btn_course_delete)
+        public void onClickButtonCourseDelete(View view) {
             mListener.onItemClick((int) itemView.getTag(), view.getId());
         }
     }

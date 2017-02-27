@@ -30,11 +30,11 @@ import io.realm.RealmRecyclerViewAdapter;
  * Created by wjn on 2017-02-07.
  */
 
-public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, CourseSectionItemAdapter.CourseSectionItemViewHolder> {
+public class SectionItemAdapter extends RealmRecyclerViewAdapter<Item, SectionItemAdapter.SectionItemViewHolder> {
 
     private final OnRecyclerViewClickListener mListener;
 
-    public CourseSectionItemAdapter(Context context, OrderedRealmCollection<Item> data, OnRecyclerViewClickListener listener) {
+    public SectionItemAdapter(Context context, OrderedRealmCollection<Item> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
         mListener = listener;
     }
@@ -47,14 +47,14 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
     }
 
     @Override
-    public CourseSectionItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SectionItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.course_section_item_list_item, parent, false);
-        return new CourseSectionItemViewHolder(view);
+        View view = inflater.inflate(R.layout.list_item_of_section_item, parent, false);
+        return new SectionItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final CourseSectionItemViewHolder holder, int position) {
+    public void onBindViewHolder(final SectionItemViewHolder holder, int position) {
         if (getData() != null) {
             Item item = getData().get(position);
 
@@ -96,7 +96,7 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
         }
     }
 
-    class CourseSectionItemViewHolder extends RecyclerView.ViewHolder {
+    class SectionItemViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.layout_section_item)
         LinearLayout linearLayoutSectionItem;
@@ -115,7 +115,7 @@ public class CourseSectionItemAdapter extends RealmRecyclerViewAdapter<Item, Cou
         @BindView(R.id.pg_section_item_preview)
         ProgressBar progressBarSectionItemPreview;
 
-        public CourseSectionItemViewHolder(final View itemView) {
+        public SectionItemViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 

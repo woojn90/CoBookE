@@ -49,7 +49,7 @@ public class ItemAdapter extends RealmRecyclerViewAdapter <Item, ItemAdapter.Ite
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.item_list_item, parent, false);
+        View view = inflater.inflate(R.layout.list_item_of_item, parent, false);
         return new ItemViewHolder(view);
     }
 

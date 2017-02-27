@@ -53,12 +53,12 @@ public class DisplayUtility {
         editTextDesc.setText(beforeDesc);
 
         builder.setTitle(R.string.string_item_info);
-        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setNeutralButton(R.string.string_cancel, null);
         builder.setPositiveButton(R.string.string_update, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String title = editTextTitle.getText().toString();
-                String Desc = editTextDesc.getText().toString();
+                String title = editTextTitle.getText().toString().trim();
+                String Desc = editTextDesc.getText().toString().trim();
 
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
@@ -125,11 +125,11 @@ public class DisplayUtility {
         editTextTitle.setText(beforeTitle);
 
         builder.setTitle(R.string.string_folder_info);
-        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setNeutralButton(R.string.string_cancel, null);
         builder.setPositiveButton(R.string.string_update, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String title = editTextTitle.getText().toString();
+                String title = editTextTitle.getText().toString().trim();
 
                 Realm realm = Realm.getDefaultInstance();
                 Folder folder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, folderId).findFirst();

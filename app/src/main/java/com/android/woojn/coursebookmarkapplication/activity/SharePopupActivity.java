@@ -9,9 +9,11 @@ import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.in
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.URLUtil;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -92,9 +94,9 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
         if (shareIntent != null && Intent.ACTION_SEND.equals(shareIntent.getAction())
                 && "text/plain".equals(shareIntent.getType())) {
             String sharedText = shareIntent.getStringExtra(Intent.EXTRA_TEXT);
-            if (sharedText != null) {
+            if (sharedText != null && sharedText.contains("http")) {
                 String stringUrl = sharedText.substring(sharedText.indexOf("http"));
-                if (stringUrl.length() > 0) {
+                if (URLUtil.isValidUrl(stringUrl) && Patterns.WEB_URL.matcher(stringUrl).matches()) {
                     mTextViewShareUrl.setText(stringUrl);
 
                     mRealm.beginTransaction();
@@ -108,9 +110,13 @@ public class SharePopupActivity extends AppCompatActivity implements RealmChange
 
                     new ParseAsyncTask().execute(mItemId, null, null);
                     return;
+                } else {
+                    showToastByForce(R.string.msg_invalid_url_not_valid);
+                    finishAndRemoveTask();
+                    return;
                 }
             }
-            showToastByForce(R.string.msg_invalid_url_not_save);
+            showToastByForce(R.string.msg_invalid_url_not_contain_http);
             finishAndRemoveTask();
         }
     }

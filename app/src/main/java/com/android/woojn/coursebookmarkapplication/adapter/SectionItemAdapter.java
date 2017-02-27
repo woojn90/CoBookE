@@ -27,14 +27,14 @@ import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
 /**
- * Created by wjn on 2017-02-18.
+ * Created by wjn on 2017-02-07.
  */
 
-public class ItemAdapter extends RealmRecyclerViewAdapter <Item, ItemAdapter.ItemViewHolder> {
+public class SectionItemAdapter extends RealmRecyclerViewAdapter<Item, SectionItemAdapter.SectionItemViewHolder> {
 
     private final OnRecyclerViewClickListener mListener;
 
-    public ItemAdapter(Context context, OrderedRealmCollection data, OnRecyclerViewClickListener listener) {
+    public SectionItemAdapter(Context context, OrderedRealmCollection<Item> data, OnRecyclerViewClickListener listener) {
         super(context, data, true);
         mListener = listener;
     }
@@ -47,22 +47,22 @@ public class ItemAdapter extends RealmRecyclerViewAdapter <Item, ItemAdapter.Ite
     }
 
     @Override
-    public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SectionItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.list_item_of_item, parent, false);
-        return new ItemViewHolder(view);
+        View view = inflater.inflate(R.layout.list_item_of_section_item, parent, false);
+        return new SectionItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ItemViewHolder holder, int position) {
+    public void onBindViewHolder(final SectionItemViewHolder holder, int position) {
         if (getData() != null) {
             Item item = getData().get(position);
 
             if (item.isVisited()) {
                 holder.itemView.setTag(item.getId());
-                holder.textViewItemTitle.setText(item.getTitle());
-                holder.textViewItemDesc.setText(item.getDesc());
-                holder.textViewItemUrl.setText(item.getUrl());
+                holder.textViewSectionItemTitle.setText(item.getTitle());
+                holder.textViewSectionItemDesc.setText(item.getDesc());
+                holder.textViewSectionItemUrl.setText(item.getUrl());
 
                 Glide.with(this.context)
                         .load(item.getImageUrl())
@@ -70,52 +70,52 @@ public class ItemAdapter extends RealmRecyclerViewAdapter <Item, ItemAdapter.Ite
                             @Override
                             public boolean onException(Exception e, String model,
                                     Target<GlideDrawable> target, boolean isFirstResource) {
-                                holder.progressBarItemPreview.setVisibility(View.INVISIBLE);
-                                holder.textViewItemPreview.setVisibility(View.VISIBLE);
+                                holder.progressBarSectionItemPreview.setVisibility(View.INVISIBLE);
+                                holder.textViewSectionItemPreview.setVisibility(View.VISIBLE);
                                 return false;
                             }
 
                             @Override
                             public boolean onResourceReady(GlideDrawable resource, String model,
                                     Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                holder.progressBarItemPreview.setVisibility(View.INVISIBLE);
-                                holder.textViewItemPreview.setVisibility(View.VISIBLE);
+                                holder.progressBarSectionItemPreview.setVisibility(View.INVISIBLE);
+                                holder.textViewSectionItemPreview.setVisibility(View.VISIBLE);
                                 return false;
                             }
                         })
                         .thumbnail(0.1f)
                         .centerCrop()
-                        .into(holder.imageViewItemPreview);
+                        .into(holder.imageViewSectionItemPreview);
 
-                holder.progressBarItem.setVisibility(View.INVISIBLE);
-                holder.linearLayoutItem.setVisibility(View.VISIBLE);
+                holder.progressBarSectionItem.setVisibility(View.INVISIBLE);
+                holder.linearLayoutSectionItem.setVisibility(View.VISIBLE);
             } else {
-                holder.linearLayoutItem.setVisibility(View.INVISIBLE);
-                holder.progressBarItem.setVisibility(View.VISIBLE);
+                holder.linearLayoutSectionItem.setVisibility(View.INVISIBLE);
+                holder.progressBarSectionItem.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    class ItemViewHolder extends RecyclerView.ViewHolder {
+    class SectionItemViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.layout_item)
-        LinearLayout linearLayoutItem;
-        @BindView(R.id.pg_item)
-        ProgressBar progressBarItem;
-        @BindView(R.id.tv_item_title)
-        TextView textViewItemTitle;
-        @BindView(R.id.tv_item_desc)
-        TextView textViewItemDesc;
-        @BindView(R.id.tv_item_url)
-        TextView textViewItemUrl;
-        @BindView(R.id.tv_item_preview)
-        TextView textViewItemPreview;
-        @BindView(R.id.iv_item_preview)
-        ImageView imageViewItemPreview;
-        @BindView(R.id.pg_item_preview)
-        ProgressBar progressBarItemPreview;
+        @BindView(R.id.layout_section_item)
+        LinearLayout linearLayoutSectionItem;
+        @BindView(R.id.pg_section_item)
+        ProgressBar progressBarSectionItem;
+        @BindView(R.id.tv_section_item_title)
+        TextView textViewSectionItemTitle;
+        @BindView(R.id.tv_section_item_desc)
+        TextView textViewSectionItemDesc;
+        @BindView(R.id.tv_section_item_url)
+        TextView textViewSectionItemUrl;
+        @BindView(R.id.tv_section_item_preview)
+        TextView textViewSectionItemPreview;
+        @BindView(R.id.iv_section_item_preview)
+        ImageView imageViewSectionItemPreview;
+        @BindView(R.id.pg_section_item_preview)
+        ProgressBar progressBarSectionItemPreview;
 
-        public ItemViewHolder(final View itemView) {
+        public SectionItemViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
@@ -148,8 +148,8 @@ public class ItemAdapter extends RealmRecyclerViewAdapter <Item, ItemAdapter.Ite
             });
         }
 
-        @OnClick(R.id.btn_item_overflow)
-        public void onClickButtonItemOverflow(View view) {
+        @OnClick(R.id.btn_section_item_overflow)
+        public void onClickButtonSectionItemOverflow(View view) {
             mListener.onItemInItemClick((int) itemView.getTag(), view);
         }
     }

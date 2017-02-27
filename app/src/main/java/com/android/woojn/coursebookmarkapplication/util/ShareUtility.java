@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.android.woojn.coursebookmarkapplication.R;
 import com.android.woojn.coursebookmarkapplication.model.Course;
+import com.android.woojn.coursebookmarkapplication.model.Folder;
 import com.android.woojn.coursebookmarkapplication.model.Item;
 import com.android.woojn.coursebookmarkapplication.model.Section;
 
@@ -55,8 +56,31 @@ public class ShareUtility {
                     textToShare.append("\n" + item.getUrl());
                 }
             }
+        } else if (realmObject instanceof Folder) {
+            Folder folder = (Folder) realmObject;
+            textToShare.append("[" + folder.getTitle() + "]\n");
+            textToShare = getTextInsideFolder(folder, textToShare, "");
         }
         return textToShare.toString();
+    }
+
+    private static StringBuffer getTextInsideFolder(Folder parentFolder, StringBuffer beforeSb, String whiteSpace) {
+        StringBuffer afterSb = beforeSb;
+
+        if (parentFolder.getFolders().size() > 0 || parentFolder.getItems().size() > 0) {
+            int count = 1;
+            for (Folder folder : parentFolder.getFolders()) {
+                afterSb.append("\n\n" + whiteSpace + count++ + ") [" + folder.getTitle() + "]");
+                afterSb = getTextInsideFolder(folder, beforeSb, whiteSpace + "  ");
+            }
+            for (Item item : parentFolder.getItems()) {
+                afterSb.append("\n\n" + whiteSpace + count++ + ") " + item.getTitle());
+                afterSb.append("\n" + whiteSpace + "   " + item.getUrl());
+            }
+        } else {
+            afterSb = beforeSb.append(whiteSpace + " (비어있음)");
+        }
+        return afterSb;
     }
 
 }

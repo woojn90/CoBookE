@@ -1,92 +1,155 @@
 /*
-	Fractal by HTML5 UP
+	Helios by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
-/* Button */
+/* Basic */
 
-	input[type="submit"],
-	input[type="reset"],
-	input[type="button"],
-	button,
-	.button {
-		position: relative;
-		-ms-behavior: url("assets/js/ie/PIE.htc");
-		border: solid 2px #e6e6e6 !important;
+	a {
+		border-bottom: solid 1px #ddd;
 	}
 
-		input[type="submit"]:hover,
-		input[type="reset"]:hover,
-		input[type="button"]:hover,
-		button:hover,
-		.button:hover {
-			border: solid 2px #e6e6e6 !important;
-		}
-
-		input[type="submit"].special,
-		input[type="reset"].special,
-		input[type="button"].special,
-		button.special,
-		.button.special {
-			border: none !important;
-		}
-
-			input[type="submit"].special:hover,
-			input[type="reset"].special:hover,
-			input[type="button"].special:hover,
-			button.special:hover,
-			.button.special:hover {
-				border: none !important;
-			}
-
-/* Image */
-
-	.image {
-		-ms-behavior: url("assets/js/ie/PIE.htc");
+	hr {
+		border-top: solid 1px #777;
+		border-bottom: solid 1px #777;
 	}
 
-		.image img {
-			position: relative;
-			-ms-behavior: url("assets/js/ie/PIE.htc");
-		}
+	.timestamp {
+		color: #777;
+	}
 
-		.image.phone:before, .image.phone:after {
-			display: none;
-		}
+/* Section/Article */
 
-		.image.phone .inner:before, .image.phone .inner:after {
-			display: none;
-		}
+	section > .last-child, section.last-child, article > .last-child, article.last-child {
+		margin-bottom: 0;
+	}
 
 /* List */
 
-	ul.icons li {
-		padding: 0 0 0 1.5em;
+	ul.divided li {
+		border-top: solid 1px #777;
 	}
 
-		ul.icons li:first-child {
-			padding-left: 0 !important;
-		}
-
-		ul.icons li .icon:before {
-			font-size: 24px;
-		}
-
-	ul.icons.major li {
-		padding: 0 0 0 2.5em;
+	ul.menu li {
+		border-left: solid 1px #777;
 	}
 
-		ul.icons.major li .icon:before {
-			font-size: 48px;
-		}
+	ul.icons {
+		background: #333;
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
+
+/* Button */
+
+	.button {
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
+
+/* Icons */
+
+	.icon.circled {
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
 
 /* Header */
 
 	#header {
-		min-height: 0;
+		-ms-behavior: url("assets/js/ie/backgroundsize.min.htc");
 	}
 
-		#header .image {
-			margin: 0 0 2em 0;
+	body.homepage #header {
+		height: auto;
+		min-height: 0;
+		padding: 12em 0 12em 0;
+	}
+
+		body.homepage #header:after {
+			display: none;
 		}
+
+/* Nav */
+
+	#nav > ul:before, #nav > ul:after {
+		border-top: solid 1px #777;
+		border-bottom: solid 1px #777;
+	}
+
+	#nav > ul > li {
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
+
+		#nav > ul > li.active {
+			border-color: #999;
+		}
+
+	.dropotron {
+		background: #fff;
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
+
+		.dropotron li {
+			border-color: #eee;
+			padding-right: 1em;
+			color: #5b5b5b;
+		}
+
+		.dropotron.level-0 {
+			box-shadow: none !important;
+			margin-top: 1em;
+		}
+
+/* Carousel */
+
+	.carousel .forward, .carousel .backward {
+		border-radius: 100%;
+		background-color: #483949;
+		width: 7em;
+		height: 7em;
+		margin-top: -3.5em;
+		border-radius: 100%;
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
+
+		.carousel .forward:before, .carousel .backward:before {
+			display: none;
+		}
+
+	.carousel .forward {
+		right: -3.5em;
+	}
+
+	.carousel .backward {
+		left: -3.5em;
+	}
+
+/* Footer */
+
+	#footer ul.divided li {
+		border-color: #3B373C;
+	}
+
+	#footer ul.menu li {
+		border-color: #3B373C;
+	}
+
+	#footer hr {
+		border-color: #3B373C;
+	}
+
+	#footer .icons {
+		background: #2F2930;
+	}
+
+	#footer .copyright {
+		color: #777;
+	}
+
+		#footer .copyright a {
+			color: #aaa;
+			border: 0;
+		}
+
+			#footer .copyright a:hover {
+				color: #ccc;
+			}

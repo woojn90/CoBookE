@@ -41,7 +41,7 @@ public class FolderAdapter extends RealmRecyclerViewAdapter <Folder, FolderAdapt
     @Override
     public FolderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.folder_list_item, parent, false);
+        View view = inflater.inflate(R.layout.list_item_of_folder, parent, false);
         return new FolderViewHolder(view);
     }
 

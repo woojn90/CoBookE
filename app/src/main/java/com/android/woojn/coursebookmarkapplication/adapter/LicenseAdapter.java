@@ -2,7 +2,6 @@ package com.android.woojn.coursebookmarkapplication.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,7 @@ public class LicenseAdapter extends RecyclerView.Adapter<LicenseAdapter.LicenseV
     @Override
     public LicenseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.license_list_item, parent, false);
+        View view = inflater.inflate(R.layout.list_item_of_license, parent, false);
         return new LicenseViewHolder(view);
     }
 

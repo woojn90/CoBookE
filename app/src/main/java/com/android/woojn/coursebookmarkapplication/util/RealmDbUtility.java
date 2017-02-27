@@ -100,11 +100,6 @@ public class RealmDbUtility {
         courseEx1.setSearchWord("강남역");
         courseEx1.setDesc("강남역 근처 코스 예시");
         courseEx1.setFavorite(true);
-        Course courseEx2 = realm.createObject(Course.class, getNewIdByClass(Course.class));
-        courseEx2.setTitle("동아리 모임 장소");
-        courseEx2.setSearchWord("종로3가역");
-        courseEx2.setDesc("종로3가역 근처 코스 예시");
-        courseEx2.setFavorite(false);
         Section sectionEx11 = realm.createObject(Section.class, getNewIdByClass(Section.class));
         sectionEx11.setTitle("식당");
         sectionEx11.setSearchWord("맛집");
@@ -139,12 +134,8 @@ public class RealmDbUtility {
 
         Folder folderEx1 = realm.createObject(Folder.class, getNewIdByClass(Folder.class));
         folderEx1.setTitle("공부");
-        Folder folderEx2 = realm.createObject(Folder.class, getNewIdByClass(Folder.class));
-        folderEx2.setTitle("패션");
         Folder folderEx3 = realm.createObject(Folder.class, getNewIdByClass(Folder.class));
-        folderEx3.setTitle("일상");
-        Folder folderEx4 = realm.createObject(Folder.class, getNewIdByClass(Folder.class));
-        folderEx4.setTitle("기타");
+        folderEx3.setTitle("뉴스");
 
         Item itemEx1 = realm.createObject(Item.class, getNewIdByClass(Item.class));
         itemEx1.setUrl(context.getString(R.string.pref_value_home_page_naver));
@@ -153,9 +144,7 @@ public class RealmDbUtility {
 
         Folder homeFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, DEFAULT_FOLDER_ID).findFirst();
         homeFolder.getFolders().add(folderEx1);
-        homeFolder.getFolders().add(folderEx2);
         homeFolder.getFolders().add(folderEx3);
-        homeFolder.getFolders().add(folderEx4);
         homeFolder.getItems().add(itemEx1);
         homeFolder.getItems().add(itemEx2);
 

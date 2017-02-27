@@ -6,7 +6,6 @@ import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibility;
-
 import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.isDeleteWithConfirm;
 import static com.android.woojn.coursebookmarkapplication.util.ShareUtility.shareTextByRealmObject;
 
@@ -31,14 +30,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
-import com.android.woojn.coursebookmarkapplication.adapter.CourseSectionAdapter;
+import com.android.woojn.coursebookmarkapplication.adapter.SectionAdapter;
 import com.android.woojn.coursebookmarkapplication.async.ParseAsyncTask;
 import com.android.woojn.coursebookmarkapplication.model.Course;
 import com.android.woojn.coursebookmarkapplication.model.Item;
@@ -46,6 +47,7 @@ import com.android.woojn.coursebookmarkapplication.model.Section;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,7 +61,7 @@ import io.realm.RealmResults;
  */
 
 public class CourseActivity extends AppCompatActivity
-        implements CourseSectionAdapter.OnRecyclerViewClickListener {
+        implements SectionAdapter.OnRecyclerViewClickListener {
 
     @BindView(R.id.layout_course_info)
     protected LinearLayout mLinearLayoutCourseInfo;
@@ -107,13 +109,13 @@ public class CourseActivity extends AppCompatActivity
 
         RealmResults<Section> sections = currentCourse.getSections().sort(FIELD_NAME_ID);
         mRecyclerViewSection.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerViewSection.setAdapter(new CourseSectionAdapter(this, sections, this));
+        mRecyclerViewSection.setAdapter(new SectionAdapter(this, sections, this));
         updateTextViewEmptyVisibility(Section.class, currentCourse.getId(), mTextViewSectionEmpty);
 
         final GestureDetector gd = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                showCourseDialog(currentCourse.getTitle(), currentCourse.getSearchWord(), currentCourse.getDesc());
+                showCourseDialog(currentCourse.getTitle(), currentCourse.getDesc(), currentCourse.getSearchWord());
                 return true;
             }
         });
@@ -155,6 +157,16 @@ public class CourseActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_merge_word:
+                ArrayList<String> jointWords = getJointWords();
+                if (jointWords != null) {
+                    if (jointWords.size() == 1) {
+                        setJointWord(jointWords.get(0));
+                    } else {
+                        showSelectJointWordDialog(jointWords);
+                    }
+                }
+                return true;
             case R.id.action_share:
                 shareTextByRealmObject(this, currentCourse);
                 return true;
@@ -172,13 +184,10 @@ public class CourseActivity extends AppCompatActivity
             case R.id.btn_section_share:
                 shareTextByRealmObject(CourseActivity.this, section);
                 break;
+            case R.id.btn_section_delete:
+                deleteSection(section);
+                break;
         }
-    }
-
-    @Override
-    public void onItemLongClick(int id) {
-        Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, id).findFirst();
-        deleteSection(section);
     }
 
     @Override
@@ -206,6 +215,14 @@ public class CourseActivity extends AppCompatActivity
         mToast.show();
     }
 
+    private void showToastByForce(String text) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this, text, Toast.LENGTH_LONG);
+        mToast.show();
+    }
+
     private void toggleFavoriteImageView(boolean isFavorite) {
         if (isFavorite) {
             mImageViewFavoriteN.setVisibility(View.GONE);
@@ -219,7 +236,12 @@ public class CourseActivity extends AppCompatActivity
 
     private void setAllTextView() {
         mTextViewCourseTitle.setText(currentCourse.getTitle());
-        mTextViewCourseSearchWord.setText("(" + currentCourse.getSearchWord() + ")");
+        String searchWord = currentCourse.getSearchWord();
+        if (searchWord != null && !searchWord.isEmpty()) {
+            mTextViewCourseSearchWord.setText("(" + currentCourse.getSearchWord() + ")");
+        } else {
+            mTextViewCourseSearchWord.setText("");
+        }
         String desc = currentCourse.getDesc();
         if (desc != null && !desc.isEmpty()) {
             mTextViewCourseDesc.setVisibility(View.VISIBLE);
@@ -262,6 +284,121 @@ public class CourseActivity extends AppCompatActivity
         }
     }
 
+    private ArrayList<String> getJointWords() {
+        RealmList<Section> sections = currentCourse.getSections();
+        ArrayList<String> jointWords = new ArrayList<>();
+
+        if (sections == null || sections.size() <= 1) {
+            showToastByForce(getString(R.string.msg_more_than_two_section));
+            return null;
+        }
+
+        String word1 = sections.get(0).getSearchWord();
+        String word2 = sections.get(1).getSearchWord();
+
+        String jointWordBetweenFirstAndSecond;
+        int indexLengthForSkip = 0;
+        for (int i = 0; i < word1.length(); i++) {
+            if (indexLengthForSkip != 0) {
+                indexLengthForSkip--;
+                continue;
+            }
+            jointWordBetweenFirstAndSecond = getJointWordDetail("", i, word1, word2);
+
+            if (jointWordBetweenFirstAndSecond.isEmpty()) {
+                continue;
+            } else {
+                if (!jointWordBetweenFirstAndSecond.trim().isEmpty()) {
+                    jointWords.add(jointWordBetweenFirstAndSecond.trim());
+                }
+                word2 = word2.replace(jointWordBetweenFirstAndSecond, "");
+                indexLengthForSkip = jointWordBetweenFirstAndSecond.length() - 1;
+            }
+        }
+
+        if (jointWords.size() == 0) {
+            showToastByForce(getString(R.string.msg_no_joint_word));
+            return null;
+        }
+
+        if (sections.size() > 2) {
+            for (int i = jointWords.size() - 1; i >= 0; i--) {
+                String jointWord = jointWords.get(i);
+                for (int j = 2; j < sections.size(); j++) {
+                    String sectionSearchWord = sections.get(j).getSearchWord();
+                    if (sectionSearchWord.contains(jointWord)) {
+                        continue;
+                    } else {
+                        jointWords.remove(i);
+                        break;
+                    }
+                }
+            }
+
+            if (jointWords.size() == 0) {
+                showToastByForce(getString(R.string.msg_no_joint_word));
+                return null;
+            }
+        }
+
+        return jointWords;
+    }
+
+    private String getJointWordDetail(String jointWord, int index, String word1, String word2) {
+        if (index != word1.length()) {
+            String targetWord = jointWord + String.valueOf(word1.charAt(index));
+
+            if (word2.contains(targetWord)) {
+                return getJointWordDetail(targetWord, index + 1, word1, word2);
+            }
+        }
+        return jointWord;
+    }
+
+    private void showSelectJointWordDialog(ArrayList<String> jointWords) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final View dialogView = getLayoutInflater().inflate(R.layout.dialog_dropdown, null);
+        builder.setView(dialogView);
+        final Spinner spinnerSection = (Spinner) dialogView.findViewById(R.id.sp_dropdown);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, jointWords);
+        spinnerSection.setAdapter(adapter);
+        spinnerSection.setSelection(0);
+
+        builder.setTitle(R.string.string_select_joint_word);
+        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setPositiveButton(R.string.string_select, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setJointWord(spinnerSection.getSelectedItem().toString());
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void setJointWord(final String jointWord) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.msg_prefix_merge_word) + jointWord + getString(R.string.msg_postfix_merge_word));
+        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setPositiveButton(R.string.string_set, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mRealm.beginTransaction();
+                currentCourse.setSearchWord(jointWord);
+                for (Section section : currentCourse.getSections()) {
+                    String beforeSectionSearchWord = section.getSearchWord();
+                    section.setSearchWord(beforeSectionSearchWord.replace(jointWord, "").trim());
+                }
+                mRealm.commitTransaction();
+                showToastByForce(getString(R.string.msg_prefix_merge_word) + jointWord + getString(R.string.msg_postfix_merge_word_result));
+                setAllTextView();
+            }
+        });
+        builder.show();
+    }
+
     private void deleteSectionConfirm(Section section) {
         RealmList<Item> sectionItems = section.getItems();
         mRealm.beginTransaction();
@@ -297,31 +434,31 @@ public class CourseActivity extends AppCompatActivity
         startActivity(webIntent);
     }
 
-    private void showCourseDialog(final String beforeTitle, final String beforeSearchWord, final String beforeDesc) {
+    private void showCourseDialog(final String beforeTitle, final String beforeDesc, final String beforeSearchWord) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final View dialogView = getLayoutInflater().inflate(R.layout.dialog_course, null);
         builder.setView(dialogView);
         final EditText editTextTitle = (EditText) dialogView.findViewById(R.id.et_course_title);
-        final EditText editTextSearchWord = (EditText) dialogView.findViewById(R.id.et_course_search_word);
         final EditText editTextDesc = (EditText) dialogView.findViewById(R.id.et_course_desc);
+        final EditText editTextSearchWord = (EditText) dialogView.findViewById(R.id.et_course_search_word);
 
         editTextTitle.setText(beforeTitle);
-        editTextSearchWord.setText(beforeSearchWord);
         editTextDesc.setText(beforeDesc);
+        editTextSearchWord.setText(beforeSearchWord);
 
         builder.setTitle(R.string.string_course_info);
-        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setNeutralButton(R.string.string_cancel, null);
         builder.setPositiveButton(R.string.string_update, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String title = editTextTitle.getText().toString();
-                String searchWord = editTextSearchWord.getText().toString();
-                String Desc = editTextDesc.getText().toString();
+                String title = editTextTitle.getText().toString().trim();
+                String Desc = editTextDesc.getText().toString().trim();
+                String searchWord = editTextSearchWord.getText().toString().trim();
 
                 mRealm.beginTransaction();
                 currentCourse.setTitle(title);
-                currentCourse.setSearchWord(searchWord);
                 currentCourse.setDesc(Desc);
+                currentCourse.setSearchWord(searchWord);
                 mRealm.commitTransaction();
                 setAllTextView();
             }
@@ -333,9 +470,9 @@ public class CourseActivity extends AppCompatActivity
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
         editTextTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-        editTextSearchWord.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-        editTextDesc.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        editTextDesc.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        editTextDesc.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        editTextSearchWord.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editTextSearchWord.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE){
@@ -356,11 +493,11 @@ public class CourseActivity extends AppCompatActivity
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String afterTitle = editTextTitle.getText().toString();
-                String afterSearchWord = editTextSearchWord.getText().toString();
                 String afterDesc = editTextDesc.getText().toString();
+                String afterSearchWord = editTextSearchWord.getText().toString();
 
-                if (!afterTitle.trim().isEmpty() && !afterSearchWord.trim().isEmpty()
-                        && (!beforeTitle.equals(afterTitle) || !beforeSearchWord.equals(afterSearchWord) || !beforeDesc.equals(afterDesc))) {
+                if (!afterTitle.trim().isEmpty()
+                        && (!beforeTitle.equals(afterTitle) || !beforeDesc.equals(afterDesc) || !beforeSearchWord.equals(afterSearchWord))) {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -372,8 +509,8 @@ public class CourseActivity extends AppCompatActivity
             }
         };
         editTextTitle.addTextChangedListener(textWatcher);
-        editTextSearchWord.addTextChangedListener(textWatcher);
         editTextDesc.addTextChangedListener(textWatcher);
+        editTextSearchWord.addTextChangedListener(textWatcher);
     }
 
     private void showSectionDialog(final int sectionId, final boolean isCreated, final String beforeTitle, final String beforeSearchWord) {
@@ -389,12 +526,12 @@ public class CourseActivity extends AppCompatActivity
         }
 
         builder.setTitle(R.string.string_section_info);
-        builder.setNegativeButton(R.string.string_cancel, null);
+        builder.setNeutralButton(R.string.string_cancel, null);
         builder.setPositiveButton(isCreated ? R.string.string_update : R.string.string_register, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String title = editTextTitle.getText().toString();
-                String searchWord = editTextSearchWord.getText().toString();
+                String title = editTextTitle.getText().toString().trim();
+                String searchWord = editTextSearchWord.getText().toString().trim();
 
                 Section section;
                 mRealm.beginTransaction();

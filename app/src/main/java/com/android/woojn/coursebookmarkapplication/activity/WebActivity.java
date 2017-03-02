@@ -69,6 +69,9 @@ public class WebActivity extends AppCompatActivity {
     private int mSectionId;
     private int mFolderId;
 
+    private boolean mLoadingFinished;
+    private boolean mRedirect;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +91,9 @@ public class WebActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String stringUrl = mEditTextWebAddress.getText().toString();
+                    if (!stringUrl.startsWith("http://") && !stringUrl.startsWith("https://")) {
+                        stringUrl = "http://" + stringUrl;
+                    }
                     mWebView.loadUrl(stringUrl);
                     setButtonsEnable();
                     mEditTextWebAddress.clearFocus();
@@ -114,15 +120,13 @@ public class WebActivity extends AppCompatActivity {
         setButtonsEnable();
 
         mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                mEditTextWebAddress.setText(url);
-                super.onPageStarted(view, url, favicon);
-            }
-
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (!mLoadingFinished) {
+                    mRedirect = true;
+                }
+                mLoadingFinished = false;
                 view.loadUrl(url);
                 return true;
             }
@@ -130,15 +134,33 @@ public class WebActivity extends AppCompatActivity {
             @TargetApi(Build.VERSION_CODES.N)
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (!mLoadingFinished) {
+                    mRedirect = true;
+                }
+                mLoadingFinished = false;
                 view.loadUrl(request.getUrl().toString());
                 mEditTextWebAddress.setText(mWebView.getUrl());
                 return true;
             }
 
             @Override
-            public void onPageFinished(WebView view, String url) {
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 mEditTextWebAddress.setText(url);
-                setButtonsEnable();
+                mLoadingFinished = false;
+                super.onPageStarted(view, url, favicon);
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (!mRedirect) {
+                    mLoadingFinished = true;
+                }
+                if (mLoadingFinished && !mRedirect) {
+                    mEditTextWebAddress.setText(url);
+                    setButtonsEnable();
+                } else {
+                    mRedirect = false;
+                }
                 super.onPageFinished(view, url);
             }
         });
@@ -234,33 +256,38 @@ public class WebActivity extends AppCompatActivity {
     }
 
     private void saveThisPage() {
-        Realm realm = Realm.getDefaultInstance();
-        int newItemId = getNewIdByClass(Item.class);
+        if (mLoadingFinished) {
+            Realm realm = Realm.getDefaultInstance();
+            int newItemId = getNewIdByClass(Item.class);
 
-        if (URLUtil.isValidUrl(mWebView.getUrl()) && Patterns.WEB_URL.matcher(mWebView.getUrl()).matches()) {
-            realm.beginTransaction();
-            Item item = realm.createObject(Item.class, newItemId);
-            item.setUrl(mWebView.getUrl());
-            item.setTitle(getString(R.string.string_default_title));
-            item.setDesc(getString(R.string.string_default_desc));
-            item.setVisited(false);
-            realm.commitTransaction();
-
-            if (mSectionId != DEFAULT_SECTION_ID) {
-                Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, mSectionId).findFirst();
+            if (URLUtil.isValidUrl(mWebView.getUrl()) && Patterns.WEB_URL.matcher(mWebView.getUrl()).matches()) {
                 realm.beginTransaction();
-                section.getItems().add(item);
+                Item item = realm.createObject(Item.class, newItemId);
+                item.setUrl(mWebView.getUrl());
+                item.setTitle(getString(R.string.string_default_title));
+                item.setDesc(getString(R.string.string_default_desc));
+                item.setVisited(false);
                 realm.commitTransaction();
+
+                if (mSectionId != DEFAULT_SECTION_ID) {
+                    Section section = realm.where(Section.class).equalTo(FIELD_NAME_ID, mSectionId).findFirst();
+                    realm.beginTransaction();
+                    section.getItems().add(item);
+                    realm.commitTransaction();
+                } else {
+                    Folder parentFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, mFolderId).findFirst();
+                    realm.beginTransaction();
+                    parentFolder.getItems().add(item);
+                    realm.commitTransaction();
+                }
+                realm.close();
+                showToastByForce(R.string.msg_save_bookmark);
             } else {
-                Folder parentFolder = realm.where(Folder.class).equalTo(FIELD_NAME_ID, mFolderId).findFirst();
-                realm.beginTransaction();
-                parentFolder.getItems().add(item);
-                realm.commitTransaction();
+                realm.close();
+                showToastByForce(R.string.msg_invalid_url_not_valid);
             }
-            realm.close();
-            showToastByForce(R.string.msg_save_bookmark);
         } else {
-            showToastByForce(R.string.msg_invalid_url_not_valid);
+            showToastByForce(R.string.msg_impossible_to_save_not_finished_loading);
         }
     }
 }

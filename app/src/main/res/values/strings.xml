@@ -86,6 +86,7 @@
     <string name="msg_invalid_url_home">적합한 주소가 아니므로 홈페이지로 연결합니다.</string>
     <string name="msg_invalid_url_not_contain_http">웹 주소가 아니므로 저장할 수 없습니다.</string>
     <string name="msg_invalid_url_not_valid">적합한 웹 주소가 아닙니다.</string>
+    <string name="msg_impossible_to_save_not_finished_loading">완전히 로딩된 후에 저장할 수 있습니다.</string>
     <string name="msg_prefix_save">[</string>
     <string name="msg_postfix_save">] 폴더로 저장되었습니다.</string>
     <string name="msg_prefix_move_or_copy">[</string>

@@ -26,3 +26,4 @@ CoBookE는 북마크를 관리하는 데에 있어 차별화된 강점을 가지
 - [x] #21 Develop item tab & Enhance share function
 - [x] #25 Complete developing app & Prepare showcase
 - [x] #32 Enhance some functions & Make new showcase page
+- [ ] #34 Solve all problems in issues

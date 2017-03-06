@@ -19,6 +19,7 @@ CoBookE는 북마크를 관리하는 데에 있어 차별화된 강점을 가지
 
 ## 개발 진행 상황
 
+### 출시 전
 - [x] #2 Basic Structure
 - [x] #8 Design UI roughly (with fake data)
 - [x] #11 DB Linkage
@@ -26,4 +27,7 @@ CoBookE는 북마크를 관리하는 데에 있어 차별화된 강점을 가지
 - [x] #21 Develop item tab & Enhance share function
 - [x] #25 Complete developing app & Prepare showcase
 - [x] #32 Enhance some functions & Make new showcase page
-- [ ] #34 Solve all problems in issues
+- [x] #34 Solve all problems in issues
+
+### 출시 후
+사용자 리뷰 확인 후 작업 예정

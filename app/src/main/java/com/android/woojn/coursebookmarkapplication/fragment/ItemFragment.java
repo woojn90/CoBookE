@@ -3,6 +3,7 @@ package com.android.woojn.coursebookmarkapplication.fragment;
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_FOLDER_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_TITLE;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_FOLDER_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_SECTION_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_STRING_URL;
@@ -57,6 +58,7 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 /**
  * Created by wjn on 2017-02-16.
@@ -360,6 +362,9 @@ public class ItemFragment extends Fragment
             mRecyclerViewFolder.setAdapter(new FolderAdapter(getContext(), mFolders, ItemFragment.this));
             mRecyclerViewItem.setAdapter(new ItemAdapter(getContext(), mItems, ItemFragment.this));
         }
+        if (getContext().getString(R.string.pref_key_sort_item).equals(key)) {
+            setRecyclerViewAdapter();
+        }
     }
 
     private void showToastByForce(int resId) {
@@ -386,10 +391,22 @@ public class ItemFragment extends Fragment
 
     private void setRecyclerViewAdapter() {
         toggleUpArrowImageView();
-
         Folder currentFolder = mRealm.where(Folder.class).equalTo(FIELD_NAME_ID, currentFolderId).findFirst();
-        mFolders = currentFolder.getFolders().sort(FIELD_NAME_ID);
-        mItems = currentFolder.getItems().sort(FIELD_NAME_ID);
+
+        String sort = mSharedPreferences.getString(getString(R.string.pref_key_sort_item), getString(R.string.string_sort_latest));
+        if (getString(R.string.string_sort_abc).equals(sort)) {
+            mFolders = currentFolder.getFolders().sort(FIELD_NAME_TITLE);
+            mItems = currentFolder.getItems().sort(FIELD_NAME_TITLE);
+        } else if (getString(R.string.string_sort_cba).equals(sort)) {
+            mFolders = currentFolder.getFolders().sort(FIELD_NAME_TITLE, Sort.DESCENDING);
+            mItems = currentFolder.getItems().sort(FIELD_NAME_TITLE, Sort.DESCENDING);
+        } else if (getString(R.string.string_sort_latest).equals(sort)) {
+            mFolders = currentFolder.getFolders().sort(FIELD_NAME_ID);
+            mItems = currentFolder.getItems().sort(FIELD_NAME_ID);
+        } else if (getString(R.string.string_sort_earliest).equals(sort)) {
+            mFolders = currentFolder.getFolders().sort(FIELD_NAME_ID, Sort.DESCENDING);
+            mItems = currentFolder.getItems().sort(FIELD_NAME_ID, Sort.DESCENDING);
+        }
         mRecyclerViewFolder.setAdapter(new FolderAdapter(getContext(), mFolders, this));
         mRecyclerViewItem.setAdapter(new ItemAdapter(getContext(), mItems, this));
 

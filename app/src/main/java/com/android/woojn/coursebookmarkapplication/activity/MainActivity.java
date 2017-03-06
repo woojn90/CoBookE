@@ -10,6 +10,7 @@ import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.in
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.insertInitialData;
 import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.toggleGridColumn;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,11 +19,13 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.android.woojn.coursebookmarkapplication.R;
@@ -176,6 +179,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_change_grid:
                 toggleGridColumn(this, item);
                 break;
+            case R.id.action_sort:
+                showSortSelectionDialog();
+                break;
             case R.id.action_help:
                 showOnboarderActivity();
                 return true;
@@ -185,6 +191,44 @@ public class MainActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showSortSelectionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice);
+        adapter.add(getString(R.string.string_sort_abc));
+        adapter.add(getString(R.string.string_sort_cba));
+        adapter.add(getString(R.string.string_sort_latest));
+        adapter.add(getString(R.string.string_sort_earliest));
+
+        String beforeSort;
+        if (mTabLayout.getSelectedTabPosition() == PAGE_COURSE) {
+            beforeSort = mSharedPreferences.getString(getString(R.string.pref_key_sort_course), getString(R.string.string_sort_latest));
+        } else {
+            beforeSort = mSharedPreferences.getString(getString(R.string.pref_key_sort_item), getString(R.string.string_sort_latest));
+        }
+        int index = 0;
+        for (int i = 0; i < adapter.getCount(); i++) {
+            if (beforeSort.equals(adapter.getItem(i))) {
+                index = i;
+            }
+        }
+
+        builder.setTitle(R.string.string_sort_select);
+        builder.setSingleChoiceItems(adapter, index, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                if (mTabLayout.getSelectedTabPosition() == PAGE_COURSE) {
+                    editor.putString(getString(R.string.pref_key_sort_course), adapter.getItem(which));
+                } else {
+                    editor.putString(getString(R.string.pref_key_sort_item), adapter.getItem(which));
+                }
+                editor.apply();
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
 
     private void showOnboarderActivity() {

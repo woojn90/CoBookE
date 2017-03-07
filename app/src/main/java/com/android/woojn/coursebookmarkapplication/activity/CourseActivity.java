@@ -193,7 +193,7 @@ public class CourseActivity extends AppCompatActivity
     @Override
     public void onItemDoubleTap(int id) {
         Section section = mRealm.where(Section.class).equalTo(FIELD_NAME_ID, id).findFirst();
-        showSectionDialog(section.getId(), true, section.getTitle(), section.getSearchWord());
+        showSectionDialog(section.getId(), true, section.getTitle(), section.getSearchWord(), section.getSearchEngine());
     }
 
     @OnClick({R.id.iv_favorite_y_course, R.id.iv_favorite_n_course})
@@ -204,7 +204,8 @@ public class CourseActivity extends AppCompatActivity
     @OnClick(R.id.fab_insert_section)
     protected void onClickFloatingActionButton() {
         int newSectionId = getNewIdByClass(Section.class);
-        showSectionDialog(newSectionId, false, "", "");
+        showSectionDialog(newSectionId, false, "", "",
+                mSharedPreferences.getString(getString(R.string.pref_key_target_of_auto_search), getString(R.string.pref_value_target_of_auto_search_naver_total)));
     }
 
     private void showToastByForce(int resId) {
@@ -412,8 +413,7 @@ public class CourseActivity extends AppCompatActivity
     }
 
     private void searchAndShowResults(Section section) {
-        String searchEngine = mSharedPreferences.getString(getString(R.string.pref_key_target_of_auto_search),
-                getString(R.string.pref_value_target_of_auto_search_naver_total));
+        String searchEngine = section.getSearchEngine();
         String query = currentCourse.getSearchWord() + " " + section.getSearchWord();
 
         if (getString(R.string.pref_value_target_of_auto_search_instagram).equals(searchEngine)) {
@@ -467,7 +467,6 @@ public class CourseActivity extends AppCompatActivity
         final AlertDialog alertDialog = builder.create();
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
         editTextTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         editTextDesc.setImeOptions(EditorInfo.IME_ACTION_NEXT);
@@ -493,11 +492,8 @@ public class CourseActivity extends AppCompatActivity
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String afterTitle = editTextTitle.getText().toString();
-                String afterDesc = editTextDesc.getText().toString();
-                String afterSearchWord = editTextSearchWord.getText().toString();
 
-                if (!afterTitle.trim().isEmpty()
-                        && (!beforeTitle.equals(afterTitle) || !beforeDesc.equals(afterDesc) || !beforeSearchWord.equals(afterSearchWord))) {
+                if (!afterTitle.trim().isEmpty()) {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -513,13 +509,16 @@ public class CourseActivity extends AppCompatActivity
         editTextSearchWord.addTextChangedListener(textWatcher);
     }
 
-    private void showSectionDialog(final int sectionId, final boolean isCreated, final String beforeTitle, final String beforeSearchWord) {
+    private void showSectionDialog(final int sectionId, final boolean isCreated, final String beforeTitle,
+            final String beforeSearchWord, final String valueOfSearchEngine) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final View dialogView = getLayoutInflater().inflate(R.layout.dialog_section, null);
         builder.setView(dialogView);
         final EditText editTextTitle = (EditText) dialogView.findViewById(R.id.et_section_title);
         final EditText editTextSearchWord = (EditText) dialogView.findViewById(R.id.et_section_search_word);
+        final Spinner spinnerSearchEngine = (Spinner) dialogView.findViewById(R.id.sp_search_engine);
 
+        setSpinnerData(spinnerSearchEngine, valueOfSearchEngine);
         if (isCreated) {
             editTextTitle.setText(beforeTitle);
             editTextSearchWord.setText(beforeSearchWord);
@@ -547,6 +546,7 @@ public class CourseActivity extends AppCompatActivity
                     currentCourse.getSections().add(section);
                     updateTextViewEmptyVisibility(Section.class, currentCourse.getId(), mTextViewSectionEmpty);
                 }
+                section.setSearchEngine(((SearchEngine)spinnerSearchEngine.getSelectedItem()).getValue());
                 mRealm.commitTransaction();
             }
         });
@@ -554,7 +554,7 @@ public class CourseActivity extends AppCompatActivity
         final AlertDialog alertDialog = builder.create();
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        if (!isCreated) alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
         editTextTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         editTextSearchWord.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -581,8 +581,7 @@ public class CourseActivity extends AppCompatActivity
                 String afterTitle = editTextTitle.getText().toString();
                 String afterSearchWord = editTextSearchWord.getText().toString();
 
-                if (!afterTitle.trim().isEmpty() && !afterSearchWord.trim().isEmpty()
-                        && (!beforeTitle.equals(afterTitle) || !beforeSearchWord.equals(afterSearchWord))) {
+                if (!afterTitle.trim().isEmpty() && !afterSearchWord.trim().isEmpty()) {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -595,6 +594,49 @@ public class CourseActivity extends AppCompatActivity
         };
         editTextTitle.addTextChangedListener(textWatcher);
         editTextSearchWord.addTextChangedListener(textWatcher);
+    }
+
+    private void setSpinnerData(Spinner spinner, String value) {
+        ArrayList<SearchEngine> searchEngines = new ArrayList<>();
+        searchEngines.add(new SearchEngine(getString(R.string.pref_value_target_of_auto_search_naver_total),
+                getString(R.string.pref_label_target_of_auto_search_naver_total)));
+        searchEngines.add(new SearchEngine(getString(R.string.pref_value_target_of_auto_search_naver_blog),
+                getString(R.string.pref_label_target_of_auto_search_naver_blog)));
+        searchEngines.add(new SearchEngine(getString(R.string.pref_value_target_of_auto_search_google),
+                getString(R.string.pref_label_target_of_auto_search_google)));
+        searchEngines.add(new SearchEngine(getString(R.string.pref_value_target_of_auto_search_instagram),
+                getString(R.string.pref_label_target_of_auto_search_instagram)));
+
+        ArrayAdapter<SearchEngine> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, searchEngines);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0);
+        if (value != null && !value.isEmpty()) {
+            for (int i = 0; i < searchEngines.size(); i++) {
+                if (value.equals(searchEngines.get(i).getValue())) {
+                    spinner.setSelection(i);
+                    return;
+                }
+            }
+        }
+    }
+
+    class SearchEngine {
+        private String value;
+        private String label;
+
+        public SearchEngine(String value, String label) {
+            this.value = value;
+            this.label = label;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
     }
 
     private void retrieveSectionItemById(int itemId) {

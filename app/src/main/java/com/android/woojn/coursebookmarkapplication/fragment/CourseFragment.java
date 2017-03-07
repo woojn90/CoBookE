@@ -3,15 +3,17 @@ package com.android.woojn.coursebookmarkapplication.fragment;
 import static com.android.woojn.coursebookmarkapplication.Constants.DEFAULT_VIEW_ID;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_FAVORITE;
 import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_ID;
+import static com.android.woojn.coursebookmarkapplication.Constants.FIELD_NAME_TITLE;
 import static com.android.woojn.coursebookmarkapplication.Constants.KEY_COURSE_ID;
 import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.getNewIdByClass;
-import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility
-        .updateTextViewEmptyVisibility;
+import static com.android.woojn.coursebookmarkapplication.util.RealmDbUtility.updateTextViewEmptyVisibility;
 import static com.android.woojn.coursebookmarkapplication.util.SettingUtility.isDeleteWithConfirm;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -47,7 +49,8 @@ import io.realm.Sort;
  * Created by wjn on 2017-02-16.
  */
 
-public class CourseFragment extends Fragment implements CourseAdapter.OnRecyclerViewClickListener{
+public class CourseFragment extends Fragment implements CourseAdapter.OnRecyclerViewClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     @BindView(R.id.tv_course_empty)
     protected TextView mTextViewCourseEmpty;
@@ -55,12 +58,16 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
     protected RecyclerView mRecyclerViewCourse;
 
     private Realm mRealm;
+    private SharedPreferences mSharedPreferences;
     private Toast mToast;
+    private RealmResults<Course> mCourses;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRealm = Realm.getDefaultInstance();
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -68,10 +75,8 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         View rootView = inflater.inflate(R.layout.fragment_course, container, false);
         ButterKnife.bind(this, rootView);
 
-        RealmResults<Course> courses = mRealm.where(Course.class).findAllSorted(FIELD_NAME_ID)
-                .sort(FIELD_NAME_FAVORITE, Sort.DESCENDING);
         mRecyclerViewCourse.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerViewCourse.setAdapter(new CourseAdapter(getContext(), courses, this));
+        setRecyclerViewAdapter();
 
         FloatingActionButton fabInsertCourse = (FloatingActionButton) getActivity().findViewById(R.id.fab_insert_course);
         fabInsertCourse.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +99,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
     public void onDestroy() {
         super.onDestroy();
         mRealm.close();
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -121,12 +127,38 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         showCourseDialog(course.getId(), true, course.getTitle(), course.getDesc(), course.getSearchWord());
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (getContext().getString(R.string.pref_key_sort_course).equals(key)) {
+            setRecyclerViewAdapter();
+        }
+    }
+
     private void showToastByForce(int resId) {
         if (mToast != null) {
             mToast.cancel();
         }
         mToast = Toast.makeText(getContext(), resId, Toast.LENGTH_LONG);
         mToast.show();
+    }
+
+    private void setRecyclerViewAdapter() {
+        String sort = mSharedPreferences.getString(getString(R.string.pref_key_sort_course), getString(R.string.string_sort_latest));
+
+        if (getString(R.string.string_sort_abc).equals(sort)) {
+            mCourses = mRealm.where(Course.class).findAllSorted(FIELD_NAME_TITLE)
+                    .sort(FIELD_NAME_FAVORITE, Sort.DESCENDING);
+        } else if (getString(R.string.string_sort_cba).equals(sort)) {
+            mCourses = mRealm.where(Course.class).findAllSorted(FIELD_NAME_TITLE, Sort.DESCENDING)
+                    .sort(FIELD_NAME_FAVORITE, Sort.DESCENDING);
+        } else if (getString(R.string.string_sort_latest).equals(sort)) {
+            mCourses = mRealm.where(Course.class).findAllSorted(FIELD_NAME_ID)
+                    .sort(FIELD_NAME_FAVORITE, Sort.DESCENDING);
+        } else if (getString(R.string.string_sort_earliest).equals(sort)) {
+            mCourses = mRealm.where(Course.class).findAllSorted(FIELD_NAME_ID, Sort.DESCENDING)
+                    .sort(FIELD_NAME_FAVORITE, Sort.DESCENDING);
+        }
+        mRecyclerViewCourse.setAdapter(new CourseAdapter(getContext(), mCourses, this));
     }
 
     private void toggleCourseFavorite(final Course course) {
@@ -218,7 +250,6 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
                     Intent insertIntent = new Intent(getContext(), CourseActivity.class);
                     insertIntent.putExtra(KEY_COURSE_ID, courseId);
                     startActivity(insertIntent);
-
                     updateTextViewEmptyVisibility(Course.class, 0, mTextViewCourseEmpty);
                 }
                 mRealm.commitTransaction();
@@ -228,7 +259,7 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
         final AlertDialog alertDialog = builder.create();
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        if (!isCreated) alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
         editTextTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         editTextDesc.setImeOptions(EditorInfo.IME_ACTION_NEXT);
@@ -254,11 +285,8 @@ public class CourseFragment extends Fragment implements CourseAdapter.OnRecycler
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String afterTitle = editTextTitle.getText().toString();
-                String afterDesc = editTextDesc.getText().toString();
-                String afterSearchWord = editTextSearchWord.getText().toString();
 
-                if (!afterTitle.trim().isEmpty()
-                        && (!beforeTitle.equals(afterTitle) || !beforeDesc.equals(afterDesc) || !beforeSearchWord.equals(afterSearchWord))) {
+                if (!afterTitle.trim().isEmpty()) {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);

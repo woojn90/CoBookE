@@ -12,6 +12,7 @@
     <string name="menu_help">사용방법</string>
     <string name="menu_setting">설정하기</string>
     <string name="menu_change_grid">그리드 변경</string>
+    <string name="menu_sort">정렬하기</string>
     <string name="menu_merge_word">공통단어 뽑기</string>
     <string name="menu_share">공유하기</string>
     <string name="menu_search">검색하기</string>
@@ -34,12 +35,14 @@
     <string name="string_select">선택</string>
     <string name="string_set">설정</string>
     <string name="string_search_word">검색어</string>
+    <string name="string_search_engine">검색엔진</string>
     <string name="string_course_info">코스 정보</string>
     <string name="string_section_info">코스 그룹 정보</string>
     <string name="string_section_select">코스 그룹 선택</string>
     <string name="string_item_info">항목 정보</string>
     <string name="string_folder_info">폴더 정보</string>
     <string name="string_folder_select">폴더 선택</string>
+    <string name="string_sort_select">정렬 방식 선택</string>
     <string name="string_save">저장</string>
     <string name="string_save_and_run">저장 후 앱실행</string>
     <string name="string_home">Home</string>
@@ -81,10 +84,12 @@
     <string name="msg_postfix_merge_word_result">]로 설정하였습니다.</string>
     <string name="msg_no_joint_word">모든 그룹에 공통으로 포함된 검색어가 없습니다.</string>
     <string name="msg_more_than_two_section">코스 그룹이 2개 이상일 때만 가능합니다.</string>
+    <string name="msg_license_asset_problem">라이센스 내용을 로딩에 문제가 발생했습니다. 개발자에 문의부탁드립니다.</string>
 
     <string name="msg_invalid_url_home">적합한 주소가 아니므로 홈페이지로 연결합니다.</string>
     <string name="msg_invalid_url_not_contain_http">웹 주소가 아니므로 저장할 수 없습니다.</string>
     <string name="msg_invalid_url_not_valid">적합한 웹 주소가 아닙니다.</string>
+    <string name="msg_impossible_to_save_not_finished_loading">완전히 로딩된 후에 저장할 수 있습니다.</string>
     <string name="msg_prefix_save">[</string>
     <string name="msg_postfix_save">] 폴더로 저장되었습니다.</string>
     <string name="msg_prefix_move_or_copy">[</string>
@@ -111,7 +116,7 @@
     <string name="pref_value_home_page_google">http://www.google.com</string>
     <string name="pref_value_home_page_daum">http://m.daum.net</string>
 
-    <string name="pref_label_target_of_auto_search">자동 검색 대상</string>
+    <string name="pref_label_target_of_auto_search">검색 엔진 기본값 (코스 그룹)</string>
     <string name="pref_key_target_of_auto_search" translatable="false">target_of_auto_search</string>
     <string name="pref_label_target_of_auto_search_naver_total">네이버(전체)</string>
     <string name="pref_label_target_of_auto_search_naver_blog">네이버(블로그)</string>
@@ -132,7 +137,7 @@
     <string name="settings_title_download_backup_file">백업 가져오기(업데이트 예정)</string>
     <string name="settings_summary_download_backup_file">저장해둔 파일을 앱으로 불러옵니다.</string>
 
-    <string name="pref_label_tab_index">초기 선택 Tab</string>
+    <string name="pref_label_tab_index">최초 선택 Tab</string>
     <string name="pref_key_tab_index" translatable="false">tab</string>
 
     <string name="settings_key_delete_with_confirm" translatable="false">delete_with_confirm</string>
@@ -150,5 +155,12 @@
 
     <string name="pref_key_item_number_of_grid_column" translatable="false">number_of_column</string>
     <string name="pref_key_zero_means_first_run" translatable="false">first_run</string>
+    <string name="pref_key_sort_course" translatable="false">sort_course</string>
+    <string name="pref_key_sort_item" translatable="false">sort_item</string>
+
+    <string name="string_sort_abc">가나다 순</string>
+    <string name="string_sort_cba">가나다 역순</string>
+    <string name="string_sort_latest">최근 저장 순</string>
+    <string name="string_sort_earliest">최근 저장 역순</string>
 
 </resources>

@@ -26,4 +26,15 @@
             android:layout_marginStart="@dimen/margin_left_of_edit_text"
             android:hint="@string/hint_section_search_word"/>
     </TableRow>
+    <TableRow>
+        <TextView
+            style="@style/TextViewInDialog"
+            android:text="@string/string_search_engine"/>
+        <Spinner
+            android:id="@+id/sp_search_engine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_left_of_edit_text"
+            android:layout_marginStart="@dimen/margin_left_of_edit_text"/>
+    </TableRow>
 </TableLayout>

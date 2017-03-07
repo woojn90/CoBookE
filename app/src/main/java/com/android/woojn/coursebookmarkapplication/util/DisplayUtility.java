@@ -73,7 +73,6 @@ public class DisplayUtility {
         final AlertDialog alertDialog = builder.create();
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
         editTextTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         editTextDesc.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -100,8 +99,7 @@ public class DisplayUtility {
                 String afterTitle = editTextTitle.getText().toString();
                 String afterDesc = editTextDesc.getText().toString();
 
-                if (!afterTitle.trim().isEmpty() && !afterDesc.trim().isEmpty()
-                        && (!beforeTitle.equals(afterTitle) || !beforeDesc.equals(afterDesc))) {
+                if (!afterTitle.trim().isEmpty() && !afterDesc.trim().isEmpty()) {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -143,7 +141,6 @@ public class DisplayUtility {
         final AlertDialog alertDialog = builder.create();
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         editTextTitle.requestFocus();
         editTextTitle.setImeOptions(EditorInfo.IME_ACTION_DONE);
         editTextTitle.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -168,7 +165,7 @@ public class DisplayUtility {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String afterTitle = editTextTitle.getText().toString();
 
-                if (!afterTitle.trim().isEmpty() && !beforeTitle.equals(afterTitle)) {
+                if (!afterTitle.trim().isEmpty()) {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 } else {
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);

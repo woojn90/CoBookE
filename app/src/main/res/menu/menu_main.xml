@@ -6,12 +6,18 @@
         android:orderInCategory="1"
         android:title="@string/menu_change_grid"
         android:icon="@drawable/ic_fab_grid_3x3"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
     <item
+        android:id="@+id/action_sort"
         android:orderInCategory="2"
+        android:title="@string/menu_sort"
+        android:icon="@drawable/ic_sort"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:orderInCategory="3"
         android:title="@string/menu_overflow"
         android:icon="@drawable/ic_action_overflow"
-        app:showAsAction="always">
+        app:showAsAction="ifRoom">
         <menu>
             <item
                 android:id="@+id/action_help"

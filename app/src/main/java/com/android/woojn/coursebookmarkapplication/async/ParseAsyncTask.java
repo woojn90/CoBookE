@@ -32,7 +32,6 @@ public class ParseAsyncTask extends AsyncTask<Integer, Void, Void> {
 
             Elements ogTags = doc.select("meta[property^=og:]");
             if (ogTags.size() <= 0) {
-                // TODO: og: 태그 없을 때 다른 tag로 찾기 enhance
                 Elements imgSrcPrefixHttp = doc.select("img[src^=http]");
 
                 realm.beginTransaction();

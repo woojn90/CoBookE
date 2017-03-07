@@ -14,6 +14,8 @@ public class Section extends RealmObject {
     private int id;
     private String title;
     private String searchWord;
+    private String searchEngine;
+
     private RealmList<Item> items;
 
     public int getId() {
@@ -34,6 +36,14 @@ public class Section extends RealmObject {
 
     public void setSearchWord(String searchWord) {
         this.searchWord = searchWord;
+    }
+
+    public String getSearchEngine() {
+        return searchEngine;
+    }
+
+    public void setSearchEngine(String searchEngine) {
+        this.searchEngine = searchEngine;
     }
 
     public RealmList<Item> getItems() {

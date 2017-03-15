@@ -1,4 +1,4 @@
-﻿# CoBookE (Course Bookmark with Efficiency)
+# CoBookE (Course Bookmark with Efficiency)
 [![Build Status](https://travis-ci.org/woojn90/CoBookE.svg?branch=master)](https://travis-ci.org/woojn90/CoBookE)
 
 ## 소개
